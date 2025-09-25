@@ -14,11 +14,34 @@ project ("HCI")
 # [VCPKG] Find packages
 find_package(fmt CONFIG REQUIRED)
 
+find_package(glm           CONFIG REQUIRED)
+find_package(GLEW                 REQUIRED)
+find_package(glfw3         CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+
+if(WIN32)
+    find_package(OpenCV CONFIG REQUIRED PATHS "c:/HCI/opencv/build")
+elseif(UNIX)
+    find_package(OpenCV CONFIG REQUIRED)
+endif()
+
 # Add source to this project's executable.
 add_executable(HCI "HCI.cpp" "HCI.hpp")
 
 # [VCPKG] target libraries
-target_link_libraries(HCI PRIVATE fmt::fmt)
+target_link_libraries(HCI PRIVATE
+    fmt::fmt
+    GLEW::GLEW
+    glfw
+    glm::glm
+    nlohmann_json::nlohmann_json
+    ${OpenCV_LIBS}
+)
+
+target_include_directories(HCI PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${OpenCV_INCLUDE_DIRS}
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET HCI PROPERTY CXX_STANDARD 20)
