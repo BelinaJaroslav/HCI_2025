@@ -45,6 +45,10 @@ target_include_directories(HCI PRIVATE
     ${OpenCV_INCLUDE_DIRS}
 )
 
+# Copy resources into the build folder so relative paths work
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/App/Resources 
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/App/)
+
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET HCI PROPERTY CXX_STANDARD 20)
 endif()

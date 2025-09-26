@@ -1,5 +1,12 @@
 # Jak hoblovat
 
+## Branche
+
+```shell
+# Vytvoří lokálně novou branch a přepne do ní
+git checkout -b "feat/lab01task01"
+```
+
 ## Jak to spustit u sebe ve VS
 
 * Je potřeba mít:
