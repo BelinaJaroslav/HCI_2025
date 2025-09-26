@@ -12,7 +12,6 @@ project("HCI")
 
 # [VCPKG] Find packages
 find_package(fmt CONFIG REQUIRED)
-
 find_package(glm           CONFIG REQUIRED)
 find_package(GLEW                 REQUIRED)
 find_package(glfw3         CONFIG REQUIRED)
@@ -24,8 +23,12 @@ elseif(UNIX)
     find_package(OpenCV CONFIG REQUIRED)
 endif()
 
+file(GLOB_RECURSE SOURCES 
+    "${PROJECT_SOURCE_DIR}/App/*.cpp"
+)
+
 # Add source to this project's executable.
-add_executable(HCI "HCI.cpp" "HCI.hpp")
+add_executable(HCI "HCI.cpp" ${SOURCES})
 
 # [VCPKG] target libraries
 target_link_libraries(HCI PRIVATE
