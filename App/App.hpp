@@ -19,6 +19,8 @@ private:
     cv::Point2f find_object_luma(cv::Mat& frame, unsigned char threshold) const;
     void draw_cross_normalized(cv::Mat& img, cv::Point2f center_normalized, int size) const;
 
+    cv::Point2f find_object_chroma(cv::Mat& frame) const;
+
     // Lab 02
     // Lab 03
     // Lab 04
