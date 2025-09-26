@@ -2,7 +2,6 @@
 
 #include <fmt/core.h>
 
-// Task 01
 void App::IdentifyObjectByLuminance() const
 {
     const unsigned char THRESHOLD = 248;
@@ -108,22 +107,4 @@ void App::draw_cross_normalized(cv::Mat& img, cv::Point2f center_normalized, int
 
     cv::line(img, p1, p2, CV_RGB(255, 0, 0), 2);
     cv::line(img, p3, p4, CV_RGB(255, 0, 0), 2);
-}
-
-// Task 02
-void App::FindRedObjectInImage() const
-{
-
-}
-
-// Task 03
-void App::FindRedObjectInVideo() const
-{
-
-}
-
-// Task 04
-void App::FindFaceInVideo() const
-{
-
 }

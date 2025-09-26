@@ -5,6 +5,18 @@
 ```shell
 # Vytvoří lokálně novou branch a přepne do ní
 git checkout -b "feat/lab01task01"
+
+# Klasika dokud není konkrétní zadání hotovo
+git add .
+git commit -m "..."
+git push origin feat/lab01task01
+
+# Na GitHubu se udělá Pull Request & Merge do main větve
+# Případně vyřešit konflikty
+
+# Merge z GitHubu je potřeba si synchronizovat lokálně
+git checkout main
+git pull origin main
 ```
 
 ## Jak to spustit u sebe ve VS
