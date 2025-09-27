@@ -19,7 +19,7 @@ bool App::Init()
 void App::Run()
 {
     // Lab 01 Task 01
-    IdentifyObjectByLuminance();
+    //IdentifyObjectByLuminance();
     // Lab 01 Task 02
     FindRedObjectInImage();
     // Lab 01 Task 03

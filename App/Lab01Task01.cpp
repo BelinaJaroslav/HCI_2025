@@ -24,8 +24,8 @@ void App::IdentifyObjectByLuminance() const
     fmt::println("Took {} seconds.", elapsed_seconds.count());
 
     // Draw the center into both images and show the result
-    draw_cross_normalized(frame_orig, center_normalized, 20);
-    draw_cross_normalized(frame_edit, center_normalized, 20);
+    draw_cross_normalized(frame_orig, center_normalized, 20, CV_RGB(255, 0, 0));
+    draw_cross_normalized(frame_edit, center_normalized, 20, CV_RGB(255, 0, 0));
 
     auto win1_name = "Original image";
     cv::namedWindow(win1_name);
@@ -91,7 +91,7 @@ cv::Point2f App::find_object_luma(cv::Mat& frame, unsigned char threshold) const
     return center_normalized;
 }
 
-void App::draw_cross_normalized(cv::Mat& img, cv::Point2f center_normalized, int size) const
+void App::draw_cross_normalized(cv::Mat& img, cv::Point2f center_normalized, int size, cv::Scalar color) const
 {
     // Author: JJ
     center_normalized.x = std::clamp(center_normalized.x, 0.0f, 1.0f);
@@ -105,6 +105,6 @@ void App::draw_cross_normalized(cv::Mat& img, cv::Point2f center_normalized, int
     cv::Point2f p3(center_absolute.x, center_absolute.y - size / 2);
     cv::Point2f p4(center_absolute.x, center_absolute.y + size / 2);
 
-    cv::line(img, p1, p2, CV_RGB(255, 0, 0), 2);
-    cv::line(img, p3, p4, CV_RGB(255, 0, 0), 2);
+    cv::line(img, p1, p2, color, 2);
+    cv::line(img, p3, p4, color, 2);
 }
