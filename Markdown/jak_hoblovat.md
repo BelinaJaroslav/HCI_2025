@@ -19,6 +19,10 @@ git checkout main
 git pull origin main
 ```
 
+Potom, co se úspešně zmerguje, je možné již nepotřebnou branch smazat na GitHubu (ve webovém UI) a u sebe pomocí `git branch -D feat/lab01task01`.
+
+Všechny větve, o kterých lokál ví, lze vypsat pomocí `git branch -v`.
+
 ## Jak to spustit u sebe ve VS
 
 * Je potřeba mít:

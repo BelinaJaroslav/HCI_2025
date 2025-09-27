@@ -11,7 +11,14 @@ void App::FindRedObjectInImage() const
     cv::Mat frame_orig = cv::imread("App/Resources/red_cup.jpg");
     if (frame_orig.empty()) throw std::runtime_error("Empty file? Wrong path?");
 
-    auto center_normalized = find_red_object_chroma(frame_orig);
+    // Find the center and measure the time it takes
+    auto start = std::chrono::steady_clock::now();
+    //
+    auto center_normalized = find_red_object_chroma(frame_orig); // Aprrox 60 ms on 1280x945 image, too slow for 60 fps, must scale down the image
+    //
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    fmt::println("Took {} milliseconds.", elapsed_seconds.count() * 1000);    
 
     auto win1_name = "Original image";
     cv::namedWindow(win1_name);
@@ -76,7 +83,7 @@ cv::Point2f App::find_red_object_chroma(cv::Mat& frame) const
     return center_normalized;
 }
 
-// (Not tested), Find anything (except red) in the image `frame`, search is done using HSV values between threshold_lower & threshold_upper
+// Find anything (except red) in the image `frame`, search is done using HSV values between threshold_lower & threshold_upper
 cv::Point2f App::find_object_chroma(cv::Mat& frame, cv::Scalar threshold_lower, cv::Scalar threshold_upper) const
 {
     cv::Mat frame_edit;

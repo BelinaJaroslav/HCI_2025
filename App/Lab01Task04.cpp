@@ -6,4 +6,5 @@ void App::FindFaceInVideo() const
 {
     fmt::println("== Lab 01 Task 04 ==");
 
+    //TODO: Find the center of your face =)
 }

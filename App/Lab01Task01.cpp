@@ -18,10 +18,12 @@ void App::IdentifyObjectByLuminance() const
 
     // Find the center and measure the time it takes
     auto start = std::chrono::steady_clock::now();
+    //
     auto center_normalized = find_object_luma(frame_edit, THRESHOLD);
+    //
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
-    fmt::println("Took {} seconds.", elapsed_seconds.count());
+    fmt::println("Took {} milliseconds.", elapsed_seconds.count() * 1000);
 
     // Draw the center into both images and show the result
     draw_cross_normalized(frame_orig, center_normalized, 20, CV_RGB(255, 0, 0));
