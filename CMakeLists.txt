@@ -18,7 +18,7 @@ find_package(glfw3         CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
 if(WIN32)
-    find_package(OpenCV CONFIG REQUIRED PATHS "c:/HCI/opencv/build")
+    find_package(OpenCV CONFIG REQUIRED PATHS "c:/HCI/opencv/build" "C:/Users/jaroslav/source/repos/HCI_2025/opencv/build")
 elseif(UNIX)
     find_package(OpenCV CONFIG REQUIRED)
 endif()
