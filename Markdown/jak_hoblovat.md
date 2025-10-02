@@ -50,12 +50,11 @@ Všechny větve, o kterých lokál ví, lze vypsat pomocí `git branch -v`.
 
 * Potom:
   * Otevřít VS launcher
-  * _Open a local folder_ a vybrat tuhle složku (tento repozitář) &ensp;(nikoliv _Open a project or solution_)
+  * _Open a local folder_ a vybrat složku s projektem &ensp;(nikoliv _Open a project or solution_)
   * Nechat to chroupat dokud se v _Output_ neobjeví `1> CMake generation finished.`
-  * Teď přichází haluz: je potřeba spustit _Build_ → _Build All_, ta možnost tam ale nejspíš nebude. Její objevení jsem vyvoval tak, že jsem si otevřel `HCI.cpp`, nahoře se objeví žluté oznámení → kliknout na _Generate_, načež se objeví další oznámení → kliknout na _vcpkg_.
-  * Nyní už můžeme dát _Build_ → _Build All_
-  * Spustit projekt, vybrat HCI.exe
-  * Měla by se objevit konzole s pozdravem
+  * Nahoře v selectu změnit _default_ na _vcpkg_
+  * Nyní můžeme dát _Build_ → _Build All_ &ensp;(Ctrl + Shift + B)
+  * U zelené šipky vybrat HCI.exe a spustit
 
 ### OpenCV
 

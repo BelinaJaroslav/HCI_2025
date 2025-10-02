@@ -1,14 +1,10 @@
 #include "App.hpp"
+
 #include <fmt/core.h>
 #include <chrono>
 
-
 void App::lab_find_face_in_video()
 {
-    if (!face_cascade.load("App/Resources/haarcascade_frontalface_default.xml")) {
-        fmt::println("Error loading face cascade.");
-    }
-
 	cv::Mat frame; // for captured frame 
     do {
         //auto start = std::chrono::steady_clock::now();
@@ -20,7 +16,11 @@ void App::lab_find_face_in_video()
         }
 
         // Find face
-        cv::Point2f center = find_face(frame);
+        auto faces = face_detector.find_faces(frame);
+        cv::Point2f center(0);
+        if (faces.size() > 0) {
+            center = faces[0];
+        }
 
         // Display result
         cv::Mat scene_cross = frame.clone();
@@ -37,34 +37,4 @@ void App::lab_find_face_in_video()
         fps_meter.update();
 
 	} while (cv::pollKey() != 27); //message loop untill ESC
-
 }
-
-cv::Point2f App::find_face(cv::Mat & frame)
-{
-    cv::Point2f center(0.0f, 0.0f); // for result
-
-	cv::Mat scene_grey;
-    cv::cvtColor(frame, scene_grey, cv::COLOR_BGR2GRAY);
-
-	std::vector<cv::Rect> faces;
-	face_cascade.detectMultiScale(scene_grey, faces);
-        
-	if (faces.size() > 0)
-	{
-          // faces[0].x      -- absolute coordinates
-          // faces[0].y      -- absolute coordinates
-          // faces[0].width
-          // faces[0].height
-    
-          // compute "center" as normalized coordinates of the face  
-            center.x = (faces[0].x + faces[0].width / 2.0f) / frame.cols;
-            center.y = (faces[0].y + faces[0].height / 2.0f) / frame.rows;
-	}
-
-    //fmt::println("Found face center at: ({:.2f}, {:.2f})", center.x, center.y);
-
-    return center;      
-}
-
-

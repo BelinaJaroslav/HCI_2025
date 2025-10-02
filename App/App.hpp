@@ -2,6 +2,7 @@
 
 #include <opencv2/opencv.hpp>
 
+#include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
 
 class App {
@@ -13,8 +14,13 @@ public:
     ~App();
 
 private:
+    // == MEMBERS ==
+    FaceDetector face_detector;
     FPSMeter fps_meter;
 
+    cv::VideoCapture capture;             
+
+    // == METHODS ==
     // Lab 01
     void lab_identify_object_by_luminance() const;
     void lab_find_red_object_in_image() const;
@@ -27,10 +33,6 @@ private:
     cv::Point2f find_red_object_chroma(cv::Mat& frame) const; // Find red object using HSV
     cv::Point2f find_object_chroma(cv::Mat& frame, cv::Scalar threshold_lower, cv::Scalar threshold_upper) const; // Find custom color object using HSV
     
-    cv::VideoCapture capture;             
-    cv::CascadeClassifier face_cascade;
-    cv::Point2f find_face(cv::Mat& frame);
-
     // Lab 02
     void lab_complex_behaviour();
 
