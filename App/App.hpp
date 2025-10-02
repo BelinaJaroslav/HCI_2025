@@ -2,6 +2,8 @@
 
 #include <opencv2/opencv.hpp>
 
+#include "FPSMeter.hpp"
+
 class App {
 public:
     App();
@@ -11,6 +13,8 @@ public:
     ~App();
 
 private:
+    FPSMeter fps_meter;
+
     // Lab 01
     void lab_identify_object_by_luminance() const;
     void lab_find_red_object_in_image() const;

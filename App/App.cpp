@@ -37,11 +37,11 @@ bool App::Init()
 void App::Run()
 {
     // Lab 01 Task 01
-    lab_identify_object_by_luminance();
+    //lab_identify_object_by_luminance();
     // Lab 01 Task 02
-    lab_find_red_object_in_image();
+    //lab_find_red_object_in_image();
     // Lab 01 Task 03
-    lab_find_red_object_in_video();
+    //lab_find_red_object_in_video();
     // Lab 01 Task 04
     lab_find_face_in_video();
 }
