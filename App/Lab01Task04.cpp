@@ -3,7 +3,7 @@
 #include <chrono>
 
 
-void App::FindFaceInVideo()
+void App::lab_find_face_in_video()
 {
     if (!face_cascade.load("App/Resources/haarcascade_frontalface_default.xml")) {
         fmt::println("Error loading face cascade.");
@@ -19,7 +19,7 @@ void App::FindFaceInVideo()
         }
 
         // Find face
-        cv::Point2f center = FindFace(frame);
+        cv::Point2f center = find_face(frame);
 
         // Display result
         cv::Mat scene_cross = frame.clone();
@@ -34,7 +34,7 @@ void App::FindFaceInVideo()
 
 }
 
-cv::Point2f App::FindFace(cv::Mat & frame)
+cv::Point2f App::find_face(cv::Mat & frame)
 {
     cv::Point2f center(0.0f, 0.0f); // for result
 

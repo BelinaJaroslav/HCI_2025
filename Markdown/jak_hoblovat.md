@@ -23,6 +23,10 @@ Potom, co se úspešně zmerguje, je možné již nepotřebnou branch smazat na 
 
 Všechny větve, o kterých lokál ví, lze vypsat pomocí `git branch -v`.
 
+## Code style
+
+`všechno_snake_case`
+
 ## Jak to spustit u sebe ve VS
 
 * Je potřeba mít:
