@@ -41,9 +41,9 @@ void App::Run()
     // Lab 01 Task 02
     //FindRedObjectInImage();
     // Lab 01 Task 03
-    //FindRedObjectInVideo();
+    FindRedObjectInVideo();
     // Lab 01 Task 04
-    FindFaceInVideo();
+    //FindFaceInVideo();
 }
 
 App::~App()
