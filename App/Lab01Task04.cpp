@@ -6,7 +6,7 @@
 void App::FindFaceInVideo()
 {
     if (!face_cascade.load("App/Resources/haarcascade_frontalface_default.xml")) {
-        std::cerr << "Error loading face cascade." << std::endl;
+        fmt::println("Error loading face cascade.");
     }
 
 	cv::Mat frame; // for captured frame 
@@ -15,7 +15,7 @@ void App::FindFaceInVideo()
 
         capture.read(frame);
         if (frame.empty()) {
-            std::cerr << "Cam disconnected? End of video?" << std::endl;
+            fmt::println("Cam disconnected ? End of video ? ");
         }
 
         // Find face
