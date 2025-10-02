@@ -4,7 +4,7 @@
 
 #include <fmt/core.h>
 
-void App::FindRedObjectInImage() const
+void App::lab_find_red_object_in_image() const
 {    
     fmt::println("== Lab 01 Task 02 ==");
 

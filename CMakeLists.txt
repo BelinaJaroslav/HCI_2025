@@ -10,6 +10,8 @@ endif()
 
 project("HCI")
 
+set(CMAKE_BUILD_TYPE Release)
+
 # [VCPKG] Find packages
 find_package(fmt CONFIG REQUIRED)
 find_package(glm           CONFIG REQUIRED)
