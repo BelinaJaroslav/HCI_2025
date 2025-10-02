@@ -13,7 +13,7 @@ bool App::Init()
     cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_WARNING);
 
     //TODO: Open capture device (camera or file) stream here, store capture device variable as protected member variable in App class. If camera is not found, open the video file.
-    //capture.open(0);
+    capture.open(0);
 
     if (!capture.isOpened()) {
         fmt::println("No camera found, trying fallback video file...");
@@ -43,7 +43,10 @@ void App::Run()
     // Lab 01 Task 03
     //lab_find_red_object_in_video();
     // Lab 01 Task 04
-    lab_find_face_in_video();
+    //lab_find_face_in_video();
+
+    // Lab 02 Task 01
+    lab_complex_behaviour();
 }
 
 App::~App()

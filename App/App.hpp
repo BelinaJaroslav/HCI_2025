@@ -32,6 +32,8 @@ private:
     cv::Point2f find_face(cv::Mat& frame);
 
     // Lab 02
+    void lab_complex_behaviour();
+
     // Lab 03
     // Lab 04
     // Lab 05

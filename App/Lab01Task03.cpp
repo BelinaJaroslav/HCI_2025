@@ -7,8 +7,6 @@ void App::lab_find_red_object_in_video()
 {
     fmt::println("== Lab 01 Task 03 ==");
 
-    Init();
-
     cv::Mat frame, resized_frame;
 
 	do {
