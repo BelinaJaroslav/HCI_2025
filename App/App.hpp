@@ -8,9 +8,8 @@
 class App {
 public:
     App();
-    bool Init();
-    void Run();
-    
+    bool init();
+    void run();    
     ~App();
 
 private:

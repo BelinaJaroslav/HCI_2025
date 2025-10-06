@@ -7,7 +7,7 @@ App::App()
     fmt::println("Startujem.");
 }
 
-bool App::Init() 
+bool App::init() 
 {
     // Disable OpenCV info messages
     cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_WARNING);
@@ -39,7 +39,7 @@ bool App::Init()
     return true;
 }
 
-void App::Run()
+void App::run()
 {
     // Lab 01 Task 01
     //lab_identify_object_by_luminance();

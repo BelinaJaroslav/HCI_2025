@@ -7,8 +7,8 @@ App app;
 int main()
 {    
     try {
-        if (app.Init()) {
-            app.Run();
+        if (app.init()) {
+            app.run();
         }
     }
     catch (std::exception const& e) {
