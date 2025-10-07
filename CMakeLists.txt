@@ -26,7 +26,7 @@ elseif(UNIX)
 endif()
 
 file(GLOB_RECURSE SOURCES 
-    "${PROJECT_SOURCE_DIR}/App/*.cpp"
+    "${PROJECT_SOURCE_DIR}/App/*.cpp"    
 )
 
 # Add source to this project's executable.
