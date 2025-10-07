@@ -2,15 +2,15 @@
 
 #include <opencv2/opencv.hpp>
 
+#include "CV2Tools.hpp"
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
 
 class App {
 public:
     App();
-    bool Init();
-    void Run();
-    
+    bool init();
+    void run();    
     ~App();
 
 private:
@@ -25,17 +25,9 @@ private:
     void lab_identify_object_by_luminance() const;
     void lab_find_red_object_in_image() const;
     void lab_find_red_object_in_video();
-    void lab_find_face_in_video();
-
-    cv::Point2f find_object_luma(cv::Mat& frame, unsigned char threshold) const; // Find object using lightness in grayscale
-    void draw_cross_normalized(cv::Mat& img, cv::Point2f center_normalized, int size, cv::Scalar color) const;
-
-    cv::Point2f find_red_object_chroma(cv::Mat& frame) const; // Find red object using HSV
-    cv::Point2f find_object_chroma(cv::Mat& frame, cv::Scalar threshold_lower, cv::Scalar threshold_upper) const; // Find custom color object using HSV
-    
+    void lab_find_face_in_video();    
     // Lab 02
     void lab_complex_behaviour();
-
     // Lab 03
     // Lab 04
     // Lab 05

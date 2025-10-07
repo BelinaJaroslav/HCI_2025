@@ -1,4 +1,4 @@
-#include "App.hpp"
+#include <App/App.hpp>
 
 #include <fmt/core.h>
 
@@ -28,13 +28,13 @@ void App::lab_complex_behaviour()
         }
         else if (n_faces_found == 1) {
             // Find red object and draw cross
-            auto red_object_center = find_red_object_chroma(frame);
-            draw_cross_normalized(frame, red_object_center, 30, CV_RGB(0, 200, 255)); // blue cross
+            auto red_object_center = CV2Tools::find_red_object_chroma(frame);
+            CV2Tools::draw_cross_normalized(frame, red_object_center, 30, CV_RGB(0, 200, 255)); // blue cross
 
             // Draw face crosses
             /*
             for (const auto& face_center : face_centers) {
-                draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
+                CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
             }
             /**/
 
