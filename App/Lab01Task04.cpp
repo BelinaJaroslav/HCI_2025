@@ -24,7 +24,7 @@ void App::lab_find_face_in_video()
 
         // Display result
         cv::Mat scene_cross = frame.clone();
-        draw_cross_normalized(scene_cross, center, 30, CV_RGB(0, 200, 255));
+        CV2Tools::draw_cross_normalized(scene_cross, center, 30, CV_RGB(0, 200, 255));
         cv::imshow("Face Detection", scene_cross);
 
         /*

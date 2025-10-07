@@ -26,10 +26,10 @@ void App::lab_find_red_object_in_video()
         //cv::resize(frame, resized_frame, cv::Size(), 0.5, 0.5, cv::INTER_LINEAR); // Reduce to 50%
 
 
-        auto center_normalized = find_red_object_chroma(frame);
+        auto center_normalized = CV2Tools::find_red_object_chroma(frame);
 
-        draw_cross_normalized(frame, center_normalized, 20, CV_RGB(0, 200, 255));
-        //draw_cross_normalized(resized_frame, center_normalized, 20, CV_RGB(0, 200, 255));
+        CV2Tools::draw_cross_normalized(frame, center_normalized, 20, CV_RGB(0, 200, 255));
+        //CV2Tools::draw_cross_normalized(resized_frame, center_normalized, 20, CV_RGB(0, 200, 255));
 
 
         auto end = std::chrono::steady_clock::now();
