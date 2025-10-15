@@ -1,10 +1,14 @@
 #pragma once
 
+#include <atomic>
+#include <tuple>
+
 #include <opencv2/opencv.hpp>
 
 #include "CV2Tools.hpp"
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
+#include "SyncedDeque.hpp"
 
 class App {
 public:
@@ -16,9 +20,12 @@ public:
 private:
     // == MEMBERS ==
     FaceDetector face_detector;
-    FPSMeter fps_meter;
+    FPSMeter fps_meter_main;
+    SyncedDeque<std::tuple<cv::Mat, std::vector<cv::Point2f>>> synced_deque;
 
-    cv::VideoCapture capture;             
+    cv::VideoCapture capture;
+
+    std::atomic<bool> do_terminate_worker_threads;
 
     // == METHODS ==
     // Lab 01
@@ -26,9 +33,15 @@ private:
     void lab_find_red_object_in_image() const;
     void lab_find_red_object_in_video();
     void lab_find_face_in_video();    
+    
     // Lab 02
     void lab_complex_behaviour();
+    
     // Lab 03
+    void lab_multithread();
+    
+    void tracker_thread();
+
     // Lab 04
     // Lab 05
     // Lab 06
