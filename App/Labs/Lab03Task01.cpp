@@ -24,6 +24,8 @@ void App::lab_multithread()
 
     std::jthread worker_thread(&App::tracker_thread, this);
 
+    FPSMeter fps_meter_worker;
+
     do {
 
         // Try to get next frame from worker_thread
@@ -58,11 +60,15 @@ void App::lab_multithread()
                 // "Lockscreen"
                 cv::imshow(window_name, image_warning);
             }
+
+            // Measure FPS: opnly frames from worker thread
+            if (fps_meter_worker.is_updated()) fmt::println("Worker thread FPS: {:.3f}", fps_meter_worker.get());
+            fps_meter_worker.update();
         }
 
-        // Measure FPS
-        if (fps_meter.is_updated()) fmt::println("Main thread FPS: {:.3f}", fps_meter.get());
-        fps_meter.update();
+        // Measure main thread "FPS"
+        if (fps_meter_main.is_updated()) fmt::println("Main thread \"FPS\": {:.3f}", fps_meter_main.get());
+        fps_meter_main.update();
 
     } while (cv::pollKey() != 27); // Repeat until user presses ESC
     

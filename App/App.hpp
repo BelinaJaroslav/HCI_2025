@@ -20,7 +20,7 @@ public:
 private:
     // == MEMBERS ==
     FaceDetector face_detector;
-    FPSMeter fps_meter;
+    FPSMeter fps_meter_main;
     SyncedDeque<std::tuple<cv::Mat, std::vector<cv::Point2f>>> synced_deque;
 
     cv::VideoCapture capture;

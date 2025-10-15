@@ -33,8 +33,8 @@ void App::lab_find_face_in_video()
         fmt::println("Frame processed in {:.2f} ms", elapsed_ms);
 		/**/
 
-        if (fps_meter.is_updated()) fmt::println("FPS: {:.3f}", fps_meter.get());
-        fps_meter.update();
+        if (fps_meter_main.is_updated()) fmt::println("FPS: {:.3f}", fps_meter_main.get());
+        fps_meter_main.update();
 
 	} while (cv::pollKey() != 27); //message loop untill ESC
 }
