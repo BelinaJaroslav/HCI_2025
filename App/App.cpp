@@ -3,6 +3,7 @@
 #include <fmt/core.h>
 
 App::App()
+    : do_terminate_worker_threads(false)
 {
     fmt::println("Startujem.");
 }
@@ -51,7 +52,10 @@ void App::run()
     //lab_find_face_in_video();
 
     // Lab 02 Task 01
-    lab_complex_behaviour();
+    //lab_complex_behaviour();
+    
+    // Lab 03 Task 01
+    lab_multithread();
 }
 
 App::~App()
