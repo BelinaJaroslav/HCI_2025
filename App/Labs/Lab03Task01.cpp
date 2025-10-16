@@ -15,6 +15,7 @@ void App::lab_multithread()
 	t_renderer.join();
 }
 
+
 void App::tracker_thread()
 {
 	/*
@@ -37,13 +38,8 @@ void App::tracker_thread()
 		}
 
 		// Find faces
-		//auto face_centers = face_detector.find_faces(frame);
-
-		auto t0 = std::chrono::high_resolution_clock::now();
 		auto face_centers = face_detector.find_faces(frame);
-		auto t1 = std::chrono::high_resolution_clock::now();
-		double detection_time = std::chrono::duration<double, std::milli>(t1 - t0).count();
-		fmt::println("Face detection time: {:.2f} ms", detection_time);
+
 
 		// Push into synced_deque
 		//synced_deque.push_back(std::make_tuple(frame, face_centers)); // DATA IS BEING COPIED HERE
