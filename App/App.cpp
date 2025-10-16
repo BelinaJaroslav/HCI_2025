@@ -55,7 +55,10 @@ void App::run()
     //lab_complex_behaviour();
     
     // Lab 03 Task 01
-    lab_multithread();
+    // lab_multithread();
+
+    // Lab 04 task 01
+    lab_compression();
 }
 
 App::~App()
