@@ -10,7 +10,7 @@ endif()
 
 project("HCI")
 
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 # [VCPKG] Find packages
 find_package(fmt CONFIG REQUIRED)
