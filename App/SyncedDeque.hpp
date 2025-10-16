@@ -9,6 +9,7 @@ protected:
     std::deque<T> de_queue;
     std::condition_variable cv_sleep;
     std::mutex mux_sleep;
+    std::atomic<bool> shutdown_ = false;
 
 public:
     SyncedDeque() = default;
@@ -33,6 +34,15 @@ public:
     T pop_front() {
         std::scoped_lock lock(mux);
         auto t = std::move(de_queue.front());
+        de_queue.pop_front();
+        return t;
+    }
+
+    // 
+    T pop_front_wait() {
+        wait(); // blocks until not empty
+        std::scoped_lock lock(mux);
+        T t = std::move(de_queue.front());
         de_queue.pop_front();
         return t;
     }
@@ -70,7 +80,7 @@ public:
     }
 
     // Returns number of items in Queue
-    size_t count() {
+    size_t size() {
         std::scoped_lock lock(mux);
         return de_queue.size();
     }

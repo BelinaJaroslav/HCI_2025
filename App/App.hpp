@@ -41,6 +41,8 @@ private:
     void lab_multithread();
     
     void tracker_thread();
+    void render_thread();
+    void esc_listener_thread();
 
     // Lab 04
     // Lab 05
