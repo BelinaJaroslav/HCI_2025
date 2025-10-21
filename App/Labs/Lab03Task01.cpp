@@ -55,19 +55,25 @@ void App::tracker_thread()
 
 void App::render_thread() {
 	/*
-    Main thread:
-	    * opens the camera (video file)
-	    * creates the tracker thread
-    (in the loop):
-	    * prints the result in the console (or displays the image)
-	    * tests key to end program
-	    * coordinates thread termination
-	    * at the end joins tracker thread
+	Main thread:
+		* opens the camera (video file)
+		* creates the tracker thread
+	(in the loop):
+		* prints the result in the console (or displays the image)
+		* tests key to end program
+		* coordinates thread termination
+		* at the end joins tracker thread
    */
 	const auto window_name = "Face Detection";
 
 	cv::Mat image_no_face = cv::imread("App/Resources/looking_for_user.jpg");
 	cv::Mat image_warning = cv::imread("App/Resources/warning.jpg");
+
+	// Face detector is not the best so to avoid epilepsy inducing flashing of either "splashscreen" or "lockscreen"
+	// we display them only when multiple frames without face or with more than 1 faces are detected in a series
+	const int screen_switch_threshold = 20;
+	int n_zero_faces_found_continuously = 0;
+	int n_more_faces_found_continuously = 0;
 
 	do {
 
@@ -80,11 +86,29 @@ void App::render_thread() {
 		auto n_faces_found = face_centers.size();
 
 		// Act depending on number of faces found
+
 		if (n_faces_found == 0) {
+			n_zero_faces_found_continuously++;
+			n_more_faces_found_continuously = 0;
+		}
+		else if (n_faces_found == 1) {
+			n_zero_faces_found_continuously = 0;
+			n_more_faces_found_continuously = 0;
+		}
+		else {
+			n_more_faces_found_continuously++;
+			n_zero_faces_found_continuously = 0;
+		}
+
+		if (n_zero_faces_found_continuously >= screen_switch_threshold) {
 			// "Splashscreen"
 			cv::imshow(window_name, image_no_face);
 		}
-		else if (n_faces_found == 1) {
+		else if (n_more_faces_found_continuously >= screen_switch_threshold) {
+			// "Lockscreen"
+			cv::imshow(window_name, image_warning);
+		}
+		else {
 			// Find red object
 			//NOTE: This takes less than 2ms, but could be moved in a different thread in case of FPS emergency
 			auto red_object_center = CV2Tools::find_red_object_chroma(frame);
@@ -102,10 +126,6 @@ void App::render_thread() {
 			// Display result
 			cv::imshow(window_name, frame);
 		}
-		else {
-			// "Lockscreen"
-			cv::imshow(window_name, image_warning);
-		}		
 
 		// Measure FPS: use main fps meter to measure render_thread fps
 		if (fps_meter_main.is_updated()) fmt::println("Render thread FPS: {:.3f}", fps_meter_main.get());
