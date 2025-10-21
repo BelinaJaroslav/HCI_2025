@@ -6,13 +6,12 @@
 #include <condition_variable>
 
 
-
 void App::lab_multithread()
 {
 	std::jthread t_worker(&App::tracker_thread, this);
 	std::jthread t_renderer(&App::render_thread, this);
 
-	t_renderer.join();
+	// jthreads are joined automatically
 }
 
 
@@ -25,6 +24,8 @@ void App::tracker_thread()
 		* send the result to the main thread
 		* coordinate thread termination (if necessary)
 	*/
+
+	FPSMeter fps_meter_tracker_thread;
 
 	cv::Mat frame; // For captured frame
 
@@ -40,32 +41,33 @@ void App::tracker_thread()
 		// Find faces
 		auto face_centers = face_detector.find_faces(frame);
 
-
 		// Push into synced_deque
-		//synced_deque.push_back(std::make_tuple(frame, face_centers)); // DATA IS BEING COPIED HERE
-		synced_deque.push_back(std::make_tuple(frame.clone(), face_centers)); //close was faster last time
+		synced_deque.push_back(std::make_tuple(frame, face_centers)); // DATA IS BEING COPIED HERE
+
+		// Measure FPS: only frames from tracker thread
+		if (fps_meter_tracker_thread.is_updated()) fmt::println("Tracker thread FPS: {:.3f}", fps_meter_tracker_thread.get());
+		fps_meter_tracker_thread.update();
 
 		// Repeat until App sets `do_terminate_worker_threads` to `true`
 	} while (!do_terminate_worker_threads);
 }
 
+
 void App::render_thread() {
 	/*
-   Main thread:
-	   * opens the camera (video file)
-	   * creates the tracker thread
-   (in the loop):
-	   * prints the result in the console (or displays the image)
-	   * tests key to end program
-	   * coordinates thread termination
-	   * at the end joins tracker thread
+    Main thread:
+	    * opens the camera (video file)
+	    * creates the tracker thread
+    (in the loop):
+	    * prints the result in the console (or displays the image)
+	    * tests key to end program
+	    * coordinates thread termination
+	    * at the end joins tracker thread
    */
 	const auto window_name = "Face Detection";
 
 	cv::Mat image_no_face = cv::imread("App/Resources/looking_for_user.jpg");
 	cv::Mat image_warning = cv::imread("App/Resources/warning.jpg");
-
-	FPSMeter fps_meter_worker;
 
 	do {
 
@@ -83,8 +85,11 @@ void App::render_thread() {
 			cv::imshow(window_name, image_no_face);
 		}
 		else if (n_faces_found == 1) {
-			// Find red object and draw cross
+			// Find red object
+			//NOTE: This takes less than 2ms, but could be moved in a different thread in case of FPS emergency
 			auto red_object_center = CV2Tools::find_red_object_chroma(frame);
+
+			// Draw cross where the red object is
 			CV2Tools::draw_cross_normalized(frame, red_object_center, 30, CV_RGB(0, 200, 255)); // blue cross
 
 			// Draw face crosses
@@ -100,20 +105,14 @@ void App::render_thread() {
 		else {
 			// "Lockscreen"
 			cv::imshow(window_name, image_warning);
-		}
+		}		
 
-		// Measure FPS: opnly frames from worker thread
-		if (fps_meter_worker.is_updated()) fmt::println("Worker thread FPS: {:.3f}", fps_meter_worker.get());
-		fps_meter_worker.update();
-
-
-		// Measure main thread "FPS"
-		if (fps_meter_main.is_updated()) fmt::println("Main thread \"FPS\": {:.3f}", fps_meter_main.get());
+		// Measure FPS: use main fps meter to measure render_thread fps
+		if (fps_meter_main.is_updated()) fmt::println("Render thread FPS: {:.3f}", fps_meter_main.get());
 		fps_meter_main.update();
 
 	} while (cv::pollKey() != 27);
 
 	do_terminate_worker_threads = true;
 }
-
 

@@ -16,8 +16,6 @@
 constexpr float MAX_PSNR = 50.0f;
 
 
-
-
 std::vector<uchar> App::lossy_bw_limit(cv::Mat& input_img, size_t size_limit) 
 {
     std::string suff(".jpg"); // target format
@@ -51,7 +49,6 @@ std::vector<uchar> App::lossy_bw_limit(cv::Mat& input_img, size_t size_limit)
 
     return bytes;
 }
-
 
 
 std::vector<uchar> App::lossy_quality_limit(const cv::Mat& frame, const float target_coefficient)
@@ -155,10 +152,10 @@ int App::lab_compression() {
                 return EXIT_SUCCESS;
                 break;
             case 'q':
-                target_coefficient += 0.03;
+                target_coefficient += 0.03f;
                 break;
             case 'a':
-                target_coefficient -= 0.03;
+                target_coefficient -= 0.03f;
                 break;
             default:
                 break;
