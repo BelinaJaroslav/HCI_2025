@@ -96,8 +96,8 @@ void App::render_thread() {
 			n_more_faces_found_continuously = 0;
 		}
 		else {
-			n_more_faces_found_continuously++;
 			n_zero_faces_found_continuously = 0;
+			n_more_faces_found_continuously++;
 		}
 
 		if (n_zero_faces_found_continuously >= screen_switch_threshold) {

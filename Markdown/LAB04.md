@@ -4,9 +4,9 @@
 
 The program requires a camera. It produces continuous stream of compressed JPEG images that fit within required size limit (bandwidth). This is similar to MJPEG compression. Use 'q' or 'a' key to increase or decrease available bandwidth. Use ESC key to terminate.
 
-- measure time needed to compress single image
-- measure time needed to decompress single image
-- compare times: what is the assymetry ratio of the JPEG compression?
+- measure time needed to compress single image &ensp; 3–5 ms
+- measure time needed to decompress single image &ensp; 2 ms
+- compare times: what is the assymetry ratio of the JPEG compression? &ensp; _decompression is approx. 2 times faster_
 
 ## Task 2: Use similar approach as in sample code, but replace limitation by bandwith with limitation by quality
 
