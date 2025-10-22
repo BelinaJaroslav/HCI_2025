@@ -2,6 +2,7 @@
 
 #include <fmt/core.h>
 
+
 void App::lab_find_red_object_in_video()
 {
     fmt::println("== Lab 01 Task 03 ==");

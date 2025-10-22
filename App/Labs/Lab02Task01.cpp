@@ -2,6 +2,7 @@
 
 #include <fmt/core.h>
 
+
 void App::lab_complex_behaviour()
 {
     cv::Mat image_no_face = cv::imread("App/Resources/looking_for_user.jpg");

@@ -15,7 +15,6 @@
 
 std::atomic<int> global_frame_id{ 0 };
 
-
 const int MAX_QUALITY = 95.0f;
 const int MIN_QUALITY = 10.0f;
 int PSNR_threshold = 30.0f;
@@ -93,7 +92,6 @@ void App::process_frame(const cv::Mat& original,
         result_queue.push_back(ProcessedFrame{ id, decoded, original.clone() });
     }
 }
-
 
 
 int App::lab_compression_pool() {

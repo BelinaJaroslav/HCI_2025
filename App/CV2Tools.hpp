@@ -4,9 +4,10 @@
 
 #include <opencv2/opencv.hpp>
 
+
 class CV2Tools {
 public:
-    //
+    
     static void draw_cross_normalized(cv::Mat& img, cv::Point2f center_normalized, int size, cv::Scalar color) {
         // Author: JJ
         center_normalized.x = std::clamp(center_normalized.x, 0.0f, 1.0f);
@@ -24,6 +25,7 @@ public:
         cv::line(img, p3, p4, color, 2);
     }
     
+
     // Find object using lightness in grayscale
     // [!] Side effect warning: frame will be edited
     static cv::Point2f find_object_luma(cv::Mat& frame, unsigned char threshold) {
@@ -72,6 +74,7 @@ public:
         return center_normalized;
     }
 
+
     // Find red object using HSV
     static cv::Point2f find_red_object_chroma(cv::Mat& frame) {
         const int MIN_SATURATION = 115;
@@ -110,6 +113,7 @@ public:
         return center_normalized;
     }
 
+
     // Find custom color object using HSV:
     // Find anything (except red) in the image `frame`, search is done using HSV values between threshold_lower & threshold_upper
     static cv::Point2f find_object_chroma(cv::Mat& frame, cv::Scalar threshold_lower, cv::Scalar threshold_upper) {
@@ -134,6 +138,7 @@ public:
 
         return center_normalized;
     }
+
 
     // Compute PSNR between two images
     // code from opencv doc 

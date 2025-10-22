@@ -15,6 +15,7 @@
 
 constexpr float MAX_PSNR = 50.0f;
 
+
 /*
 void App::grabber_thread() {
     while (capture.isOpened()) {

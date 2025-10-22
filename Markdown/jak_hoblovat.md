@@ -27,6 +27,7 @@ Všechny větve, o kterých lokál ví, lze vypsat pomocí `git branch -v`.
 
 * metody\_a\_proměnné\_snake\_case
 * ClassyANázvySouborůPascalCase
+* Dva prázdné řádky mezi definicemi funkcí
 
 ## Jak to spustit u sebe ve VS
 

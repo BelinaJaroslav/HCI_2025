@@ -2,11 +2,13 @@
 
 #include <fmt/core.h>
 
+
 App::App()
     : do_terminate_worker_threads(false)
 {
     fmt::println("Startujem.");
 }
+
 
 bool App::init() 
 {
@@ -40,6 +42,7 @@ bool App::init()
     return true;
 }
 
+
 void App::run()
 {
     // Lab 01 Task 01
@@ -55,12 +58,13 @@ void App::run()
     //lab_complex_behaviour();
     
     // Lab 03 Task 01
-    lab_multithread();
+    //lab_multithread();
 
     // Lab 04 task 01
     //lab_compression();
     lab_compression_pool();
 }
+
 
 App::~App()
 {
