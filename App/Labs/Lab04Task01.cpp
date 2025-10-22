@@ -15,6 +15,85 @@
 
 constexpr float MAX_PSNR = 50.0f;
 
+/*
+void App::grabber_thread() {
+    while (capture.isOpened()) {
+        cv::Mat frame_;
+        capture >> frame_;
+
+        if (frame_.empty()) {
+            std::cerr << "Device closed (or video at the end)" << '\n';
+            capture.release();
+            break;
+        }
+
+        // Clone to ensure thread safety
+        synced_deque_raw.push_back(frame_.clone());
+    }
+
+    // Signal end of stream with empty Mat
+    synced_deque_raw.push_back({});
+}
+
+
+void App::encoder_thread(int quality) {
+    while (true) {
+        cv::Mat frame = synced_deque_raw.pop_front_wait();
+
+        // Sentinel value to stop
+        if (frame.empty()) break;
+
+        std::string suff = ".jpg";
+        if (!cv::haveImageWriter(suff)) {
+            throw std::runtime_error("Cannot compress to format: " + suff);
+        }
+
+        std::vector<uchar> encoded;
+        std::vector<int> compression_params;
+
+        // JPEG quality (0-100), higher is better
+        compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
+        compression_params.push_back(quality);
+
+        // Encode frame to JPEG
+        bool success = cv::imencode(suff, frame, encoded, compression_params);
+        if (!success) {
+            std::cerr << "Encoding failed for frame" << std::endl;
+            continue;
+        }
+
+        // Push encoded JPEG bytes to next queue
+        synced_deque_encoded.push_back(encoded);
+    }
+
+    // Signal end of encoded stream
+    synced_deque_encoded.push_back({});
+}
+
+
+void App::decoder_thread() {
+    while (true) {
+        std::vector<uchar> encoded = synced_deque_encoded.pop_front_wait();
+
+        // Sentinel value to stop
+        if (encoded.empty()) break;
+
+        // Decode JPEG bytes into image
+        cv::Mat decoded = cv::imdecode(encoded, cv::IMREAD_COLOR);
+        if (decoded.empty()) {
+            std::cerr << "Decoding failed for image" << std::endl;
+            continue;
+        }
+
+        // Push decoded frame to next stage
+        synced_deque_decoded.push_back(decoded);
+    }
+
+    // Signal end of decoded stream
+    synced_deque_decoded.push_back({});
+}
+/**/
+
 
 std::vector<uchar> App::lossy_bw_limit(cv::Mat& input_img, size_t size_limit) 
 {
@@ -28,7 +107,7 @@ std::vector<uchar> App::lossy_bw_limit(cv::Mat& input_img, size_t size_limit)
     // prepare parameters for JPEG compressor
     // we use only quality, but other parameters are available (progressive, optimization...)
     std::vector<int> compression_params_template;
-    compression_params_template.push_back(cv::IMWRITE_JPEG_QUALITY); 
+    compression_params_template.push_back(cv::IMWRITE_JPEG_QUALITY);
 
     std::cout << '[';
 

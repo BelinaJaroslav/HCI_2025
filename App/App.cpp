@@ -59,6 +59,7 @@ void App::run()
 
     // Lab 04 task 01
     //lab_compression();
+    lab_compression_pool();
 }
 
 App::~App()
