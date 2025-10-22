@@ -10,7 +10,7 @@ endif()
 
 project("HCI")
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 # [VCPKG] Find packages
 find_package(fmt CONFIG REQUIRED)
@@ -28,6 +28,7 @@ endif()
 file(GLOB_RECURSE SOURCES 
     "${PROJECT_SOURCE_DIR}/App/*.cpp"    
 )
+
 
 # Add source to this project's executable.
 add_executable(HCI "HCI.cpp" ${SOURCES})
