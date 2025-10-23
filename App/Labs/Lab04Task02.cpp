@@ -14,6 +14,7 @@
 
 
 std::atomic<int> global_frame_id{ 0 };
+std::atomic<int> last_quality{ 95 };  // shared starting point
 
 
 const int MAX_QUALITY = 95.0f;
@@ -54,45 +55,73 @@ void App::grabber_thread() {
             process_frame(frame.clone(), id, PSNR_threshold, MAX_QUALITY, this->result_queue);
             });
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
     }
 }
 
 
-void App::process_frame(const cv::Mat& original,
+#include <atomic>
+
+void App::process_frame(
+    const cv::Mat& original,
     int id,
     int threshold,
     int quality,
     SyncedDeque<ProcessedFrame>& result_queue
 )
-
 {
-    std::vector<uchar> encoded;
-    std::vector<int> params = {
-        cv::IMWRITE_JPEG_QUALITY, quality
-    };
+    const int MIN_QUALITY = 10;
+    const int MAX_QUALITY = 100;
 
-    // Encode
-    if (!cv::imencode(".jpg", original, encoded, params))
-        return;
+    // Start near the last successful quality
+    quality = std::clamp(last_quality.load(), MIN_QUALITY, MAX_QUALITY);
 
-    // Decode
-    cv::Mat decoded = cv::imdecode(encoded, cv::IMREAD_COLOR);
-    if (decoded.empty()) return;
+    cv::Mat decoded;
+    double psnr = 0.0;
 
-    // Evaluate
-    double psnr = CV2Tools::getPSNR(original, decoded);
+    // Iteratively search for target PSNR range
+    while (true)
+    {
+        std::vector<uchar> encoded;
+        std::vector<int> params = {
+            cv::IMWRITE_JPEG_QUALITY, quality
+        };
 
-    // Recursively reduce quality if PSNR is too high
-    if (psnr > threshold && quality > MIN_QUALITY) {
-        this->process_frame(original, id, threshold, quality - 5, result_queue);
+        // Encode
+        if (!cv::imencode(".jpg", original, encoded, params))
+            return;
+
+        // Decode
+        decoded = cv::imdecode(encoded, cv::IMREAD_COLOR);
+        if (decoded.empty())
+            return;
+
+        // Evaluate
+        psnr = CV2Tools::getPSNR(original, decoded);
+
+        // Adjust quality dynamically
+        if (psnr > threshold && quality > MIN_QUALITY)
+        {
+            quality -= 5;  // too high PSNR  lower quality
+        }
+        else if (psnr < threshold - 1 && quality < MAX_QUALITY)
+        {
+            quality += 2;  // slightly under  raise quality a bit
+        }
+        else
+        {
+            // Found a good balance or hit a limit
+            break;
+        }
     }
-    else {
 
-        // Send to queue for main thread to display, expecting ordered return of processed frames :)
-        result_queue.push_back(ProcessedFrame{ id, decoded, original.clone() });
-    }
+    // Update global shared starting point for next threads
+    last_quality.store(quality);
+
+    // Send to queue for display
+    result_queue.push_back(ProcessedFrame{ id, decoded, original.clone() });
 }
+
 
 
 
@@ -122,7 +151,7 @@ int App::lab_compression_pool() {
                 auto size_uncompressed = compressed_frame.original_image.elemSize() * compressed_frame.original_image.total();
                 auto size_compressed = compressed_frame.processed_image.elemSize() * compressed_frame.processed_image.total();
 
-                std::cout << "Frame id: " << compressed_frame.id << "\n";
+                //std::cout << "Frame id: " << compressed_frame.id << "\n";
 
                 cv::imshow("original", compressed_frame.original_image);
                 cv::imshow("decoded", compressed_frame.processed_image);
@@ -155,6 +184,9 @@ int App::lab_compression_pool() {
                 compressed_frame = std::move(it->second);
                 buffer.erase(it);
             }
+            // Measure main thread "FPS"
+            if (fps_meter_main.is_updated()) fmt::println("Main thread \"FPS\": {:.3f}", fps_meter_main.get());
+            fps_meter_main.update();
         }
     }
     catch (std::exception const& e) {
