@@ -101,7 +101,7 @@ void App::lab05_run()
         glBindVertexArray(VAO_ID);
 
         // draw all VAO data
-        glDrawArrays(GL_TRIANGLES, 0, triangle_vertices.size());
+        glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(triangle_vertices.size()));
 
         // poll events, call callbacks, flip back<->front buffer
         glfwPollEvents();

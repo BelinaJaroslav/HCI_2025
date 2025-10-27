@@ -1,3 +1,7 @@
+// C++ standard
+#include <fstream>
+#include <filesystem>
+
 // OpenCV - GL independent
 #include <opencv2/opencv.hpp>
 
@@ -16,6 +20,7 @@
 
 // Non-OpenGL 3rd party libraries
 #include <fmt/core.h>
+#include <nlohmann/json.hpp>
 
 // Our App
 #include "App.hpp"
@@ -56,6 +61,26 @@ bool App::init()
     }
     fmt::println("Initialized face detector.");
     
+    // Load JSON conf
+    std::ifstream settings_file("App/Resources/app_settings.json");
+    nlohmann::json settings = nlohmann::json::parse(settings_file);
+    
+    std::string app_name = "App";
+    int win_width = 640;
+    int win_height = 480;
+
+    if (settings["app_name"].is_string()) {
+        app_name = settings["app_name"].template get<std::string>();
+    }
+    if (settings["default_resolution"].is_object()) {
+        if (settings["default_resolution"]["x"].is_number_integer()) {
+            win_width = settings["default_resolution"]["x"].template get<int>();
+        }
+        if (settings["default_resolution"]["y"].is_number_integer()) {
+            win_height = settings["default_resolution"]["y"].template get<int>();
+        }
+    }
+
     // Init OpenGL
     try {
         // Set GLFW error callback
@@ -76,7 +101,7 @@ bool App::init()
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
         // Open window (GL canvas) with no special properties :: https://www.glfw.org/docs/latest/quick.html#quick_create_window
-        window = glfwCreateWindow(1280, 800, "HCI 2025", NULL, NULL);
+        window = glfwCreateWindow(win_width, win_height, app_name.c_str(), NULL, NULL);
         if (!window) {
             glfwTerminate();
             return false;
