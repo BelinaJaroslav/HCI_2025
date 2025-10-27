@@ -1,6 +1,29 @@
-#include "App.hpp"
+// C++ standard
+#include <fstream>
+#include <filesystem>
 
+// OpenCV - GL independent
+#include <opencv2/opencv.hpp>
+
+// OpenGL Extension Wrangler: allow all multiplatform GL functions
+#include <GL/glew.h> 
+// WGLEW = Windows GL Extension Wrangler :: platform specific functions (in this case Windows)
+//#include <GL/wglew.h> // Not needed for our App
+
+// GLFW toolkit
+// Uses GL calls to open GL context, i.e. GLEW must be first.
+#include <GLFW/glfw3.h>
+
+// OpenGL math
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+// Non-OpenGL 3rd party libraries
 #include <fmt/core.h>
+#include <nlohmann/json.hpp>
+
+// Our App
+#include "App.hpp"
 
 
 App::App()
@@ -38,8 +61,124 @@ bool App::init()
     }
     fmt::println("Initialized face detector.");
     
-    fmt::println("Initialized.");
+    // Load JSON conf
+    std::ifstream settings_file("App/Resources/app_settings.json");
+    nlohmann::json settings = nlohmann::json::parse(settings_file);
+    
+    std::string app_name = "App";
+    int win_width = 640;
+    int win_height = 480;
+
+    if (settings["app_name"].is_string()) {
+        app_name = settings["app_name"].template get<std::string>();
+    }
+    if (settings["default_resolution"].is_object()) {
+        if (settings["default_resolution"]["x"].is_number_integer()) {
+            win_width = settings["default_resolution"]["x"].template get<int>();
+        }
+        if (settings["default_resolution"]["y"].is_number_integer()) {
+            win_height = settings["default_resolution"]["y"].template get<int>();
+        }
+    }
+
+    // Init OpenGL
+    try {
+        // Set GLFW error callback
+        glfwSetErrorCallback(error_callback);
+
+        // Init GLFW :: https://www.glfw.org/documentation.html
+        if (!glfwInit()) {
+            return false;
+        }
+
+        // Set OpenGL version
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+        // Set OpenGL profile
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Core, comment-out this line for Compatible
+
+        // Window is hidden until everything is initialized
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+        // Open window (GL canvas) with no special properties :: https://www.glfw.org/docs/latest/quick.html#quick_create_window
+        window = glfwCreateWindow(win_width, win_height, app_name.c_str(), NULL, NULL);
+        if (!window) {
+            glfwTerminate();
+            return false;
+        }
+        glfwSetWindowUserPointer(window, this);
+
+        // Hide cursor
+        //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        // These can be used later for switching Fullscreen On & Off
+        monitor = glfwGetPrimaryMonitor(); // Get primary monitor
+        mode = glfwGetVideoMode(monitor); // Get resolution of the monitor
+
+        // Setup callbacks
+        glfwMakeContextCurrent(window);
+        glfwSetKeyCallback(window, key_callback);
+        glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+        glfwSetMouseButtonCallback(window, mouse_button_callback);
+        glfwSetScrollCallback(window, scroll_callback);
+
+        // Set V-Sync ON.
+        glfwSwapInterval(1);
+        is_vsync_on = true;
+
+        // Init GLEW :: http://glew.sourceforge.net/basic.html
+        GLenum err = glewInit();
+        if (GLEW_OK != err) {
+            fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+        }
+        //wglewInit();
+
+        //...after ALL GLFW & GLEW init ...
+        if (GLEW_ARB_debug_output) {
+            //glDebugMessageCallback(MessageCallback, 0);
+            glEnable(GL_DEBUG_OUTPUT);
+
+            // default is asynchronous debug output, use this to simulate glGetError() functionality
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+            std::cout << "GL_DEBUG enabled.\n";
+        }
+        else std::cout << "GL_DEBUG NOT SUPPORTED!\n";
+
+        // Set GL params
+        glEnable(GL_DEPTH_TEST);
+
+        glEnable(GL_LINE_SMOOTH);
+        glEnable(GL_POLYGON_SMOOTH);
+
+        //glEnable(GL_CULL_FACE);
+
+        // Transparency blending function
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        // First init OpenGL, THAN init assets: valid context MUST exist
+        init_assets();
+
+        // Show window after everything loads        
+        glfwShowWindow(window);
+    }
+    catch (std::exception const& e) {
+        std::cerr << "Init failed : " << e.what() << "\n";
+        exit(-1);
+    }
+
+    fmt::println("App initialized.\n================");
+
+    print_gl_info();
+
     return true;
+}
+
+
+void App::init_assets()
+{
+    // Lab 05
+    lab05_init_assets();
 }
 
 
@@ -54,23 +193,55 @@ void App::run()
     // Lab 01 Task 04
     //lab_find_face_in_video();
 
-    // Lab 02 Task 01
+    // Lab 02
     //lab_complex_behaviour();
     
-    // Lab 03 Task 01
+    // Lab 03
     //lab_multithread();
 
-    // Lab 04 task 01
+    // Lab 04
     //lab_compression();
-    lab_compression_pool();
+    //lab_compression_pool();
+
+    // Lab 05
+    lab05_run();
 }
 
 
 App::~App()
 {
+    // Cleanup OpenCV
     cv::destroyAllWindows();
-    
     if (capture.isOpened()) capture.release();
 
+    // Cleanup OpenGL
+    glDeleteProgram(shader_prog_ID);
+    glDeleteBuffers(1, &VBO_ID);
+    glDeleteVertexArrays(1, &VAO_ID);
+
+    // Bye
     fmt::println("Nashle.");
+}
+
+
+void App::print_gl_info()
+{
+    std::cout << "\n=================== :: GL Info :: ===================\n";
+    std::cout << "GL Vendor:\t" << glGetString(GL_VENDOR) << "\n";
+    std::cout << "GL Renderer:\t" << glGetString(GL_RENDERER) << "\n";
+    std::cout << "GL Version:\t" << glGetString(GL_VERSION) << "\n";
+    std::cout << "GL Shading ver:\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n\n";
+
+    GLint profile;
+    glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile);
+    if (const auto errorCode = glGetError()) {
+        std::cout << "[!] Pending GL error while obtaining profile: " << errorCode << "\n";
+    }
+    if (profile & GL_CONTEXT_CORE_PROFILE_BIT) {
+        std::cout << "Core profile" << "\n";
+    }
+    else {
+        std::cout << "Compatibility profile" << "\n";
+    }
+    std::cout << "=====================================================\n\n";
 }

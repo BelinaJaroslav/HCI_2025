@@ -1,15 +1,27 @@
 #pragma once
 
+// C++ standard libraries
 #include <atomic>
 #include <tuple>
 
+// 3rd party libraries
 #include <opencv2/opencv.hpp>
 
+// Currently (lab05), we need to import GLFW3 to use `GLFWwindow` etc.
+// But importing just GLFW3 gives us bunch of errors (wrong import order),
+// so we import other stuff aswell and import order is correct.
+#include <GL/glew.h> 
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+// Our libraries
 #include "CV2Tools.hpp"
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
 #include "SyncedDeque.hpp"
 #include "ThreadPool.hpp"
+#include "Assets.hpp"
 
 
 class App {
@@ -39,7 +51,33 @@ private:
 
     std::atomic<bool> do_terminate_worker_threads;
 
+    // OpenGL members
+    GLFWwindow* window{};
+    GLFWmonitor* monitor{};
+    const GLFWvidmode* mode{};
+    bool is_vsync_on{};
+
+    GLuint shader_prog_ID{ 0 };
+    GLuint VBO_ID{ 0 };
+    GLuint VAO_ID{ 0 };
+    std::vector<vertex> triangle_vertices =
+    {
+        {{0.0f,  0.5f,  0.0f}},
+        {{0.5f, -0.5f,  0.0f}},
+        {{-0.5f, -0.5f,  0.0f}}
+    };
+
     // == METHODS ==
+    void init_assets();
+    void print_gl_info();
+    
+    // Callbacks
+    static void error_callback(int error, const char* description);
+    static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+    static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+    static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+    
     // Lab 01
     void lab_identify_object_by_luminance() const;
     void lab_find_red_object_in_image() const;
@@ -65,7 +103,9 @@ private:
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
     
     // Lab 05
-    
+    void lab05_init_assets();
+    void lab05_run();
+        
     // Lab 06
     // Lab 07
     // Lab 08

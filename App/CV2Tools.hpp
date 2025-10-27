@@ -142,7 +142,7 @@ public:
 
     // Compute PSNR between two images
     // code from opencv doc 
-    static double getPSNR(const cv::Mat& I1, const cv::Mat& I2)
+    static double get_PSNR(const cv::Mat& I1, const cv::Mat& I2)
     {
         cv::Mat s1;
         cv::absdiff(I1, I2, s1);       // |I1 - I2|

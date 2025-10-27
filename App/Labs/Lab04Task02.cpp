@@ -16,9 +16,9 @@
 std::atomic<int> global_frame_id{ 0 };
 std::atomic<int> last_quality{ 95 };  // shared starting point
 
-const int MAX_QUALITY = 95.0f;
-const int MIN_QUALITY = 10.0f;
-int PSNR_threshold = 30.0f;
+const int MAX_QUALITY = 95;
+const int MIN_QUALITY = 10;
+int PSNR_threshold = 30;
 
 ThreadPool threadPool(6);
 
@@ -96,7 +96,7 @@ void App::process_frame(
             return;
 
         // Evaluate
-        psnr = CV2Tools::getPSNR(original, decoded);
+        psnr = CV2Tools::get_PSNR(original, decoded);
 
         // Adjust quality dynamically
         if (psnr > threshold && quality > MIN_QUALITY)
