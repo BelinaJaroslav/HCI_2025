@@ -16,7 +16,6 @@
 std::atomic<int> global_frame_id{ 0 };
 std::atomic<int> last_quality{ 95 };  // shared starting point
 
-
 const int MAX_QUALITY = 95.0f;
 const int MIN_QUALITY = 10.0f;
 int PSNR_threshold = 30.0f;
@@ -121,8 +120,6 @@ void App::process_frame(
     // Send to queue for display
     result_queue.push_back(ProcessedFrame{ id, decoded, original.clone() });
 }
-
-
 
 
 int App::lab_compression_pool() {

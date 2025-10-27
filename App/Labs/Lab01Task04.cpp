@@ -3,6 +3,7 @@
 #include <fmt/core.h>
 #include <chrono>
 
+
 void App::lab_find_face_in_video()
 {
 	cv::Mat frame; // for captured frame 

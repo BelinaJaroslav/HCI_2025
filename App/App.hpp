@@ -12,9 +12,9 @@
 #include "ThreadPool.hpp"
 
 
-
 class App {
 public:
+
     App();
     bool init();
     void run();    
@@ -28,15 +28,12 @@ public:
 
     SyncedDeque<ProcessedFrame> result_queue;
 
-
 private:
-
 
     // == MEMBERS ==
     FaceDetector face_detector;
     FPSMeter fps_meter_main;
     SyncedDeque<std::tuple<cv::Mat, std::vector<cv::Point2f>>> synced_deque;
-
 
     cv::VideoCapture capture;
 
@@ -60,16 +57,15 @@ private:
 
     // Lab 04
     int lab_compression(); 
+    int lab_compression_pool();
 
     void grabber_thread();
-
     void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
-
-
     std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
-    int lab_compression_pool();
+    
     // Lab 05
+    
     // Lab 06
     // Lab 07
     // Lab 08

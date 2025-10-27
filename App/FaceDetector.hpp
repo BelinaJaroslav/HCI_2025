@@ -2,13 +2,17 @@
 
 #include <opencv2/opencv.hpp>
 
+
 class FaceDetector {
 public:
+
 	FaceDetector() { }
+
 
 	bool load_classifier(const cv::String& filename) {
 		return m_classifier.load(filename);
 	}
+
 
 	std::vector<cv::Point2f> find_faces(cv::Mat& frame) {
         cv::Mat frame_grayscale;
@@ -33,6 +37,7 @@ public:
 	}
 
 private:
+
 	cv::CascadeClassifier m_classifier;
 
 };

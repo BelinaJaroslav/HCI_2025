@@ -12,7 +12,8 @@ using namespace std;
 // Class that represents a simple thread pool
 class ThreadPool {
 public:
-    // // Constructor to creates a thread pool with given
+
+    // Constructor to creates a thread pool with given
     // number of threads
     ThreadPool(size_t num_threads
         = thread::hardware_concurrency())
@@ -61,6 +62,7 @@ public:
         }
     }
 
+
     // Destructor to stop the thread pool
     ~ThreadPool()
     {
@@ -80,6 +82,7 @@ public:
         }
     }
 
+
     // Enqueue task for execution by the thread pool
     void enqueue(function<void()> task)
     {
@@ -91,6 +94,7 @@ public:
     }
 
 private:
+
     // Vector to store worker threads
     vector<thread> threads_;
 
@@ -100,11 +104,9 @@ private:
     // Mutex to synchronize access to shared data
     mutex queue_mutex_;
 
-    // Condition variable to signal changes in the state of
-    // the tasks queue
+    // Condition variable to signal changes in the state of the tasks queue
     condition_variable cv_;
 
-    // Flag to indicate whether the thread pool should stop
-    // or not
+    // Flag to indicate whether the thread pool should stop or not
     std::atomic<bool> stop_{ false };
 };

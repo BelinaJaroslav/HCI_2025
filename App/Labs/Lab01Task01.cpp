@@ -2,6 +2,7 @@
 
 #include <fmt/core.h>
 
+
 void App::lab_identify_object_by_luminance() const
 {
     const unsigned char THRESHOLD = 248;
