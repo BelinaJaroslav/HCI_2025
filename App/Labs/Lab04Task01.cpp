@@ -163,7 +163,7 @@ std::vector<uchar> App::lossy_quality_limit(const cv::Mat& frame, const float ta
         }
         // check the quality with PSNR
         float min_psnr = target_coefficient * MAX_PSNR;
-        if (CV2Tools::getPSNR(decoded,frame) <= min_psnr) {
+        if (CV2Tools::get_PSNR(decoded,frame) <= min_psnr) {
             break;
         }
     }
