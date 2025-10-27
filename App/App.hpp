@@ -69,6 +69,7 @@ private:
 
     // == METHODS ==
     void init_assets();
+    void print_gl_info();
     
     // Callbacks
     static void error_callback(int error, const char* description);

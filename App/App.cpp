@@ -168,6 +168,9 @@ bool App::init()
     }
 
     fmt::println("App initialized.\n================");
+
+    print_gl_info();
+
     return true;
 }
 
@@ -218,4 +221,27 @@ App::~App()
 
     // Bye
     fmt::println("Nashle.");
+}
+
+
+void App::print_gl_info()
+{
+    std::cout << "\n=================== :: GL Info :: ===================\n";
+    std::cout << "GL Vendor:\t" << glGetString(GL_VENDOR) << "\n";
+    std::cout << "GL Renderer:\t" << glGetString(GL_RENDERER) << "\n";
+    std::cout << "GL Version:\t" << glGetString(GL_VERSION) << "\n";
+    std::cout << "GL Shading ver:\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n\n";
+
+    GLint profile;
+    glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile);
+    if (const auto errorCode = glGetError()) {
+        std::cout << "[!] Pending GL error while obtaining profile: " << errorCode << "\n";
+    }
+    if (profile & GL_CONTEXT_CORE_PROFILE_BIT) {
+        std::cout << "Core profile" << "\n";
+    }
+    else {
+        std::cout << "Compatibility profile" << "\n";
+    }
+    std::cout << "=====================================================\n\n";
 }
