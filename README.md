@@ -10,4 +10,4 @@
 
 * [Zadání 04 (JPEG video sidequest)](./Markdown/LAB04.md)
 
-* [Zadání 05 (GLFW init)](./Markdown/LAB05.md)
+* [Zadání 05 (OpenGL init)](./Markdown/LAB05.md)
