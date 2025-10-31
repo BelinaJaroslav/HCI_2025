@@ -31,15 +31,24 @@ void App::run()
     // Get uniform location in GPU program. This will not change, so it can be moved out of the game loop.
     GLint uniform_color_location = glGetUniformLocation(shader_prog_ID, "uniform_Color");
     if (uniform_color_location == -1) {
-        std::cerr << "Uniform location is not found in active shader program. Did you forget to activate it?\n";
+        fmt::println(stderr, "Uniform location is not found in active shader program. Did you forget to activate it?");
     }
 
     while (!glfwWindowShouldClose(window)) {
         // clear canvas
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // = After clearing canvas =
+        
+        // Mouselook: get cursor's offset from window center and the move it back to center
+        if (is_mouselook_on) {
+            //glfwGetCursorPos(window, &cursor_x, &cursor_y);
+            //camera.ProcessMouseMovement(static_cast<GLfloat>(win_width / 2.0 - cursor_x), static_cast<GLfloat>(win_height / 2.0 - cursor_y));
+            glfwSetCursorPos(window, win_width / 2.0, win_height / 2.0); // We have no camera yet, so this doesn't really do anything
+        }
+
         // set uniform parameter for shader
-        // (try to change the color in key callback)          
+        // (try to change the color in some callback)          
         glUniform4f(uniform_color_location, r, g, b, a);
 
         // bind 3d object data

@@ -13,17 +13,26 @@
 * [Zadání 05 (OpenGL init)](./Markdown/LAB05.md)
 
 * [Zadání 06](./Markdown/LAB06.md)
-  * [ ] refactor ☺
-  * [ ] check for OpenGL debug extension (if you succeeded to open GL context version 4.6, it should be present)
-  * [ ] create debug callback (copy from lecture)
-  * [ ] activate debug output; if it is too noisy, use filter to suppress notifications, etc.
-  * [ ] create and register GLFW error callback to handle errors during library initialization
-  * [ ] add proper error and quit handling (in C++ use exceptions)
-  * [ ] create and register additional callbacks
-  * [ ] use callbacks and/or running time from `glfwGetTime()` to change triangle color by changing values in line
+  * [x] refactor ☺
+  * [x] check for OpenGL debug extension (if you succeeded to open GL context version 4.6, it should be present)
+  * [x] create debug callback (copy from lecture)
+  * [x] activate debug output
+  * [ ] if the debug is too noisy, use filter to suppress notifications, etc.
+  * [x] create and register GLFW error callback to handle errors during library initialization
+  * [x] create and register additional callbacks
+  * [ ] use callbacks and/or running time from `glfwGetTime()` to change triangle color by changing values
   * [ ] you can set color that is used to clear canvas – backgound color; use some other callbacks
-  * [ ] VSYNC: key callback to toggle, load initial vsync on/off value from JSON
-  * [ ] Hide window during initialization
-  * [ ] RMB to enable/disable "mouselook" ?
+  * [x] VSYNC: load initial vsync on/off value from JSON
+  * [ ] VSYNC: key callback to toggle on/off
+  * [x] Hide window during initialization
+  * [x] RMB to enable/disable "mouselook"
   * [x] IMGUI: add to vcpkg
+  * [ ] IMGUI: make it work
   * [ ] IMGUI: show FPS
+
+&nbsp;
+
+* `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor
+* `AppCallbacks.cpp` – callbacky
+* `AppInitAssets.cpp` – načtení shaderů, modelů, textur, ...
+* `AppRun.cpp` – hlavní smyčka: runtime logika a vykreslování

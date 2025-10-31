@@ -3,5 +3,7 @@
   "default_resolution": {
     "x": 1024,
     "y": 768
-  }
+  },
+  "vsync": true,
+  "mouselook": false
 }
