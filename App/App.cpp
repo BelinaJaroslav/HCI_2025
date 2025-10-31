@@ -18,6 +18,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// OpenGL error callback
+#include "gl_err_callback.h"
+
 // Non-OpenGL 3rd party libraries
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
@@ -65,9 +68,12 @@ bool App::init()
     std::ifstream settings_file("App/Resources/app_settings.json");
     nlohmann::json settings = nlohmann::json::parse(settings_file);
     
+    // - Default values
     std::string app_name = "App";
-    int win_width = 640;
-    int win_height = 480;
+    win_width = 640;
+    win_height = 480;
+    is_vsync_on = true;
+    is_mouselook_on = false;
 
     if (settings["app_name"].is_string()) {
         app_name = settings["app_name"].template get<std::string>();
@@ -79,6 +85,12 @@ bool App::init()
         if (settings["default_resolution"]["y"].is_number_integer()) {
             win_height = settings["default_resolution"]["y"].template get<int>();
         }
+    }
+    if (settings["vsync"].is_boolean()) {
+        is_vsync_on = settings["vsync"].template get<bool>();
+    }
+    if (settings["mouselook"].is_boolean()) {
+        is_mouselook_on = settings["mouselook"].template get<bool>();
     }
 
     // Init OpenGL
@@ -108,8 +120,13 @@ bool App::init()
         }
         glfwSetWindowUserPointer(window, this);
 
-        // Hide cursor
-        //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        // Hide cursor according to JSON config
+        if (is_mouselook_on) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+        else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
 
         // These can be used later for switching Fullscreen On & Off
         monitor = glfwGetPrimaryMonitor(); // Get primary monitor
@@ -120,11 +137,11 @@ bool App::init()
         glfwSetKeyCallback(window, key_callback);
         glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
         glfwSetMouseButtonCallback(window, mouse_button_callback);
+        glfwSetCursorPosCallback(window, cursor_position_callback);
         glfwSetScrollCallback(window, scroll_callback);
 
-        // Set V-Sync ON.
-        glfwSwapInterval(1);
-        is_vsync_on = true;
+        // Set V-Sync according to JSON config
+        glfwSwapInterval(is_vsync_on);
 
         // Init GLEW :: http://glew.sourceforge.net/basic.html
         GLenum err = glewInit();
@@ -135,15 +152,15 @@ bool App::init()
 
         //...after ALL GLFW & GLEW init ...
         if (GLEW_ARB_debug_output) {
-            //glDebugMessageCallback(MessageCallback, 0);
+            glDebugMessageCallback(MessageCallback, 0);
             glEnable(GL_DEBUG_OUTPUT);
 
             // default is asynchronous debug output, use this to simulate glGetError() functionality
             glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-            std::cout << "GL_DEBUG enabled.\n";
+            fmt::println("GL_DEBUG enabled.");
         }
-        else std::cout << "GL_DEBUG NOT SUPPORTED!\n";
+        else fmt::println("GL_DEBUG NOT SUPPORTED!");
 
         // Set GL params
         glEnable(GL_DEPTH_TEST);
@@ -163,7 +180,7 @@ bool App::init()
         glfwShowWindow(window);
     }
     catch (std::exception const& e) {
-        std::cerr << "Init failed : " << e.what() << "\n";
+        fmt::println(stderr, "Init failed: {}", e.what());
         exit(-1);
     }
 
@@ -172,39 +189,6 @@ bool App::init()
     print_gl_info();
 
     return true;
-}
-
-
-void App::init_assets()
-{
-    // Lab 05
-    lab05_init_assets();
-}
-
-
-void App::run()
-{
-    // Lab 01 Task 01
-    //lab_identify_object_by_luminance();
-    // Lab 01 Task 02
-    //lab_find_red_object_in_image();
-    // Lab 01 Task 03
-    //lab_find_red_object_in_video();
-    // Lab 01 Task 04
-    //lab_find_face_in_video();
-
-    // Lab 02
-    //lab_complex_behaviour();
-    
-    // Lab 03
-    //lab_multithread();
-
-    // Lab 04
-    //lab_compression();
-    //lab_compression_pool();
-
-    // Lab 05
-    lab05_run();
 }
 
 
@@ -220,7 +204,7 @@ App::~App()
     glDeleteVertexArrays(1, &VAO_ID);
 
     // Bye
-    fmt::println("Nashle.");
+    fmt::println("\nNashle.");
 }
 
 

@@ -34,18 +34,31 @@ void App::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 
+void App::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    // If mouselook is laggy then move logic into App::run ?
+}
+
+
 void App::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    /*
     auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
     
+    /*
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         // LMB was pressed...
     }
+    /**/
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         // RMB was pressed...
+        this_inst->is_mouselook_on = !this_inst->is_mouselook_on;
+        if (this_inst->is_mouselook_on) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+        else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
     }
-    /**/
 }
 

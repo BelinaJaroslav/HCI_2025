@@ -55,7 +55,12 @@ private:
     GLFWwindow* window{};
     GLFWmonitor* monitor{};
     const GLFWvidmode* mode{};
+
+    int win_width;
+    int win_height;
+    
     bool is_vsync_on{};
+    bool is_mouselook_on{};
 
     GLuint shader_prog_ID{ 0 };
     GLuint VBO_ID{ 0 };
@@ -76,6 +81,7 @@ private:
     static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
     static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+    static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
     static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
     
     // Lab 01
@@ -101,14 +107,5 @@ private:
     void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
     std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
-    
-    // Lab 05
-    void lab05_init_assets();
-    void lab05_run();
-        
-    // Lab 06
-    // Lab 07
-    // Lab 08
-    // Lab 09
-    // Lab 10
+
 };

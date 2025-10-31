@@ -4,8 +4,7 @@
 // Our App
 #include "App/App.hpp"
 
-
-void App::lab05_init_assets()
+void App::init_assets()
 {
     fmt::println("Initializing assets");
     //
@@ -58,11 +57,11 @@ void App::lab05_init_assets()
     GLint position_attrib_location = glGetAttribLocation(shader_prog_ID, "attribute_Position");
 
     glEnableVertexArrayAttrib(VAO_ID, position_attrib_location);
-    
+
     // ???
     //glVertexArrayAttribFormat(VAO_ID, position_attrib_location, vertex.position.length(), GL_FLOAT, GL_FALSE, offsetof(vertex, position));
     glVertexArrayAttribFormat(VAO_ID, position_attrib_location, 3, GL_FLOAT, GL_FALSE, offsetof(vertex, position));
-   
+
     glVertexArrayAttribBinding(VAO_ID, position_attrib_location, 0); // (GLuint vaobj, GLuint attribindex, GLuint bindingindex)
 
     // Create and fill data
@@ -72,40 +71,3 @@ void App::lab05_init_assets()
     // Connect together
     glVertexArrayVertexBuffer(VAO_ID, 0, VBO_ID, 0, sizeof(vertex)); // (GLuint vaobj, GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride)
 }
-
-
-void App::lab05_run()
-{
-    GLfloat r, g, b, a;
-    r = 1.0f; g = 0.6f; b = 1.0f; a = 1.0f; // Pink
-
-    // Activate shader program. There is only one program, so activation can be out of the loop. 
-    // In more realistic scenarios, you will activate different shaders for different 3D objects.
-    glUseProgram(shader_prog_ID);
-
-    // Get uniform location in GPU program. This will not change, so it can be moved out of the game loop.
-    GLint uniform_color_location = glGetUniformLocation(shader_prog_ID, "uniform_Color");
-    if (uniform_color_location == -1) {
-        std::cerr << "Uniform location is not found in active shader program. Did you forget to activate it?\n";
-    }
-
-    while (!glfwWindowShouldClose(window)) {
-        // clear canvas
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // set uniform parameter for shader
-        // (try to change the color in key callback)          
-        glUniform4f(uniform_color_location, r, g, b, a);
-
-        // bind 3d object data
-        glBindVertexArray(VAO_ID);
-
-        // draw all VAO data
-        glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(triangle_vertices.size()));
-
-        // poll events, call callbacks, flip back<->front buffer
-        glfwPollEvents();
-        glfwSwapBuffers(window);
-    }
-}
-

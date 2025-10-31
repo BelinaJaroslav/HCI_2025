@@ -18,6 +18,7 @@ find_package(glm           CONFIG REQUIRED)
 find_package(GLEW                 REQUIRED)
 find_package(glfw3         CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(imgui         CONFIG REQUIRED)
 
 if(WIN32)
     find_package(OpenCV CONFIG REQUIRED PATHS "c:/HCI/opencv/build" "C:/Users/jaroslav/source/repos/HCI_2025/opencv/build")
@@ -39,6 +40,7 @@ target_link_libraries(HCI PRIVATE
     glfw
     glm::glm
     nlohmann_json::nlohmann_json
+    imgui::imgui
     ${OpenCV_LIBS}
 )
 
