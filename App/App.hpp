@@ -101,14 +101,5 @@ private:
     void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
     std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
-    
-    // Lab 05
-    void lab05_init_assets();
-    void lab05_run();
-        
-    // Lab 06
-    // Lab 07
-    // Lab 08
-    // Lab 09
-    // Lab 10
+
 };

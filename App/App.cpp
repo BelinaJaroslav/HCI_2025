@@ -175,39 +175,6 @@ bool App::init()
 }
 
 
-void App::init_assets()
-{
-    // Lab 05
-    lab05_init_assets();
-}
-
-
-void App::run()
-{
-    // Lab 01 Task 01
-    //lab_identify_object_by_luminance();
-    // Lab 01 Task 02
-    //lab_find_red_object_in_image();
-    // Lab 01 Task 03
-    //lab_find_red_object_in_video();
-    // Lab 01 Task 04
-    //lab_find_face_in_video();
-
-    // Lab 02
-    //lab_complex_behaviour();
-    
-    // Lab 03
-    //lab_multithread();
-
-    // Lab 04
-    //lab_compression();
-    //lab_compression_pool();
-
-    // Lab 05
-    lab05_run();
-}
-
-
 App::~App()
 {
     // Cleanup OpenCV
