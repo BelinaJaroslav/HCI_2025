@@ -20,8 +20,8 @@
   * [ ] if the debug is too noisy, use filter to suppress notifications, etc.
   * [x] create and register GLFW error callback to handle errors during library initialization
   * [x] create and register additional callbacks
-  * [ ] use callbacks and/or running time from `glfwGetTime()` to change triangle color by changing values
-  * [ ] you can set color that is used to clear canvas – backgound color; use some other callbacks
+  * [x] use callbacks and/or running time from `glfwGetTime()` to change triangle color by changing values
+  * [x] you can set color that is used to clear canvas – backgound color; use some other callbacks
   * [x] VSYNC: load initial vsync on/off value from JSON
   * [ ] VSYNC: key callback to toggle on/off
   * [x] Hide window during initialization
