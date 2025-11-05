@@ -1,3 +1,5 @@
+#include "App.hpp"
+#include "App.hpp"
 // Non-OpenGL 3rd party libraries
 #include <fmt/core.h>
 
@@ -7,59 +9,154 @@
 
 void App::run()
 {
-    // ------------------------------------------------------------------- //
-    // This creates some redundant threads but it shouldn't matter because
-    // this functionality won't be used in the future: the app will run in 
-    // fullscreen and webcam footage will be part of the main window.
-    const bool SHOW_WEBCAM_DETECTOR_WINDOW = false;
-    const bool SHOW_WEBCAM_COMPRESSION_WINDOW = false;
+	// ------------------------------------------------------------------- //
+	// This creates some redundant threads but it shouldn't matter because
+	// this functionality won't be used in the future: the app will run in 
+	// fullscreen and webcam footage will be part of the main window.
+	const bool SHOW_WEBCAM_DETECTOR_WINDOW = false;
+	const bool SHOW_WEBCAM_COMPRESSION_WINDOW = false;
 
-    std::jthread t_detector;
-    std::jthread t_compression;
+	std::jthread t_detector;
+	std::jthread t_compression;
 
-    if (SHOW_WEBCAM_DETECTOR_WINDOW) t_detector = std::jthread(&App::lab_multithread, this);
-    if (SHOW_WEBCAM_COMPRESSION_WINDOW) t_compression = std::jthread(&App::lab_compression_pool, this);
-    // ------------------------------------------------------------------- //
+	if (SHOW_WEBCAM_DETECTOR_WINDOW) t_detector = std::jthread(&App::lab_multithread, this);
+	if (SHOW_WEBCAM_COMPRESSION_WINDOW) t_compression = std::jthread(&App::lab_compression_pool, this);
 
-    GLfloat r, g, b, a;
-    r = 1.0f; g = 0.6f; b = 1.0f; a = 1.0f; // Pink
+	FPSMeter fps_meter_main;
+	// ------------------------------------------------------------------- //
 
-    // Activate shader program. There is only one program, so activation can be out of the loop. 
-    // In more realistic scenarios, you will activate different shaders for different 3D objects.
-    glUseProgram(shader_prog_ID);
+	Color triangle_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
 
-    // Get uniform location in GPU program. This will not change, so it can be moved out of the game loop.
-    GLint uniform_color_location = glGetUniformLocation(shader_prog_ID, "uniform_Color");
-    if (uniform_color_location == -1) {
-        fmt::println(stderr, "Uniform location is not found in active shader program. Did you forget to activate it?");
-    }
+	// Activate shader program. There is only one program, so activation can be out of the loop. 
+	// In more realistic scenarios, you will activate different shaders for different 3D objects.
+	glUseProgram(shader_prog_ID);
 
-    while (!glfwWindowShouldClose(window)) {
-        // clear canvas
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Get uniform location in GPU program. This will not change, so it can be moved out of the game loop.
+	GLint uniform_color_location = glGetUniformLocation(shader_prog_ID, "uniform_Color");
+	if (uniform_color_location == -1) {
+		fmt::println(stderr, "Uniform location is not found in active shader program. Did you forget to activate it?");
+	}
 
-        // = After clearing canvas =
-        
-        // Mouselook: get cursor's offset from window center and the move it back to center
-        if (is_mouselook_on) {
-            //glfwGetCursorPos(window, &cursor_x, &cursor_y);
-            //camera.ProcessMouseMovement(static_cast<GLfloat>(win_width / 2.0 - cursor_x), static_cast<GLfloat>(win_height / 2.0 - cursor_y));
-            glfwSetCursorPos(window, win_width / 2.0, win_height / 2.0); // We have no camera yet, so this doesn't really do anything
-        }
+	// ImGui state variables
+	bool show_control_window = true;
+	bool show_fps_window = true;
+	float background_color[3] = { 0.1f, 0.1f, 0.1f }; // Dark gray background
 
-        // set uniform parameter for shader
-        // (try to change the color in some callback)          
-        glUniform4f(uniform_color_location, r, g, b, a);
+	// Main game loop
+	while (!glfwWindowShouldClose(window)) {
 
-        // bind 3d object data
-        glBindVertexArray(VAO_ID);
+		fps_meter_main.update();
 
-        // draw all VAO data
-        glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(triangle_vertices.size()));
+		// Start ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 
-        // poll events, call callbacks, flip back<->front buffer
-        glfwPollEvents();
-        glfwSwapBuffers(window);
-    }
+		renderGUI(fps_meter_main, triangle_color, background_color);
+
+
+
+		// clear canvas
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// = After clearing canvas =
+
+		// Mouselook: get cursor's offset from window center and the move it back to center
+		if (is_mouselook_on) {
+			//glfwGetCursorPos(window, &cursor_x, &cursor_y);
+			//camera.ProcessMouseMovement(static_cast<GLfloat>(win_width / 2.0 - cursor_x), static_cast<GLfloat>(win_height / 2.0 - cursor_y));
+			glfwSetCursorPos(window, win_width / 2.0, win_height / 2.0); // We have no camera yet, so this doesn't really do anything
+		}
+
+		// set uniform parameter for shader
+		// (try to change the color in some callback)          
+		glUniform4f(uniform_color_location, triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a);
+
+		// bind 3d object data
+		glBindVertexArray(VAO_ID);
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		// draw all VAO data
+		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(triangle_vertices.size()));
+
+		// poll events, call callbacks, flip back<->front buffer
+		glfwPollEvents();
+		glfwSwapBuffers(window);
+	}
 }
 
+void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, float background_color[3]) {
+
+    ImGui::Begin("FPS Meter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    {
+        // Display current FPS value
+        ImGui::Text("FPS: %.1f", fps_meter.get());
+
+        // Show if the value was just updated
+        if (fps_meter.is_updated()) {
+            ImGui::SameLine();
+            ImGui::TextColored(ImVec4(0, 1, 0, 1), " (Updated)");
+        }
+
+        // FPS history graph
+        static std::vector<float> fps_history;
+        static const int history_size = 100;
+
+        // FIX 1: Use fps_meter (the parameter) not fps_meter_main
+        fps_history.push_back(static_cast<float>(fps_meter.get()));
+        if (fps_history.size() > history_size) {
+            fps_history.erase(fps_history.begin());
+        }
+
+        // Plot the FPS history
+        ImGui::PlotLines("FPS History", fps_history.data(),
+            static_cast<int>(fps_history.size()), 0,
+            nullptr, 0.0f, 200.0f,
+            ImVec2(200, 50));
+
+        // Controls
+        if (ImGui::Button("Reset FPS Counter")) {
+            fps_meter.reset();
+            fps_history.clear();
+        }
+
+        // Interval adjustment
+        static float interval_seconds = 1.0f;
+        // FIX 2: Use fps_meter (the parameter) not fps_meter_main
+        if (ImGui::SliderFloat("Update Interval (s)", &interval_seconds, 0.1f, 5.0f)) {
+            fps_meter.set_interval(std::chrono::duration<double>(interval_seconds));
+        }
+    }
+    ImGui::End();
+
+    // Controls Window
+    ImGui::Begin("Render Controls");
+    {
+        // Convert Color struct to array for ColorEdit3
+        float triangle_color_arr[3] = { triangle_color.r, triangle_color.g, triangle_color.b };
+        if (ImGui::ColorEdit3("Triangle Color", triangle_color_arr)) {
+            triangle_color.r = triangle_color_arr[0];
+            triangle_color.g = triangle_color_arr[1];
+            triangle_color.b = triangle_color_arr[2];
+        }
+
+        // FIX 3: Apply background color changes immediately
+        if (ImGui::ColorEdit3("Background Color", background_color)) {
+            glClearColor(background_color[0], background_color[1], background_color[2], 1.0f);
+        }
+
+        ImGui::Checkbox("Mouselook", &is_mouselook_on);
+
+        if (ImGui::Button("Reset Colors")) {
+            triangle_color = { 1.0f, 0.6f, 1.0f, 1.0f };
+            background_color[0] = 0.1f;
+            background_color[1] = 0.1f;
+            background_color[2] = 0.1f;
+            // FIX 4: Apply the reset background color immediately
+            glClearColor(background_color[0], background_color[1], background_color[2], 1.0f);
+        }
+    }
+    ImGui::End();
+}

@@ -15,6 +15,12 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Imgui import 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
+
 // Our libraries
 #include "CV2Tools.hpp"
 #include "FaceDetector.hpp"
@@ -29,7 +35,7 @@ public:
 
     App();
     bool init();
-    void run();    
+    void run();
     ~App();
 
     struct ProcessedFrame {
@@ -41,6 +47,8 @@ public:
     SyncedDeque<ProcessedFrame> result_queue;
 
 private:
+
+    struct Color { GLfloat r, g, b, a; };
 
     // == MEMBERS ==
     FaceDetector face_detector;
@@ -107,5 +115,8 @@ private:
     void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
     std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
+
+    // AppRun
+    void renderGUI(FPSMeter& fps_meter, Color& triangle_color, float background_color[3]);
 
 };
