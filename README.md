@@ -27,8 +27,8 @@
   * [x] Hide window during initialization
   * [x] RMB to enable/disable "mouselook"
   * [x] IMGUI: add to vcpkg
-  * [ ] IMGUI: make it work
-  * [ ] IMGUI: show FPS
+  * [x] IMGUI: make it work
+  * [x] IMGUI: show FPS
 
 &nbsp;
 
