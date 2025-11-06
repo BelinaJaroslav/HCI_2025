@@ -26,6 +26,7 @@ void App::run()
 	// ------------------------------------------------------------------- //
 
 	Color triangle_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
+    Color background_color{ 0.1f, 0.1f, 0.1f }; // Dark gray background
 
 	// Activate shader program. There is only one program, so activation can be out of the loop. 
 	// In more realistic scenarios, you will activate different shaders for different 3D objects.
@@ -38,9 +39,6 @@ void App::run()
 	}
 
 	// ImGui state variables
-	bool show_control_window = true;
-	bool show_fps_window = true;
-	float background_color[3] = { 0.1f, 0.1f, 0.1f }; // Dark gray background
 
 	// Main game loop
 	while (!glfwWindowShouldClose(window)) {
@@ -87,7 +85,7 @@ void App::run()
 	}
 }
 
-void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, float background_color[3]) {
+void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color) {
 
     ImGui::Begin("FPS Meter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
@@ -134,7 +132,6 @@ void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, float background
     // Controls Window
     ImGui::Begin("Render Controls");
     {
-        // Convert Color struct to array for ColorEdit3
         float triangle_color_arr[3] = { triangle_color.r, triangle_color.g, triangle_color.b };
         if (ImGui::ColorEdit3("Triangle Color", triangle_color_arr)) {
             triangle_color.r = triangle_color_arr[0];
@@ -142,20 +139,19 @@ void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, float background
             triangle_color.b = triangle_color_arr[2];
         }
 
-        // FIX 3: Apply background color changes immediately
-        if (ImGui::ColorEdit3("Background Color", background_color)) {
-            glClearColor(background_color[0], background_color[1], background_color[2], 1.0f);
+        float background_color_arr[3] = { background_color.r, background_color.g, background_color.b };
+        if (ImGui::ColorEdit3("Background Color", background_color_arr)) {
+            glClear(background_color_arr[0], background_color_arr[1], background_color_arr[2], 1.0f);
         }
 
         ImGui::Checkbox("Mouselook", &is_mouselook_on);
 
         if (ImGui::Button("Reset Colors")) {
             triangle_color = { 1.0f, 0.6f, 1.0f, 1.0f };
-            background_color[0] = 0.1f;
-            background_color[1] = 0.1f;
-            background_color[2] = 0.1f;
-            // FIX 4: Apply the reset background color immediately
-            glClearColor(background_color[0], background_color[1], background_color[2], 1.0f);
+            background_color.r = 0.1f;
+            background_color.g = 0.1f;
+            background_color.b = 0.1f;
+            glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
         }
     }
     ImGui::End();

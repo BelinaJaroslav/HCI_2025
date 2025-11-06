@@ -117,6 +117,6 @@ private:
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
 
     // AppRun
-    void renderGUI(FPSMeter& fps_meter, Color& triangle_color, float background_color[3]);
+    void renderGUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);
 
 };
