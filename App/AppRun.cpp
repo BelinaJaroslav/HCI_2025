@@ -141,7 +141,7 @@ void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgroun
 
         float background_color_arr[3] = { background_color.r, background_color.g, background_color.b };
         if (ImGui::ColorEdit3("Background Color", background_color_arr)) {
-            glClear(background_color_arr[0], background_color_arr[1], background_color_arr[2], 1.0f);
+            glClearColor(background_color_arr[0], background_color_arr[1], background_color_arr[2], 1.0f);
         }
 
         ImGui::Checkbox("Mouselook", &is_mouselook_on);
