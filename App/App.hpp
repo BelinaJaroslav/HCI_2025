@@ -20,7 +20,6 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-
 // Our libraries
 #include "CV2Tools.hpp"
 #include "FaceDetector.hpp"

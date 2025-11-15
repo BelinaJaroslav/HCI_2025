@@ -1,10 +1,8 @@
-#include "App.hpp"
-#include "App.hpp"
 // Non-OpenGL 3rd party libraries
 #include <fmt/core.h>
 
 // Our App
-#include "App/App.hpp"
+#include "App.hpp"
 
 
 void App::run()
@@ -52,9 +50,7 @@ void App::run()
 
 		renderGUI(fps_meter_main, triangle_color, background_color);
 
-
-
-		// clear canvas
+		// Clear canvas
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// = After clearing canvas =
@@ -141,6 +137,9 @@ void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgroun
 
         float background_color_arr[3] = { background_color.r, background_color.g, background_color.b };
         if (ImGui::ColorEdit3("Background Color", background_color_arr)) {
+            background_color.r = background_color_arr[0];
+            background_color.g = background_color_arr[1];
+            background_color.b = background_color_arr[2];
             glClearColor(background_color_arr[0], background_color_arr[1], background_color_arr[2], 1.0f);
         }
 
