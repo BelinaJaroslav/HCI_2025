@@ -7,11 +7,22 @@
 void App::init_assets()
 {
     fmt::println("Initializing assets");
-    //
-    // Initialize pipeline: compile, link and use shaders
-    //
 
-    // SHADERS - define & compile & link
+    std::string str_simple_shader = "simple_shader";
+
+    // SHADERS
+    std::filesystem::path VS_path("./App/Resources/Shaders/basic.vert");
+    std::filesystem::path FS_path("./App/Resources/Shaders/basic.frag");
+
+    shader_library.emplace(str_simple_shader, std::make_shared<ShaderProgram>(VS_path, FS_path));
+    //shader_library.emplace("rainbow", std::make_shared<ShaderProgram>("Resources/Shaders/basic.vert", "Resources/Shaders/rainbow.frag"));
+
+    // MODELS
+    std::filesystem::path triangle_path("./App/Resources/Objects/triangle.obj");
+    auto triangle_model = Model(triangle_path, shader_library.at(str_simple_shader));
+    scene.insert({ "obj_triangle", triangle_model });
+
+    /*
     const char* vertex_shader =
         "#version 460 core\n"
         "in vec3 attribute_Position;"
@@ -70,4 +81,5 @@ void App::init_assets()
 
     // Connect together
     glVertexArrayVertexBuffer(VAO_ID, 0, VBO_ID, 0, sizeof(vertex)); // (GLuint vaobj, GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride)
+    /**/
 }

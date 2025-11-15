@@ -2,7 +2,9 @@
 
 // C++ standard libraries
 #include <atomic>
+#include <memory>
 #include <tuple>
+#include <unordered_map>
 
 // 3rd party libraries
 #include <opencv2/opencv.hpp>
@@ -21,12 +23,14 @@
 #include "imgui_impl_opengl3.h"
 
 // Our libraries
+#include "Assets.hpp"
 #include "CV2Tools.hpp"
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
-#include "SyncedDeque.hpp"
+#include "Model.hpp"
 #include "ThreadPool.hpp"
-#include "Assets.hpp"
+#include "ShaderProgram.hpp"
+#include "SyncedDeque.hpp"
 
 
 class App {
@@ -78,6 +82,9 @@ private:
         {{0.5f, -0.5f,  0.0f}},
         {{-0.5f, -0.5f,  0.0f}}
     };
+
+    std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shader_library;
+    std::unordered_map<std::string, Model> scene;
 
     // == METHODS ==
     void init_assets();

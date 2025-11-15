@@ -28,13 +28,13 @@ void App::run()
 
 	// Activate shader program. There is only one program, so activation can be out of the loop. 
 	// In more realistic scenarios, you will activate different shaders for different 3D objects.
-	glUseProgram(shader_prog_ID);
+	//glUseProgram(shader_prog_ID);
 
 	// Get uniform location in GPU program. This will not change, so it can be moved out of the game loop.
-	GLint uniform_color_location = glGetUniformLocation(shader_prog_ID, "uniform_Color");
-	if (uniform_color_location == -1) {
-		fmt::println(stderr, "Uniform location is not found in active shader program. Did you forget to activate it?");
-	}
+	//GLint uniform_color_location = glGetUniformLocation(shader_prog_ID, "uniform_Color");
+	//if (uniform_color_location == -1) {
+	//	fmt::println(stderr, "Uniform location is not found in active shader program. Did you forget to activate it?");
+	//}
 
 	// ImGui state variables
 
@@ -56,25 +56,37 @@ void App::run()
 		// = After clearing canvas =
 
 		// Mouselook: get cursor's offset from window center and the move it back to center
+        // TODO: According to JJ, this is not a good approach
 		if (is_mouselook_on) {
 			//glfwGetCursorPos(window, &cursor_x, &cursor_y);
 			//camera.ProcessMouseMovement(static_cast<GLfloat>(win_width / 2.0 - cursor_x), static_cast<GLfloat>(win_height / 2.0 - cursor_y));
 			glfwSetCursorPos(window, win_width / 2.0, win_height / 2.0); // We have no camera yet, so this doesn't really do anything
 		}
 
+        // SHADER
+        auto current_shader = shader_library.at("simple_shader");
+        current_shader->activate();
+        current_shader->setUniform("ucolor", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));
+
 		// set uniform parameter for shader
 		// (try to change the color in some callback)          
-		glUniform4f(uniform_color_location, triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a);
+		//glUniform4f(uniform_color_location, triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a);
 
 		// bind 3d object data
-		glBindVertexArray(VAO_ID);
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		//glBindVertexArray(VAO_ID);		
 
 		// draw all VAO data
-		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(triangle_vertices.size()));
+		//glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(triangle_vertices.size()));
 
+        for (auto& [key, value] : scene) {
+            //value.update();
+            value.draw();
+        }
+
+
+        // IMGUI DRAW
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		// poll events, call callbacks, flip back<->front buffer
 		glfwPollEvents();
 		glfwSwapBuffers(window);
