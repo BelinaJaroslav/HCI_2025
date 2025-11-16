@@ -1,5 +1,22 @@
 # GUI - User Interface
 
+- [x] refactor ☺
+- [x] check for OpenGL debug extension (if you succeeded to open GL context version 4.6, it should be present)
+- [x] create debug callback (copy from lecture)
+- [x] activate debug output
+- [x] if the debug is too noisy, use filter to suppress notifications, etc.
+- [x] create and register GLFW error callback to handle errors during library initialization
+- [x] create and register additional callbacks
+- [x] use callbacks and/or running time from `glfwGetTime()` to change triangle color by changing values
+- [x] you can set color that is used to clear canvas – backgound color; use some other callbacks
+- [x] VSYNC: load initial vsync on/off value from JSON
+- [x] VSYNC: key callback to toggle on/off
+- [x] Hide window during initialization
+- [x] RMB to enable/disable "mouselook"
+- [x] IMGUI: add to vcpkg
+- [x] IMGUI: make it work
+- [x] IMGUI: show FPS
+
 Implement in ongoing semestral lab project.
 
 ## Task 1 - allow OpenGL debugging

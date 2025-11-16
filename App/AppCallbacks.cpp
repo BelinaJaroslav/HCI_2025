@@ -1,3 +1,7 @@
+// Non-OpenGL 3rd party libraries
+#include <fmt/core.h>
+
+// Our App
 #include "App.hpp"
 
 
@@ -16,6 +20,12 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
             // Escape was pressed...
             // Exit The App
             glfwSetWindowShouldClose(window, GLFW_TRUE);
+            break;
+
+        case GLFW_KEY_V:
+            this_inst->is_vsync_on = !this_inst->is_vsync_on;
+            glfwSwapInterval(this_inst->is_vsync_on);
+            fmt::println("VSync: {}", this_inst->is_vsync_on);
             break;
         }
     }

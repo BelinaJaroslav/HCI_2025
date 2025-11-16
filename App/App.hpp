@@ -2,7 +2,9 @@
 
 // C++ standard libraries
 #include <atomic>
+#include <memory>
 #include <tuple>
+#include <unordered_map>
 
 // 3rd party libraries
 #include <opencv2/opencv.hpp>
@@ -20,14 +22,15 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-
 // Our libraries
+#include "Assets.hpp"
 #include "CV2Tools.hpp"
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
-#include "SyncedDeque.hpp"
+#include "Model.hpp"
 #include "ThreadPool.hpp"
-#include "Assets.hpp"
+#include "ShaderProgram.hpp"
+#include "SyncedDeque.hpp"
 
 
 class App {
@@ -70,20 +73,16 @@ private:
     bool is_vsync_on{};
     bool is_mouselook_on{};
 
-    GLuint shader_prog_ID{ 0 };
-    GLuint VBO_ID{ 0 };
-    GLuint VAO_ID{ 0 };
-    std::vector<vertex> triangle_vertices =
-    {
-        {{0.0f,  0.5f,  0.0f}},
-        {{0.5f, -0.5f,  0.0f}},
-        {{-0.5f, -0.5f,  0.0f}}
-    };
+    std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shader_library;
+    std::unordered_map<std::string, Model> scene;
 
     // == METHODS ==
     void init_assets();
     void print_gl_info();
     
+    // AppRun
+    void render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);
+
     // Callbacks
     static void error_callback(int error, const char* description);
     static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -115,8 +114,4 @@ private:
     void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
     std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
-
-    // AppRun
-    void renderGUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);
-
 };

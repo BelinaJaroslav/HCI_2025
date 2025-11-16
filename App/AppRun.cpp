@@ -1,10 +1,8 @@
-#include "App.hpp"
-#include "App.hpp"
 // Non-OpenGL 3rd party libraries
 #include <fmt/core.h>
 
 // Our App
-#include "App/App.hpp"
+#include "App.hpp"
 
 
 void App::run()
@@ -25,20 +23,9 @@ void App::run()
 	FPSMeter fps_meter_main;
 	// ------------------------------------------------------------------- //
 
+    // State
 	Color triangle_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
     Color background_color{ 0.1f, 0.1f, 0.1f }; // Dark gray background
-
-	// Activate shader program. There is only one program, so activation can be out of the loop. 
-	// In more realistic scenarios, you will activate different shaders for different 3D objects.
-	glUseProgram(shader_prog_ID);
-
-	// Get uniform location in GPU program. This will not change, so it can be moved out of the game loop.
-	GLint uniform_color_location = glGetUniformLocation(shader_prog_ID, "uniform_Color");
-	if (uniform_color_location == -1) {
-		fmt::println(stderr, "Uniform location is not found in active shader program. Did you forget to activate it?");
-	}
-
-	// ImGui state variables
 
 	// Main game loop
 	while (!glfwWindowShouldClose(window)) {
@@ -50,42 +37,43 @@ void App::run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		renderGUI(fps_meter_main, triangle_color, background_color);
+		render_GUI(fps_meter_main, triangle_color, background_color);
 
-
-
-		// clear canvas
+		// Clear canvas
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// = After clearing canvas =
 
 		// Mouselook: get cursor's offset from window center and the move it back to center
+        // TODO: According to JJ, this is not a good approach
 		if (is_mouselook_on) {
 			//glfwGetCursorPos(window, &cursor_x, &cursor_y);
 			//camera.ProcessMouseMovement(static_cast<GLfloat>(win_width / 2.0 - cursor_x), static_cast<GLfloat>(win_height / 2.0 - cursor_y));
 			glfwSetCursorPos(window, win_width / 2.0, win_height / 2.0); // We have no camera yet, so this doesn't really do anything
 		}
 
-		// set uniform parameter for shader
-		// (try to change the color in some callback)          
-		glUniform4f(uniform_color_location, triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a);
+        // SHADER
+        auto current_shader = shader_library.at("simple_shader");
+        current_shader->activate();
+        current_shader->set_uniform("ucolor", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));
 
-		// bind 3d object data
-		glBindVertexArray(VAO_ID);
+        // DRAW MODELS FROM SCENE
+        for (auto& [key, value] : scene) {
+            //value.update();
+            value.draw();
+        }
 
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-		// draw all VAO data
-		glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(triangle_vertices.size()));
-
+        // IMGUI DRAW
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		// poll events, call callbacks, flip back<->front buffer
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
 }
 
-void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color) {
+
+void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color) {
 
     ImGui::Begin("FPS Meter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
@@ -141,10 +129,11 @@ void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgroun
 
         float background_color_arr[3] = { background_color.r, background_color.g, background_color.b };
         if (ImGui::ColorEdit3("Background Color", background_color_arr)) {
+            background_color.r = background_color_arr[0];
+            background_color.g = background_color_arr[1];
+            background_color.b = background_color_arr[2];
             glClearColor(background_color_arr[0], background_color_arr[1], background_color_arr[2], 1.0f);
         }
-
-        ImGui::Checkbox("Mouselook", &is_mouselook_on);
 
         if (ImGui::Button("Reset Colors")) {
             triangle_color = { 1.0f, 0.6f, 1.0f, 1.0f };
@@ -153,6 +142,8 @@ void App::renderGUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgroun
             background_color.b = 0.1f;
             glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
         }
+
+        ImGui::Checkbox("Mouselook", &is_mouselook_on);
     }
     ImGui::End();
 }
