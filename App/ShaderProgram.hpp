@@ -25,20 +25,20 @@ public:
     void deactivate();
     void clear();
     
-    GLuint getID(void) const { return ID; }
-    //GLint getAttribLocation(const std::string & name);
+    GLuint get_ID(void) const { return ID; }
+    //GLint get_attrib_location(const std::string & name);
     
     // set uniform according to name 
     // https://docs.gl/gl4/glUniform
-    void setUniform(const std::string & name, const GLfloat val);      
-    void setUniform(const std::string & name, const GLint val);        
-    void setUniform(const std::string & name, const glm::vec3 & val);  
-    void setUniform(const std::string & name, const glm::vec4 & val);  
-    void setUniform(const std::string & name, const glm::mat3 & val);   
-    void setUniform(const std::string & name, const glm::mat4 & val);
-    void setUniform(const std::string & name, const std::vector<GLint> & val);
-    void setUniform(const std::string & name, const std::vector<GLfloat> & val);
-    void setUniform(const std::string & name, const std::vector<glm::vec3> & val);
+    void set_uniform(const std::string & name, const GLfloat val);      
+    void set_uniform(const std::string & name, const GLint val);
+    void set_uniform(const std::string & name, const glm::vec3 & val);
+    void set_uniform(const std::string & name, const glm::vec4 & val);
+    void set_uniform(const std::string & name, const glm::mat3 & val);
+    void set_uniform(const std::string & name, const glm::mat4 & val);
+    void set_uniform(const std::string & name, const std::vector<GLint> & val);
+    void set_uniform(const std::string & name, const std::vector<GLfloat> & val);
+    void set_uniform(const std::string & name, const std::vector<glm::vec3> & val);
 
 private:
     GLuint ID{0}; // default = 0, empty shader
@@ -46,14 +46,13 @@ private:
 
     std::unordered_map<std::string, GLuint> uniform_location_cache;
 
-    GLuint getUniformLocation(const std::string & name);
+    GLuint get_uniform_location(const std::string & name);
 
     std::string read_text_file(const std::filesystem::path & filename); // load text file
 
     GLuint compile_shader(const std::string & source_code, const GLenum type); 
-    std::string getShaderInfoLog(const GLuint obj);    
+    std::string get_shader_info_log(const GLuint obj);    
 
     GLuint link_shader(const std::vector<GLuint> shader_ids); 
-    std::string getProgramInfoLog(const GLuint obj);      
+    std::string get_program_info_log(const GLuint obj);      
 };
-

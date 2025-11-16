@@ -58,7 +58,7 @@ ShaderProgram::~ShaderProgram()
 
 
 // Get location or write error to console
-GLuint ShaderProgram::getUniformLocation(const std::string & name) {
+GLuint ShaderProgram::get_uniform_location(const std::string & name) {
     // deferred (lazy) cache generation
     
     // Check if the location is already cached
@@ -78,7 +78,7 @@ GLuint ShaderProgram::getUniformLocation(const std::string & name) {
 
 
 /*
-GLint ShaderProgram::getAttribLocation(const std::string & name) {
+GLint ShaderProgram::get_attrib_location(const std::string& name) {
     GLint loc = glGetAttribLocation(ID, name);
     if (loc == -1) {
         std::cerr << "No vertex attribute with name: " << name << ", or reserved name (starting with gl_)\n";
@@ -87,53 +87,53 @@ GLint ShaderProgram::getAttribLocation(const std::string & name) {
 /**/
 
 
-void ShaderProgram::setUniform(const std::string& name, const GLfloat val) {
-    auto loc = getUniformLocation(name);
+void ShaderProgram::set_uniform(const std::string& name, const GLfloat val) {
+    auto loc = get_uniform_location(name);
     glProgramUniform1f(ID, loc, val);
 }
 
-void ShaderProgram::setUniform(const std::string& name, const GLint val) {
-    auto loc = getUniformLocation(name);
+void ShaderProgram::set_uniform(const std::string& name, const GLint val) {
+    auto loc = get_uniform_location(name);
     glProgramUniform1i(ID, loc, val);
 }
 
-void ShaderProgram::setUniform(const std::string& name, const glm::vec3 & val) {
-    auto loc = getUniformLocation(name);
+void ShaderProgram::set_uniform(const std::string& name, const glm::vec3 & val) {
+    auto loc = get_uniform_location(name);
 	glProgramUniform3fv(ID, loc, 1, glm::value_ptr(val));
 }
 
-void ShaderProgram::setUniform(const std::string& name, const glm::vec4 & val) {
-    auto loc = getUniformLocation(name);
+void ShaderProgram::set_uniform(const std::string& name, const glm::vec4 & val) {
+    auto loc = get_uniform_location(name);
     glProgramUniform4fv(ID, loc, 1, glm::value_ptr(val));
 }
 
-void ShaderProgram::setUniform(const std::string& name, const glm::mat3 & val) {
-    auto loc = getUniformLocation(name);
+void ShaderProgram::set_uniform(const std::string& name, const glm::mat3 & val) {
+    auto loc = get_uniform_location(name);
 	glProgramUniformMatrix3fv(ID, loc, 1, GL_FALSE, glm::value_ptr(val));
 }
 
-void ShaderProgram::setUniform(const std::string& name, const glm::mat4 & val) {
-    auto loc = getUniformLocation(name);
+void ShaderProgram::set_uniform(const std::string& name, const glm::mat4 & val) {
+    auto loc = get_uniform_location(name);
     glProgramUniformMatrix4fv(ID, loc, 1, GL_FALSE, glm::value_ptr(val));
 }
 
-void ShaderProgram::setUniform(const std::string & name, const std::vector<GLint>& val) {
-    auto loc = getUniformLocation(name);
+void ShaderProgram::set_uniform(const std::string & name, const std::vector<GLint>& val) {
+    auto loc = get_uniform_location(name);
     glProgramUniform1iv(ID, loc, GLsizei(val.size()), reinterpret_cast<GLint const*>(val.data()));
 }
 
-void ShaderProgram::setUniform(const std::string & name, const std::vector<GLfloat>& val) {
-    auto loc = getUniformLocation(name);
+void ShaderProgram::set_uniform(const std::string & name, const std::vector<GLfloat>& val) {
+    auto loc = get_uniform_location(name);
     glProgramUniform1fv(ID, loc, GLsizei(val.size()), reinterpret_cast<GLfloat const*>(val.data()));
 }
     
-void ShaderProgram::setUniform(const std::string & name, const std::vector<glm::vec3>& val) {
-    auto loc = getUniformLocation(name);
+void ShaderProgram::set_uniform(const std::string & name, const std::vector<glm::vec3>& val) {
+    auto loc = get_uniform_location(name);
     glProgramUniform3fv(ID, loc, GLsizei(val.size()), glm::value_ptr(val[0]));
 }
   
 
-std::string ShaderProgram::getShaderInfoLog(const GLuint obj) {
+std::string ShaderProgram::get_shader_info_log(const GLuint obj) {
     int log_length = 0;
     std::string s;
     glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &log_length);
@@ -146,7 +146,7 @@ std::string ShaderProgram::getShaderInfoLog(const GLuint obj) {
 }
 
 
-std::string ShaderProgram::getProgramInfoLog(const GLuint obj) {
+std::string ShaderProgram::get_program_info_log(const GLuint obj) {
     int log_length = 0;
     std::string s;
     glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &log_length);
@@ -170,7 +170,7 @@ GLuint ShaderProgram::compile_shader(const std::string & source_code, const GLen
         GLint status;
         glGetShaderiv(shader_ID, GL_COMPILE_STATUS, &status);
         if (status == GL_FALSE) {
-            std::cerr << getShaderInfoLog(shader_ID) << '\n';
+            std::cerr << get_shader_info_log(shader_ID) << '\n';
             glDeleteShader(shader_ID);
             throw std::runtime_error("Shader compilation failed.");
         } 
@@ -190,7 +190,7 @@ GLuint ShaderProgram::link_shader(const std::vector<GLuint> shader_ids) {
     // must be set before linking
     glBindAttribLocation(prog_ID, Mesh::attribute_location_position, "position");
     glBindAttribLocation(prog_ID, Mesh::attribute_location_normal, "normal");
-    glBindAttribLocation(prog_ID, Mesh::attribute_location_texture_coords, "texture_coords");
+    glBindAttribLocation(prog_ID, Mesh::attribute_location_texture_coords, "texture_coordinates");
 
 	glLinkProgram(prog_ID);
 
@@ -205,7 +205,7 @@ GLuint ShaderProgram::link_shader(const std::vector<GLuint> shader_ids) {
         glGetProgramiv(prog_ID, GL_LINK_STATUS, &status);
         if (status == GL_FALSE) {
             std::cerr << "Error linking shader program." << std::endl;
-            std::cerr << getProgramInfoLog(prog_ID) << std::endl;
+            std::cerr << get_program_info_log(prog_ID) << std::endl;
             glDeleteProgram(prog_ID);
             throw std::runtime_error("Shader linking failed.");
         }

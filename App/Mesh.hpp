@@ -25,6 +25,7 @@ public:
     // double destruction of the same OpenGL buffer is prevented). 
     Mesh() = delete; 
     
+
     // Simple mesh from vertices
     Mesh(std::vector<vertex> const &vertices, GLenum primitive_type) : primitive_type_{primitive_type}
     {
@@ -38,7 +39,7 @@ public:
         glVertexArrayAttribBinding(vao_, attribute_location_normal, 0);
         glEnableVertexArrayAttrib(vao_, attribute_location_normal);
 
-        glVertexArrayAttribFormat(vao_, attribute_location_texture_coords, glm::vec2::length(), GL_FLOAT, GL_FALSE, offsetof(vertex, texture_coords));
+        glVertexArrayAttribFormat(vao_, attribute_location_texture_coords, glm::vec2::length(), GL_FLOAT, GL_FALSE, offsetof(vertex, texture_coordinates));
         glVertexArrayAttribBinding(vao_, attribute_location_texture_coords, 0);
         glEnableVertexArrayAttrib(vao_, attribute_location_texture_coords);
 
@@ -51,7 +52,8 @@ public:
         // store vertex count 
         count_ = static_cast<GLsizei>(vertices.size());
     }
-         
+        
+
     // Mesh with indirect vertex addressing. Needs compiled shader for attributes setup. 
     Mesh(std::vector<vertex> const &vertices, std::vector<GLuint> const &indices, GLenum primitive_type) :
         Mesh{vertices, primitive_type}
@@ -66,6 +68,7 @@ public:
         count_ = static_cast<GLsizei>(indices.size());   
     }    
 
+
     void draw() {
         glBindVertexArray(vao_);
         
@@ -76,11 +79,13 @@ public:
     	}
     }
 
+
     ~Mesh() {
     	glDeleteBuffers(1, &ebo_);
     	glDeleteBuffers(1, &vbo_);
     	glDeleteVertexArrays(1, &vao_);
     };
+
 private:
     //safe defaults
     GLenum primitive_type_{GL_POINTS}; 

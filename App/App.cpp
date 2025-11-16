@@ -211,11 +211,6 @@ App::~App()
     cv::destroyAllWindows();
     if (capture.isOpened()) capture.release();
 
-    // Cleanup OpenGL
-    glDeleteProgram(shader_prog_ID);
-    glDeleteBuffers(1, &VBO_ID);
-    glDeleteVertexArrays(1, &VAO_ID);
-
     // Bye
     fmt::println("\nNashle.");
 }

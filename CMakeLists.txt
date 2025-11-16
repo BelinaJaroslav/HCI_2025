@@ -1,16 +1,9 @@
-﻿# CMakeList.txt : CMake project for HCI, include source and define
-# project specific logic here.
-cmake_minimum_required(VERSION 3.8)
-
-# Enable Hot Reload for MSVC compilers if supported.
-if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif()
+﻿cmake_minimum_required(VERSION 3.12)
 
 project("HCI")
-
 set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_MSVC_PARALLEL ON CACHE BOOL "" FORCE)
 
 # [VCPKG] Find packages
 find_package(fmt           CONFIG REQUIRED)
@@ -52,9 +45,3 @@ target_include_directories(HCI PRIVATE
 # Copy resources into the build folder so relative paths work
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/App/Resources 
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/App/)
-
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET HCI PROPERTY CXX_STANDARD 20)
-endif()
-
-# Eventually add tests and install targets if needed.

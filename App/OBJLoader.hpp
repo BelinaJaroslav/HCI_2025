@@ -8,13 +8,13 @@
 #include "Assets.hpp"
 
 bool load_OBJ_GDrive(
-	const std::filesystem::path& filename,
+	const std::filesystem::path& file_name,
 	std::vector <vertex>& vertices,
 	std::vector <GLuint>& indices
 );
 
 void load_OBJ_PG2(
 	const std::filesystem::path& file_name,
-	std::vector<vertex>& mesh_vertices,
-	std::vector<GLuint>& mesh_vertex_indices
+	std::vector<vertex>& vertices,
+	std::vector<GLuint>& indices
 );

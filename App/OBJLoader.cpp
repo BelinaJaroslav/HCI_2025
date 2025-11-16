@@ -10,11 +10,11 @@
 
 #include "OBJLoader.hpp"
 
-#define MAX_LINE_SIZE 1024
+constexpr auto MAX_LINE_SIZE = 1024;
 
-bool load_OBJ_GDrive(const std::filesystem::path& filename, std::vector<vertex>& vertices, std::vector<GLuint>& indices)
+bool load_OBJ_GDrive(const std::filesystem::path& file_name, std::vector<vertex>& vertices, std::vector<GLuint>& indices)
 {
-	std::cout << "Loading OBJ file " << filename.string() << " ...\n";
+    fmt::println("Loading OBJ file {} ...", file_name.string());
 
 	std::vector< glm::vec3 > temp_vertices;
 	std::vector< glm::vec2 > temp_uvs;
@@ -24,7 +24,7 @@ bool load_OBJ_GDrive(const std::filesystem::path& filename, std::vector<vertex>&
 	indices.clear();
 
 	FILE * file = nullptr;
-	fopen_s(&file, filename.string().c_str(), "r");
+	fopen_s(&file, file_name.string().c_str(), "r");
 	if (file == NULL) {
 		printf("Impossible to open the file !\n");
 		return false;
@@ -32,65 +32,65 @@ bool load_OBJ_GDrive(const std::filesystem::path& filename, std::vector<vertex>&
 
 	while (1) {
 
-		char lineHeader[MAX_LINE_SIZE];
-		int res = fscanf_s(file, "%s", lineHeader, MAX_LINE_SIZE);
+		char line_header[MAX_LINE_SIZE];
+		int res = fscanf_s(file, "%s", line_header, MAX_LINE_SIZE);
 		if (res == EOF) {
 			break;
 		}
 
-		if (strcmp(lineHeader, "v") == 0) {
+		if (strcmp(line_header, "v") == 0) {
 			glm::vec3 vertex;
 			fscanf_s(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
 			temp_vertices.push_back(vertex);
 		}
-		else if (strcmp(lineHeader, "vt") == 0) {
+		else if (strcmp(line_header, "vt") == 0) {
 			glm::vec2 uv;
 			fscanf_s(file, "%f %f\n", &uv.x, &uv.y);
 			temp_uvs.push_back(uv);
 		}
-		else if (strcmp(lineHeader, "vn") == 0) {
+		else if (strcmp(line_header, "vn") == 0) {
 			glm::vec3 normal;
 			fscanf_s(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
 			temp_normals.push_back(normal);
 		}
-		else if (strcmp(lineHeader, "f") == 0) {
+		else if (strcmp(line_header, "f") == 0) {
 			std::string vertex1, vertex2, vertex3;
-			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
+			unsigned int vertex_index[3], uv_index[3], normal_index[3];
+			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertex_index[0], &uv_index[0], &normal_index[0], &vertex_index[1], &uv_index[1], &normal_index[1], &vertex_index[2], &uv_index[2], &normal_index[2]);
 			if (matches != 9) {
 				printf("File can't be read by simple parser :( Try exporting with other options\n");
 				return false;
 			}
 
 			for (int i = 0; i < 3; i++) {
-				GLuint currentIndex;
-				vertex currentVertex;
-				currentVertex.position = temp_vertices[vertexIndex[i]-1]; // OBJ array start from 1
-				currentVertex.normal = temp_normals[normalIndex[i]-1];
-				currentVertex.texture_coords = temp_uvs[uvIndex[i]-1];
+				GLuint current_index;
+				vertex current_vertex;
+				current_vertex.position = temp_vertices[vertex_index[i]-1]; // OBJ array start from 1
+				current_vertex.normal = temp_normals[normal_index[i]-1];
+				current_vertex.texture_coordinates = temp_uvs[uv_index[i]-1];
 
                 // avoid duplicit vertices
 				auto t = std::find_if(vertices.begin(),
 					vertices.end(),
-					[&currentVertex]
+					[&current_vertex]
 					(const vertex& v2) -> bool {
-						return (currentVertex == v2);
+						return (current_vertex == v2);
 					});
                     
 				if (t == vertices.end()) {
-					vertices.push_back(currentVertex);
-					currentIndex = GLuint(vertices.size() - 1);
+					vertices.push_back(current_vertex);
+					current_index = GLuint(vertices.size() - 1);
 				}
 				else {
-					currentIndex = GLuint(t - vertices.begin());
+					current_index = GLuint(t - vertices.begin());
 				}
-				indices.push_back(currentIndex);
+				indices.push_back(current_index);
 			}
 
 		}
 	}
 	
-    std::cout << "Done loading OBJ file " << filename.string() << '\n';
+    fmt::println("Done loading OBJ file {}", file_name.string());
 
 	fclose(file);
 	return true;
@@ -222,7 +222,7 @@ void load_OBJ_PG2(const std::filesystem::path& file_name, std::vector<vertex>& m
     for (unsigned int u = 0; u < vertices_direct.size(); u++) {
         vertex vertex{};
         vertex.position = vertices_direct[u];
-        if (u < n_direct_uvs) vertex.texture_coords = texture_coordinates_direct[u];
+        if (u < n_direct_uvs) vertex.texture_coordinates = texture_coordinates_direct[u];
         if (u < n_direct_normals) vertex.normal = vertex_normals_direct[u];
         mesh_vertices.push_back(vertex);
         mesh_vertex_indices.push_back(u);
