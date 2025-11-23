@@ -74,6 +74,7 @@ bool App::init()
     win_height = 480;
     is_vsync_on = true;
     is_mouselook_on = false;
+    FOV = 110.0f;
 
     if (settings["app_name"].is_string()) {
         app_name = settings["app_name"].template get<std::string>();
@@ -91,6 +92,9 @@ bool App::init()
     }
     if (settings["mouselook"].is_boolean()) {
         is_mouselook_on = settings["mouselook"].template get<bool>();
+    }
+    if (settings["FOV"].is_number_integer()) {
+        FOV = static_cast<float>(settings["FOV"].template get<int>());
     }
 
     // Init OpenGL
@@ -168,7 +172,8 @@ bool App::init()
         glEnable(GL_LINE_SMOOTH);
         glEnable(GL_POLYGON_SMOOTH);
 
-        //glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
 
         // Transparency blending function
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

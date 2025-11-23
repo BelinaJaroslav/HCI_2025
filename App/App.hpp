@@ -53,6 +53,10 @@ private:
 
     struct Color { GLfloat r, g, b, a; };
 
+    // Map keys that may be used across multiple methods
+    const std::string key_shader_simple = "simple_shader";
+    const std::string key_obj_teapot = "obj_teapot";
+
     // == MEMBERS ==
     FaceDetector face_detector;
     FPSMeter fps_meter_main;
@@ -72,6 +76,9 @@ private:
     
     bool is_vsync_on{};
     bool is_mouselook_on{};
+    float FOV{};
+
+    glm::mat4 mx_projection = glm::identity<glm::mat4>();
 
     std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shader_library;
     std::unordered_map<std::string, Model> scene;
@@ -82,6 +89,7 @@ private:
     
     // AppRun
     void render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);
+    void update_projection_matrix();
 
     // Callbacks
     static void error_callback(int error, const char* description);

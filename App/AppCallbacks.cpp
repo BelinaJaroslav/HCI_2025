@@ -35,12 +35,23 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 void App::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     // Scrollwheel was used
+    auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
+    this_inst->FOV -= 10.0f * static_cast<float>(yoffset);      // Scrollwheel down == FOV++
+    this_inst->FOV = std::clamp(this_inst->FOV, 70.0f, 140.0f); // Limit FOV to "reasonable" values
+    this_inst->update_projection_matrix();
 }
 
 
 void App::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // Window was resized
+    auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
+    this_inst->win_width = width;
+    this_inst->win_height = height;
+    // set viewport
+    glViewport(0, 0, width, height);
+    // now your canvas has [0,0] in bottom left corner, and its size is [width x height] 
+    this_inst->update_projection_matrix();
 }
 
 

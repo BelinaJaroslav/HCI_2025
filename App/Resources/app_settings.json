@@ -5,5 +5,6 @@
     "y": 768
   },
   "vsync": true,
-  "mouselook": false
+  "mouselook": false,
+  "FOV": 110
 }
