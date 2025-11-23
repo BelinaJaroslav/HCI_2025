@@ -23,13 +23,27 @@ void App::run()
 	FPSMeter fps_meter_main;
 	// ------------------------------------------------------------------- //
 
+    // Measuring delta time
+    double current_timestamp = glfwGetTime();
+    double last_frame_time = current_timestamp;
+    float delta_time = 0.0f;
+
     // State
 	Color triangle_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
     Color background_color{ 0.1f, 0.1f, 0.1f }; // Dark gray background
 
+    // Init view
+    update_projection_matrix();
+    glViewport(0, 0, win_width, win_height);
+
 	// Main game loop
 	while (!glfwWindowShouldClose(window)) {
+        // Measure delta time
+        current_timestamp = glfwGetTime();
+        delta_time = static_cast<float>(current_timestamp - last_frame_time);
+        last_frame_time = current_timestamp;
 
+        // Measure FPS
 		fps_meter_main.update();
 
 		// Start ImGui frame
@@ -45,7 +59,7 @@ void App::run()
 		// = After clearing canvas =
 
 		// Mouselook: get cursor's offset from window center and the move it back to center
-        // TODO: According to JJ, this is not a good approach
+        //TODO: According to JJ, this is not a good approach..., this will probably be handled by camera.hpp ?
 		if (is_mouselook_on) {
 			//glfwGetCursorPos(window, &cursor_x, &cursor_y);
 			//camera.ProcessMouseMovement(static_cast<GLfloat>(win_width / 2.0 - cursor_x), static_cast<GLfloat>(win_height / 2.0 - cursor_y));
@@ -53,13 +67,28 @@ void App::run()
 		}
 
         // SHADER
-        auto current_shader = shader_library.at("simple_shader");
+        auto current_shader = shader_library.at(key_shader_simple);
         current_shader->activate();
-        current_shader->set_uniform("ucolor", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));
+        // Projection matrix is a member of App, it changes on window resize and on FOV change
+        current_shader->set_uniform("u_projection_mx", mx_projection);
+        
+        // Model matrix is handled by each model individually
+
+        // View matrix temporarily handled here
+        //TODO: camera.hpp should handle this
+        glm::mat4 mx_view = glm::lookAt(
+            glm::vec3(0, 10, 20),  // Position of the camera
+            glm::vec3(0, 0, 0),    // Direction of camera look
+            glm::vec3(0, 1, 0)     // Up-vector
+        );
+        current_shader->set_uniform("u_view_mx", mx_view);
+
+        current_shader->set_uniform("u_color", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));        
 
         // DRAW MODELS FROM SCENE
         for (auto& [key, value] : scene) {
             //value.update();
+            value.relative_rotate(glm::vec3(0.0f, delta_time * 100.0f, 0.0f));
             value.draw();
         }
 
@@ -120,6 +149,9 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
     // Controls Window
     ImGui::Begin("Render Controls");
     {
+        // Display current FOV value
+        ImGui::Text("FOV: %.1f", FOV);
+
         float triangle_color_arr[3] = { triangle_color.r, triangle_color.g, triangle_color.b };
         if (ImGui::ColorEdit3("Triangle Color", triangle_color_arr)) {
             triangle_color.r = triangle_color_arr[0];
@@ -146,4 +178,18 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
         ImGui::Checkbox("Mouselook", &is_mouselook_on);
     }
     ImGui::End();
+}
+
+void App::update_projection_matrix()
+{
+    if (win_height < 1) win_height = 1; // avoid division by 0
+
+    float ratio = static_cast<float>(win_width) / win_height;
+
+    mx_projection = glm::perspective(
+        glm::radians(FOV),
+        ratio,               // Aspect Ratio. Depends on the size of your window.
+        0.1f,                // Near clipping plane. Keep as big as possible, or you'll get precision issues.
+        20000.0f             // Far clipping plane. Keep as little as possible.
+    );
 }
