@@ -32,6 +32,9 @@ void App::run()
 	Color triangle_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
     Color background_color{ 0.1f, 0.1f, 0.1f }; // Dark gray background
 
+    //init camera, maybe move?
+
+
     // Init view
     update_projection_matrix();
     glViewport(0, 0, win_width, win_height);
@@ -60,11 +63,9 @@ void App::run()
 
 		// Mouselook: get cursor's offset from window center and the move it back to center
         //TODO: According to JJ, this is not a good approach..., this will probably be handled by camera.hpp ?
-		if (is_mouselook_on) {
-			//glfwGetCursorPos(window, &cursor_x, &cursor_y);
-			//camera.ProcessMouseMovement(static_cast<GLfloat>(win_width / 2.0 - cursor_x), static_cast<GLfloat>(win_height / 2.0 - cursor_y));
-			glfwSetCursorPos(window, win_width / 2.0, win_height / 2.0); // We have no camera yet, so this doesn't really do anything
-		}
+        process_camera(delta_time);
+
+
 
         // SHADER
         auto current_shader = shader_library.at(key_shader_simple);
@@ -76,11 +77,9 @@ void App::run()
 
         // View matrix temporarily handled here
         //TODO: camera.hpp should handle this
-        glm::mat4 mx_view = glm::lookAt(
-            glm::vec3(0, 10, 20),  // Position of the camera
-            glm::vec3(0, 0, 0),    // Direction of camera look
-            glm::vec3(0, 1, 0)     // Up-vector
-        );
+
+        glm::mat4 mx_view = camera.GetViewMatrix();
+
         current_shader->set_uniform("u_view_mx", mx_view);
 
         current_shader->set_uniform("u_color", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));        
@@ -99,6 +98,11 @@ void App::run()
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
+}
+
+void App::process_camera( float delta_t) {
+    glm::vec3 movement = camera.ProcessInput(window, delta_t);
+    camera.Position += movement;
 }
 
 

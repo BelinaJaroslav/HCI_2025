@@ -202,6 +202,8 @@ bool App::init()
         exit(-1);
     }
 
+    camera = Camera(glm::vec3(0.0f, 10.0f, 20.0f));
+
     fmt::println("App initialized.\n================");
 
     print_gl_info();

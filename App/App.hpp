@@ -31,6 +31,7 @@
 #include "ThreadPool.hpp"
 #include "ShaderProgram.hpp"
 #include "SyncedDeque.hpp"
+#include "Camera.hpp"
 
 
 class App {
@@ -39,6 +40,7 @@ public:
     App();
     bool init();
     void run();
+
     ~App();
 
     struct ProcessedFrame {
@@ -64,6 +66,8 @@ private:
 
     cv::VideoCapture capture;
 
+    Camera camera;
+
     std::atomic<bool> do_terminate_worker_threads;
 
     // OpenGL members
@@ -76,6 +80,9 @@ private:
     
     bool is_vsync_on{};
     bool is_mouselook_on{};
+    double lastMouseX = 0.0f;
+    double lastMouseY = 0.0f;
+    bool firstMouse = true;
     float FOV{};
 
     glm::mat4 mx_projection = glm::identity<glm::mat4>();
@@ -90,6 +97,7 @@ private:
     // AppRun
     void render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);
     void update_projection_matrix();
+    void process_camera(float delta_t);
 
     // Callbacks
     static void error_callback(int error, const char* description);
