@@ -80,9 +80,9 @@ private:
     
     bool is_vsync_on{};
     bool is_mouselook_on{};
-    double lastMouseX = 0.0f;
-    double lastMouseY = 0.0f;
-    bool firstMouse = true;
+    double last_mouse_x = 0.0f;
+    double last_mouse_y = 0.0f;
+    bool is_first_mouse = true;
     float FOV{};
 
     glm::mat4 mx_projection = glm::identity<glm::mat4>();
@@ -93,6 +93,7 @@ private:
     // == METHODS ==
     void init_assets();
     void print_gl_info();
+    void enable_or_disable_mouselook();
     
     // AppRun
     void render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);

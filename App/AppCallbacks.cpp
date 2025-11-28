@@ -60,25 +60,25 @@ void App::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
 	if (!this_inst->is_mouselook_on)
 	{
-		// Reset firstMouse when mouselook is off
-		this_inst->firstMouse = true;
+		// Reset is_first_mouse when mouselook is off
+		this_inst->is_first_mouse = true;
 		return;
 	}
 
-	if (this_inst->firstMouse)
+	if (this_inst->is_first_mouse)
 	{
-		this_inst->lastMouseX = xpos;
-		this_inst->lastMouseY = ypos;
-		this_inst->firstMouse = false;
+		this_inst->last_mouse_x = xpos;
+		this_inst->last_mouse_y = ypos;
+		this_inst->is_first_mouse = false;
 	}
 
-	double xoffset = xpos - this_inst->lastMouseX;
-	double yoffset = this_inst->lastMouseY - ypos; // reversed
+	double xoffset = xpos - this_inst->last_mouse_x;
+	double yoffset = this_inst->last_mouse_y - ypos; // reversed
 
-	this_inst->lastMouseX = xpos;
-	this_inst->lastMouseY = ypos;
+	this_inst->last_mouse_x = xpos;
+	this_inst->last_mouse_y = ypos;
 
-	this_inst->camera.ProcessMouseMovement(static_cast<float>(xoffset), static_cast<float>(yoffset));
+	this_inst->camera.process_mouse_movement(static_cast<float>(xoffset), static_cast<float>(yoffset));
 }
 
 
@@ -94,13 +94,7 @@ void App::mouse_button_callback(GLFWwindow* window, int button, int action, int 
 
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 		// RMB was pressed...
-		this_inst->is_mouselook_on = !this_inst->is_mouselook_on;
-		if (this_inst->is_mouselook_on) {
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		}
-		else {
-			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		}
+		this_inst->enable_or_disable_mouselook();
 	}
 }
 
