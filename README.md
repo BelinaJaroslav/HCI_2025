@@ -19,12 +19,15 @@
 * [Zadání 08](./Markdown/LAB08.md)
 
 * [Zadání 09](./Markdown/LAB09.md)
-  * [ ] Enable AAx4, compare FPS with AA on/off
+  * [x] Enable AAx4
   * [ ] Add screenshot functionality
-  * [ ] Compare screenshots with AA on/off (do this later when we have some serious scene ?)
   * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color or something according to the number of detected faces)
   * [ ] Display textured object
-  * [ ] Display dynamic texture to show camera image (on an Model or by ImGUI)
+  * [ ] Display dynamic texture to show camera image (on a Model or by the ImGUI)
+
+* S těmahle bodama počkat, až budeme mít komplexnější scénu (?):
+  * [ ] Compare FPS with AA enabled/disabled
+  * [ ] Compare screenshots with AA enabled/disabled
 
 &nbsp;
 

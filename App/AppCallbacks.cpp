@@ -23,9 +23,7 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 			break;
 
 		case GLFW_KEY_V:
-			this_inst->is_vsync_on = !this_inst->is_vsync_on;
-			glfwSwapInterval(this_inst->is_vsync_on);
-			fmt::println("VSync: {}", this_inst->is_vsync_on);
+			this_inst->enable_or_disable_vsync();
 			break;
 		}
 	}

@@ -94,6 +94,7 @@ private:
     void init_assets();
     void print_gl_info();
     void enable_or_disable_mouselook();
+    void enable_or_disable_vsync();
     
     // AppRun
     void render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);

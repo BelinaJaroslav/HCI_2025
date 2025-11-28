@@ -175,6 +175,14 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
         
         ImGui::Separator();
 
+        if (ImGui::Button("VSYNC on/off")) {
+            enable_or_disable_vsync();
+        }
+        ImGui::SameLine();
+        ImGui::BeginDisabled();
+        ImGui::Checkbox("##readonly_checkbox_vsync", &is_vsync_on);
+        ImGui::EndDisabled();
+
         if (ImGui::Button("Mouselook on/off")) {
             enable_or_disable_mouselook();
         }
