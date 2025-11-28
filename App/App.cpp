@@ -202,6 +202,8 @@ bool App::init()
         exit(-1);
     }
 
+    camera = Camera(glm::vec3(0.0f, 10.0f, 20.0f));
+
     fmt::println("App initialized.\n================");
 
     print_gl_info();
@@ -241,4 +243,22 @@ void App::print_gl_info()
         std::cout << "Compatibility profile" << "\n";
     }
     std::cout << "=====================================================\n\n";
+}
+
+
+void App::enable_or_disable_mouselook()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    is_mouselook_on = !is_mouselook_on;
+    if (is_mouselook_on) {
+        // Mouselook was enabled => cursor needs to be disabled
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+    }
+    else {
+        // Mouselook was disabled => cursor needs to be enabled
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+    }
 }

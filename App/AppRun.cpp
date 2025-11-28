@@ -58,13 +58,8 @@ void App::run()
 
 		// = After clearing canvas =
 
-		// Mouselook: get cursor's offset from window center and the move it back to center
-        //TODO: According to JJ, this is not a good approach..., this will probably be handled by camera.hpp ?
-		if (is_mouselook_on) {
-			//glfwGetCursorPos(window, &cursor_x, &cursor_y);
-			//camera.ProcessMouseMovement(static_cast<GLfloat>(win_width / 2.0 - cursor_x), static_cast<GLfloat>(win_height / 2.0 - cursor_y));
-			glfwSetCursorPos(window, win_width / 2.0, win_height / 2.0); // We have no camera yet, so this doesn't really do anything
-		}
+		// Update camera position
+        process_camera(delta_time);
 
         // SHADER
         auto current_shader = shader_library.at(key_shader_simple);
@@ -74,13 +69,9 @@ void App::run()
         
         // Model matrix is handled by each model individually
 
-        // View matrix temporarily handled here
-        //TODO: camera.hpp should handle this
-        glm::mat4 mx_view = glm::lookAt(
-            glm::vec3(0, 10, 20),  // Position of the camera
-            glm::vec3(0, 0, 0),    // Direction of camera look
-            glm::vec3(0, 1, 0)     // Up-vector
-        );
+        // View matrix is handled by the camera
+        glm::mat4 mx_view = camera.get_view_matrix();
+
         current_shader->set_uniform("u_view_mx", mx_view);
 
         current_shader->set_uniform("u_color", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));        
@@ -99,6 +90,11 @@ void App::run()
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
+}
+
+void App::process_camera( float delta_t) {
+    glm::vec3 movement = camera.process_input(window, delta_t);
+    camera.position += movement;
 }
 
 
@@ -152,6 +148,8 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
         // Display current FOV value
         ImGui::Text("FOV: %.1f", FOV);
 
+        ImGui::Separator();
+
         float triangle_color_arr[3] = { triangle_color.r, triangle_color.g, triangle_color.b };
         if (ImGui::ColorEdit3("Triangle Color", triangle_color_arr)) {
             triangle_color.r = triangle_color_arr[0];
@@ -173,9 +171,17 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
             background_color.g = 0.1f;
             background_color.b = 0.1f;
             glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
-        }
+        }        
+        
+        ImGui::Separator();
 
-        ImGui::Checkbox("Mouselook", &is_mouselook_on);
+        if (ImGui::Button("Mouselook on/off")) {
+            enable_or_disable_mouselook();
+        }
+        ImGui::SameLine();
+        ImGui::BeginDisabled();
+        ImGui::Checkbox("##readonly_checkbox_mouselook", &is_mouselook_on);
+        ImGui::EndDisabled();
     }
     ImGui::End();
 }
