@@ -1,3 +1,6 @@
+#include "App/DefinesAndMacros.hpp"
+#ifndef SKIP_LABS_COMPILATION
+
 #include <App/App.hpp>
 
 #include <fmt/core.h>
@@ -254,3 +257,4 @@ int App::lab_compression() {
     return EXIT_SUCCESS;
 }
 
+#endif // !SKIP_LABS_COMPILATION

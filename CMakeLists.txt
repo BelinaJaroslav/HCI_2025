@@ -23,7 +23,7 @@ file(GLOB_RECURSE SOURCES
     "${PROJECT_SOURCE_DIR}/App/*.cpp"    
 )
 
-# Add source to this project's executable.
+# Add source to this project's executable
 add_executable(HCI "HCI.cpp" ${SOURCES})
 
 # [VCPKG] target libraries

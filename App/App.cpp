@@ -54,9 +54,12 @@ bool App::init()
         return false;
     }
 
-    fmt::println("Initialized capture device. Width: {}, Height: {}",
-        capture.get(cv::CAP_PROP_FRAME_WIDTH),
-        capture.get(cv::CAP_PROP_FRAME_HEIGHT));
+    webcamp_width = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH));
+    webcamp_height = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT));
+    fmt::println("Initialized capture device. Width: {}, Height: {}", webcamp_width, webcamp_height);
+
+    // Read one frame; we need it because when we change texture (webcamp footage in imgui) size and data format MUST match; so this will be set as initial texture
+    capture.read(initial_frame);
 
     // Init FaceDetector
     if (!face_detector.load_classifier("App/Resources/haarcascade_frontalface_default.xml")) {
@@ -113,8 +116,13 @@ bool App::init()
         // Set OpenGL profile
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Core, comment-out this line for Compatible
 
+        // Comment these out to disable anti-aliasing
+        glEnable(GL_MULTISAMPLE);
+        glfwWindowHint(GLFW_SAMPLES, 4);
+        // ------------------------------------------
+
         // Window is hidden until everything is initialized
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);        
 
         // Open window (GL canvas) with no special properties :: https://www.glfw.org/docs/latest/quick.html#quick_create_window
         window = glfwCreateWindow(win_width, win_height, app_name.c_str(), NULL, NULL);
@@ -202,7 +210,7 @@ bool App::init()
         exit(-1);
     }
 
-    camera = Camera(glm::vec3(0.0f, 10.0f, 20.0f));
+    camera = Camera(glm::vec3(4.0f, 2.0f, 6.0f));
 
     fmt::println("App initialized.\n================");
 
@@ -225,12 +233,17 @@ App::~App()
 
 void App::print_gl_info()
 {
-    std::cout << "\n=================== :: GL Info :: ===================\n";
-    std::cout << "GL Vendor:\t" << glGetString(GL_VENDOR) << "\n";
-    std::cout << "GL Renderer:\t" << glGetString(GL_RENDERER) << "\n";
-    std::cout << "GL Version:\t" << glGetString(GL_VERSION) << "\n";
-    std::cout << "GL Shading ver:\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n\n";
+    std::cout << "\n======================= :: GL Info :: =======================\n";
+    std::cout << "GL Vendor:\t\t" << glGetString(GL_VENDOR) << "\n";
+    std::cout << "GL Renderer:\t\t" << glGetString(GL_RENDERER) << "\n";
+    std::cout << "GL Version:\t\t" << glGetString(GL_VERSION) << "\n";
+    std::cout << "GL Shading version:\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
+    
+    int n_texture_units = -1;
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &n_texture_units);
+    std::cout << "No. of texture units:\t" << n_texture_units << "\n";
 
+    std::cout << "\n";
     GLint profile;
     glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile);
     if (const auto errorCode = glGetError()) {
@@ -242,7 +255,7 @@ void App::print_gl_info()
     else {
         std::cout << "Compatibility profile" << "\n";
     }
-    std::cout << "=====================================================\n\n";
+    std::cout << "=============================================================\n\n";
 }
 
 
@@ -261,4 +274,12 @@ void App::enable_or_disable_mouselook()
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
     }
+}
+
+
+void App::enable_or_disable_vsync()
+{
+    is_vsync_on = !is_vsync_on;
+    glfwSwapInterval(is_vsync_on);
+    fmt::println("VSync: {}", is_vsync_on);
 }

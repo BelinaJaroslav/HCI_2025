@@ -7,21 +7,9 @@
 
 void App::run()
 {
-	// ------------------------------------------------------------------- //
-	// This creates some redundant threads but it shouldn't matter because
-	// this functionality won't be used in the future: the app will run in 
-	// fullscreen and webcam footage will be part of the main window.
-	const bool SHOW_WEBCAM_DETECTOR_WINDOW = false;
-	const bool SHOW_WEBCAM_COMPRESSION_WINDOW = false;
-
-	std::jthread t_detector;
-	std::jthread t_compression;
-
-	if (SHOW_WEBCAM_DETECTOR_WINDOW) t_detector = std::jthread(&App::lab_multithread, this);
-	if (SHOW_WEBCAM_COMPRESSION_WINDOW) t_compression = std::jthread(&App::lab_compression_pool, this);
-
-	FPSMeter fps_meter_main;
-	// ------------------------------------------------------------------- //
+    // Webcam service
+    std::jthread thread_webcam_service;
+    thread_webcam_service = std::jthread(&App::webcam_thread, this);
 
     // Measuring delta time
     double current_timestamp = glfwGetTime();
@@ -29,8 +17,9 @@ void App::run()
     float delta_time = 0.0f;
 
     // State
-	Color triangle_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
-    Color background_color{ 0.1f, 0.1f, 0.1f }; // Dark gray background
+	Color teapot_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
+    Color background_color{ 0.549f, 0.823f, 0.858f }; // Sky color
+    glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
 
     // Init view
     update_projection_matrix();
@@ -38,20 +27,27 @@ void App::run()
 
 	// Main game loop
 	while (!glfwWindowShouldClose(window)) {
+        // Webcam service
+        if (!synced_deque.empty()) {
+            auto tup = synced_deque.pop_front();
+            auto& frame = std::get<0>(tup);
+            n_faces_found = std::get<1>(tup);
+            texture_library.at(key_tex_webcam)->replace_image(frame);
+        }
+
         // Measure delta time
         current_timestamp = glfwGetTime();
         delta_time = static_cast<float>(current_timestamp - last_frame_time);
-        last_frame_time = current_timestamp;
-
-        // Measure FPS
-		fps_meter_main.update();
+        last_frame_time = current_timestamp;        
 
 		// Start ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		render_GUI(fps_meter_main, triangle_color, background_color);
+        // Measure FPS and render GUI
+        fps_meter_main.update();
+		render_GUI(teapot_color, background_color);
 
 		// Clear canvas
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -71,15 +67,16 @@ void App::run()
 
         // View matrix is handled by the camera
         glm::mat4 mx_view = camera.get_view_matrix();
-
-        current_shader->set_uniform("u_view_mx", mx_view);
-
-        current_shader->set_uniform("u_color", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));        
+        current_shader->set_uniform("u_view_mx", mx_view);       
 
         // DRAW MODELS FROM SCENE
         for (auto& [key, value] : scene) {
-            //value.update();
-            value.relative_rotate(glm::vec3(0.0f, delta_time * 100.0f, 0.0f));
+            
+            // Rotating teapot
+            if (key == key_obj_teapot) {
+                value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, 23 * glfwGetTime());
+            }
+
             value.draw();
         }
 
@@ -92,99 +89,17 @@ void App::run()
 	}
 }
 
-void App::process_camera( float delta_t) {
-    glm::vec3 movement = camera.process_input(window, delta_t);
+void App::process_camera(float delta_t)
+{
+    glm::vec3 movement = camera.process_input(window, delta_t, is_camera_freeform);
     camera.position += movement;
+
+    if (!is_camera_freeform) {
+        camera.position.y = get_heightmap_y(camera.position.x, camera.position.z);
+        camera.position.y += 2.0f; // Add "player height"
+    }
 }
 
-
-void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color) {
-
-    ImGui::Begin("FPS Meter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-    {
-        // Display current FPS value
-        ImGui::Text("FPS: %.1f", fps_meter.get());
-
-        // Show if the value was just updated
-        if (fps_meter.is_updated()) {
-            ImGui::SameLine();
-            ImGui::TextColored(ImVec4(0, 1, 0, 1), " (Updated)");
-        }
-
-        // FPS history graph
-        static std::vector<float> fps_history;
-        static const int history_size = 100;
-
-        // FIX 1: Use fps_meter (the parameter) not fps_meter_main
-        fps_history.push_back(static_cast<float>(fps_meter.get()));
-        if (fps_history.size() > history_size) {
-            fps_history.erase(fps_history.begin());
-        }
-
-        // Plot the FPS history
-        ImGui::PlotLines("FPS History", fps_history.data(),
-            static_cast<int>(fps_history.size()), 0,
-            nullptr, 0.0f, 200.0f,
-            ImVec2(200, 50));
-
-        // Controls
-        if (ImGui::Button("Reset FPS Counter")) {
-            fps_meter.reset();
-            fps_history.clear();
-        }
-
-        // Interval adjustment
-        static float interval_seconds = 1.0f;
-        // FIX 2: Use fps_meter (the parameter) not fps_meter_main
-        if (ImGui::SliderFloat("Update Interval (s)", &interval_seconds, 0.1f, 5.0f)) {
-            fps_meter.set_interval(std::chrono::duration<double>(interval_seconds));
-        }
-    }
-    ImGui::End();
-
-    // Controls Window
-    ImGui::Begin("Render Controls");
-    {
-        // Display current FOV value
-        ImGui::Text("FOV: %.1f", FOV);
-
-        ImGui::Separator();
-
-        float triangle_color_arr[3] = { triangle_color.r, triangle_color.g, triangle_color.b };
-        if (ImGui::ColorEdit3("Triangle Color", triangle_color_arr)) {
-            triangle_color.r = triangle_color_arr[0];
-            triangle_color.g = triangle_color_arr[1];
-            triangle_color.b = triangle_color_arr[2];
-        }
-
-        float background_color_arr[3] = { background_color.r, background_color.g, background_color.b };
-        if (ImGui::ColorEdit3("Background Color", background_color_arr)) {
-            background_color.r = background_color_arr[0];
-            background_color.g = background_color_arr[1];
-            background_color.b = background_color_arr[2];
-            glClearColor(background_color_arr[0], background_color_arr[1], background_color_arr[2], 1.0f);
-        }
-
-        if (ImGui::Button("Reset Colors")) {
-            triangle_color = { 1.0f, 0.6f, 1.0f, 1.0f };
-            background_color.r = 0.1f;
-            background_color.g = 0.1f;
-            background_color.b = 0.1f;
-            glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
-        }        
-        
-        ImGui::Separator();
-
-        if (ImGui::Button("Mouselook on/off")) {
-            enable_or_disable_mouselook();
-        }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_mouselook", &is_mouselook_on);
-        ImGui::EndDisabled();
-    }
-    ImGui::End();
-}
 
 void App::update_projection_matrix()
 {
@@ -198,4 +113,68 @@ void App::update_projection_matrix()
         0.1f,                // Near clipping plane. Keep as big as possible, or you'll get precision issues.
         20000.0f             // Far clipping plane. Keep as little as possible.
     );
+}
+
+
+float App::get_heightmap_y(float position_x, float position_z)
+{
+    float X = position_x + HEIGHTMAP_SHIFT;
+    float Z = position_z + HEIGHTMAP_SHIFT;
+    float Y = 0.0f;
+
+    float X_floor = std::floor(X);
+    float Z_floor = std::floor(Z);
+
+    float X_ceil = std::ceil(X);
+    float Z_ceil = std::ceil(Z);
+
+    if (X - X_floor < 0.5f && Z - Z_floor < 0.5f) {
+        // In the lower-left triangle
+        float x_fraction = X - X_floor;
+        float y_fraction = Z - Z_floor;
+        float common_height = heightmap_heights[{X_floor, Z_floor}];
+        float x_difference = heightmap_heights[{X_ceil, Z_floor}] - common_height;
+        float y_difference = heightmap_heights[{X_floor, Z_ceil}] - common_height;
+        Y = common_height + x_fraction * x_difference + y_fraction * y_difference;
+    }
+    else {
+        // In the upper-right triangle
+        float x_fraction = X_ceil - X;
+        float y_fraction = Z_ceil - Z;
+        float common_height = heightmap_heights[{X_ceil, Z_ceil}];
+        float x_difference = common_height - heightmap_heights[{X_floor, Z_ceil}];
+        float y_difference = common_height - heightmap_heights[{X_ceil, Z_floor}];
+        Y = common_height - x_fraction * x_difference - y_fraction * y_difference;
+    }
+
+    return Y * HEIGHTMAP_SCALE;
+}
+
+
+void App::webcam_thread()
+{
+    cv::Mat frame; // For captured frame
+
+    do {
+        // Get next frame
+        capture.read(frame);
+        if (frame.empty()) {
+            fmt::println("Cam disconnected? End of video?");
+            continue;
+        }
+
+        // Find faces
+        auto face_centers = face_detector.find_faces(frame);
+        int _n_faces_found = static_cast<int>(face_centers.size());
+
+        // Draw face crosses
+        for (const auto& face_center : face_centers) {
+            CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
+        }
+
+        // Push into synced_deque
+        synced_deque.push_back(std::make_tuple(frame, _n_faces_found)); // DATA IS BEING COPIED HERE
+
+        
+    } while (!do_terminate_worker_threads); // Repeat until App sets `do_terminate_worker_threads` to `true`
 }

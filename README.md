@@ -19,18 +19,28 @@
 * [Zadání 08](./Markdown/LAB08.md)
 
 * [Zadání 09](./Markdown/LAB09.md)
-  * [ ] Enable AAx4, compare FPS with AA on/off
+  * [x] Enable AAx4
+  * [ ] Compare FPS with AA enabled/disabled
   * [ ] Add screenshot functionality
-  * [ ] Compare screenshots with AA on/off (do this later when we have some serious scene ?)
-  * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color or something according to the number of detected faces)
-  * [ ] Display textured object
-  * [ ] Display dynamic texture to show camera image (on an Model or by ImGUI)
+  * [ ] Compare screenshots with AA enabled/disabled (AA can be disabled by commenting-out two lines in `App.cpp`)
+  * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color/rotation_speed or something according to the number of detected faces)
+  * [x] Display textured object
+  * [x] Display dynamic texture to show camera image in ImGui
+
+* Issues:
+  * App can be exited via ESC, but not by closing the window (because ESC callback terminates webcam thread and then closes main window; how to terminate thread if we close the window directly?)
+  * Proč křížek na detekovaném obličeji bliká ?
 
 &nbsp;
 
 * `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ...
+* `AppGUI.cpp` – Dear ImGui
 * `AppCallbacks.cpp` – callbacky
 * `AppInitAssets.cpp` – načtení shaderů, modelů, textur, ...
 * `AppRun.cpp` – hlavní smyčka: runtime logika a vykreslování
 
 &nbsp;
+
+* HW specs: ??
+  * FPS without AA: ??
+  * FPS with AAx4: ??

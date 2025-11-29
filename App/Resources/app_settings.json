@@ -1,8 +1,8 @@
 {
   "app_name": "HCI 2025",
   "default_resolution": {
-    "x": 1024,
-    "y": 768
+    "x": 1600,
+    "y": 850
   },
   "vsync": true,
   "mouselook": false,

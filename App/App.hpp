@@ -9,7 +9,7 @@
 // 3rd party libraries
 #include <opencv2/opencv.hpp>
 
-// Currently (lab05), we need to import GLFW3 to use `GLFWwindow` etc.
+// We need to import GLFW3 to use `GLFWwindow` etc.
 // But importing just GLFW3 gives us bunch of errors (wrong import order),
 // so we import other stuff aswell and import order is correct.
 #include <GL/glew.h> 
@@ -23,15 +23,17 @@
 #include "imgui_impl_opengl3.h"
 
 // Our libraries
-#include "Assets.hpp"
+#include "Camera.hpp"
 #include "CV2Tools.hpp"
+#include "DefinesAndMacros.hpp"
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
-#include "Model.hpp"
+//#include "Model.hpp"
+#include "ModelSimple.hpp"
 #include "ThreadPool.hpp"
 #include "ShaderProgram.hpp"
 #include "SyncedDeque.hpp"
-#include "Camera.hpp"
+#include "vertex.hpp"
 
 
 class App {
@@ -57,18 +59,29 @@ private:
 
     // Map keys that may be used across multiple methods
     const std::string key_shader_simple = "simple_shader";
+    const std::string key_obj_heightmap = "obj_heightmap";
     const std::string key_obj_teapot = "obj_teapot";
+    const std::string key_obj_cube = "obj_cube";
+    const std::string key_tex_webcam = "tex_webcam";
+    const std::string key_tex_singlecolor = "tex_singlecolor";
+    const std::string key_tex_tileatlas = "tex_tileatlas";
+    const std::string key_tex_woodbox = "tex_woodbox";
 
     // == MEMBERS ==
     FaceDetector face_detector;
     FPSMeter fps_meter_main;
-    SyncedDeque<std::tuple<cv::Mat, std::vector<cv::Point2f>>> synced_deque;
+    SyncedDeque<std::tuple<cv::Mat, int>> synced_deque;
 
     cv::VideoCapture capture;
 
     Camera camera;
 
     std::atomic<bool> do_terminate_worker_threads;
+
+    int n_faces_found = 0;
+    int webcamp_width = 0;
+    int webcamp_height = 0;
+    cv::Mat initial_frame;
 
     // OpenGL members
     GLFWwindow* window{};
@@ -84,21 +97,27 @@ private:
     double last_mouse_y = 0.0f;
     bool is_first_mouse = true;
     float FOV{};
+    bool is_camera_freeform = false;
 
     glm::mat4 mx_projection = glm::identity<glm::mat4>();
 
     std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shader_library;
-    std::unordered_map<std::string, Model> scene;
+    std::unordered_map<std::string, std::shared_ptr<Texture>> texture_library;
+    std::unordered_map<std::string, ModelSimple> scene;
+
+    std::map<std::pair<float, float>, float> heightmap_heights;
 
     // == METHODS ==
     void init_assets();
     void print_gl_info();
     void enable_or_disable_mouselook();
+    void enable_or_disable_vsync();
     
     // AppRun
-    void render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);
+    void render_GUI(Color& triangle_color, Color& background_color);
     void update_projection_matrix();
     void process_camera(float delta_t);
+    float get_heightmap_y(float position_x, float position_z);
 
     // Callbacks
     static void error_callback(int error, const char* description);
@@ -108,27 +127,28 @@ private:
     static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
     static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
     
+    // Webcam service
+    void webcam_thread();
+
+    // Faster compile time (?): These old Labs don't have to be re-compiled everytime we change anything in App.hpp or any of its imports
+#ifndef SKIP_LABS_COMPILATION
     // Lab 01
     void lab_identify_object_by_luminance() const;
     void lab_find_red_object_in_image() const;
     void lab_find_red_object_in_video();
     void lab_find_face_in_video();    
-    
     // Lab 02
-    void lab_complex_behaviour();
-    
+    void lab_complex_behaviour();    
     // Lab 03
-    void lab_multithread();
-    
+    void lab_multithread();    
     void tracker_thread();
     void render_thread();
-
     // Lab 04
     int lab_compression(); 
     int lab_compression_pool();
-
     void grabber_thread();
     void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
     std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
+#endif // !SKIP_LABS_COMPILATION
 };

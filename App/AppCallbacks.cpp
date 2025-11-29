@@ -17,15 +17,19 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 	if ((action == GLFW_PRESS) || (action == GLFW_REPEAT)) {
 		switch (key) {
 		case GLFW_KEY_ESCAPE:
-			// Escape was pressed...
-			// Exit The App
+			// `Escape` was pressed... Exit The App
+			this_inst->do_terminate_worker_threads = true;
 			glfwSetWindowShouldClose(window, GLFW_TRUE);
 			break;
 
+		case GLFW_KEY_C:
+			// `C` to on/off freeform camera
+			this_inst->is_camera_freeform = !this_inst->is_camera_freeform;
+			break;		
+
 		case GLFW_KEY_V:
-			this_inst->is_vsync_on = !this_inst->is_vsync_on;
-			glfwSwapInterval(this_inst->is_vsync_on);
-			fmt::println("VSync: {}", this_inst->is_vsync_on);
+			// `V` to on/off VSYNC
+			this_inst->enable_or_disable_vsync();
 			break;
 		}
 	}

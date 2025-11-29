@@ -15,7 +15,7 @@
 ShaderProgram::ShaderProgram(const std::filesystem::path& VS_file, const std::filesystem::path& FS_file)
 {
     // compile shaders and store IDs for linker
-    auto vertex_shader   = compile_shader(read_text_file(VS_file), GL_VERTEX_SHADER);
+    auto vertex_shader = compile_shader(read_text_file(VS_file), GL_VERTEX_SHADER);
     auto fragment_shader = compile_shader(read_text_file(FS_file), GL_FRAGMENT_SHADER);
 
     std::vector<GLuint> shader_ids{vertex_shader, fragment_shader};
@@ -190,7 +190,7 @@ GLuint ShaderProgram::link_shader(const std::vector<GLuint> shader_ids) {
     // must be set before linking
     glBindAttribLocation(prog_ID, Mesh::attribute_location_position, "position");
     glBindAttribLocation(prog_ID, Mesh::attribute_location_normal, "normal");
-    glBindAttribLocation(prog_ID, Mesh::attribute_location_texture_coords, "texture_coordinates");
+    glBindAttribLocation(prog_ID, Mesh::attribute_location_texture_coordinates, "texture_coordinates");
 
 	glLinkProgram(prog_ID);
 

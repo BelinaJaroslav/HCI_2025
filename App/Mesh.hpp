@@ -7,8 +7,8 @@
 #include <glm/glm.hpp> 
 #include <glm/ext.hpp>
 
-#include "Assets.hpp"
 #include "NonCopyable.hpp"
+#include "vertex.hpp"
 
 
 class Mesh: private NonCopyable
@@ -17,7 +17,7 @@ public:
     // force attribute slots in shaders for all meshes, shaders etc.
     static constexpr GLuint attribute_location_position{0};
     static constexpr GLuint attribute_location_normal{1};
-    static constexpr GLuint attribute_location_texture_coords{2};
+    static constexpr GLuint attribute_location_texture_coordinates{2};
 
     // No default constructor. RAII - if constructed, it will be correctly initialized
     // and can be rendered. OpenGL resources are guaranteed to be deallocated using destructor. 
@@ -39,9 +39,9 @@ public:
         glVertexArrayAttribBinding(vao_, attribute_location_normal, 0);
         glEnableVertexArrayAttrib(vao_, attribute_location_normal);
 
-        glVertexArrayAttribFormat(vao_, attribute_location_texture_coords, glm::vec2::length(), GL_FLOAT, GL_FALSE, offsetof(vertex, texture_coordinates));
-        glVertexArrayAttribBinding(vao_, attribute_location_texture_coords, 0);
-        glEnableVertexArrayAttrib(vao_, attribute_location_texture_coords);
+        glVertexArrayAttribFormat(vao_, attribute_location_texture_coordinates, glm::vec2::length(), GL_FLOAT, GL_FALSE, offsetof(vertex, texture_coordinates));
+        glVertexArrayAttribBinding(vao_, attribute_location_texture_coordinates, 0);
+        glEnableVertexArrayAttrib(vao_, attribute_location_texture_coordinates);
 
         glCreateBuffers(1, &vbo_);
         GLsizeiptr vbo_size = static_cast<GLsizeiptr>(vertices.size() * sizeof(vertex));
@@ -97,6 +97,3 @@ private:
     GLuint vbo_{0};
     GLuint ebo_{0};
 };
-  
-
-

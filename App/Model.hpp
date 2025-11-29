@@ -10,10 +10,11 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
 
-#include "Assets.hpp"
 #include "Mesh.hpp"
 #include "OBJLoader.hpp"
 #include "ShaderProgram.hpp"
+#include "Texture.hpp"
+#include "vertex.hpp"
 
 
 class Model
@@ -21,8 +22,8 @@ class Model
 public:
     // origin point of whole model
     glm::vec3 pivot_position{}; // [0,0,0] of the object
-    glm::vec3 euler_angles{};    // pitch, yaw, roll
-    glm::vec3 scale{1.0f};
+    glm::vec3 euler_angles{}; // pitch, yaw, roll
+    glm::vec3 scale{ 1.0f };
 
     glm::mat4 local_model_matrix{ 1.0 }; // cache, and for complex transformations (default = identity) 
 
@@ -31,6 +32,7 @@ public:
     {
         std::shared_ptr<Mesh> mesh;             // geometry & topology, vertex attributes
         std::shared_ptr<ShaderProgram> shader;  // which shader to use to draw this part of the model
+        std::shared_ptr<Texture> texture;
 
         glm::vec3 origin;       // mesh origin relative to origin of the whole model
         glm::vec3 euler_angles; // mesh rotation relative to orientation of the whole model
@@ -40,34 +42,48 @@ public:
     std::vector<mesh_package> meshes;
     
     Model() = default;
-    Model(const std::filesystem::path & filename, std::shared_ptr<ShaderProgram> shader) {
-        // Load mesh (all meshes) of the model, (in the future: load material of each mesh, load textures...)
-        // notice: you can load multiple meshes and place them to proper positions, 
-        //            multiple textures (with reusing) etc. to construct single complicated Model   
-        //
-        // This can be done by extending OBJ file parser (OBJ can load hierarchical models),
-        // or by your own JSON model specification (or keep it simple and set a rule: 1model=1mesh ...) 
-        //
 
+    // === NORMAL MODEL ===
+    Model(const std::filesystem::path& filename,
+        std::shared_ptr<ShaderProgram> shader,
+        std::shared_ptr<Texture> texture_shared_ptr = std::make_shared<Texture>()
+    )
+    {
         std::vector<vertex> vertices;
         std::vector<GLuint> indices;
 
         load_OBJ_GDrive(filename, vertices, indices);
         //load_OBJ_PG2(filename, vertices, indices);
 
-        auto mesh_shared_ptr = make_shared<Mesh>(vertices, indices, GL_TRIANGLES);
+        auto mesh_shared_ptr = std::make_shared<Mesh>(vertices, indices, GL_TRIANGLES);
 
-        add_mesh(mesh_shared_ptr, shader);
+        add_mesh(mesh_shared_ptr, shader, texture_shared_ptr);
+    }
+
+    // === HEIGHTMAP ===
+    Model(const std::filesystem::path& filename,
+        std::shared_ptr<ShaderProgram> shader,
+        std::map<std::pair<float, float>, float>& heightmap_heights,
+        std::shared_ptr<Texture> texture_shared_ptr
+    )
+    {
+        std::vector<vertex> vertices;
+        std::vector<GLuint> indices;
+        load_heightmap(filename, vertices, indices, heightmap_heights);
+        auto mesh_shared_ptr = std::make_shared<Mesh>(vertices, indices, GL_TRIANGLES);
+        add_mesh(mesh_shared_ptr, shader, texture_shared_ptr);
     }
 
 
     void add_mesh(std::shared_ptr<Mesh> mesh,
-                 std::shared_ptr<ShaderProgram> shader,
-                 glm::vec3 origin = glm::vec3(0.0f),      // dafault value
-                 glm::vec3 euler_angles = glm::vec3(0.0f), // dafault value
-                 glm::vec3 scale = glm::vec3(1.0f)        // dafault value
-                 ) {
-        meshes.emplace_back(mesh, shader, origin, euler_angles, scale);
+        std::shared_ptr<ShaderProgram> shader,
+        std::shared_ptr<Texture> texture,
+        glm::vec3 origin = glm::vec3(0.0f),
+        glm::vec3 euler_angles = glm::vec3(0.0f),
+        glm::vec3 scale = glm::vec3(1.0f)
+    )
+    {
+        meshes.emplace_back(mesh, shader, texture, origin, euler_angles, scale);
     }
 
 
@@ -87,7 +103,12 @@ public:
             glm::mat4 mesh_model_matrix = create_model_mx(mesh_pkg.origin, mesh_pkg.euler_angles, mesh_pkg.scale);
             mesh_pkg.shader->set_uniform("u_model_mx", mesh_model_matrix * local_model_matrix);
 
-            mesh_pkg.mesh->draw();        // draw mesh
+            mesh_pkg.texture->bind();
+            mesh_pkg.shader->set_uniform("tex0", 0);
+
+            //std::cout << mesh_pkg.texture->get_name() << "\n";
+
+            mesh_pkg.mesh->draw();
         }
     }
 

@@ -1,4 +1,7 @@
-﻿#include <App/App.hpp>
+﻿#include "App/DefinesAndMacros.hpp"
+#ifndef SKIP_LABS_COMPILATION
+
+#include <App/App.hpp>
 
 #include <fmt/core.h>
 
@@ -40,3 +43,5 @@ void App::lab_find_red_object_in_video()
 
 	} while (cv::pollKey() != 27); // Message loop until user presses ESC
 }
+
+#endif // !SKIP_LABS_COMPILATION
