@@ -23,7 +23,8 @@ public:
     Texture(const glm::vec3& vec); // synthetic single-color RGB texture
     Texture(const glm::vec4& vec); // synthetic single-color RGBA texture
     Texture(const std::filesystem::path& path, Interpolation interpolation = Interpolation::linear_mipmap_linear);
-    
+    //Texture(int width, int height);
+
     ~Texture();
 
     void bind(void);

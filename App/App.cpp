@@ -54,9 +54,12 @@ bool App::init()
         return false;
     }
 
-    fmt::println("Initialized capture device. Width: {}, Height: {}",
-        capture.get(cv::CAP_PROP_FRAME_WIDTH),
-        capture.get(cv::CAP_PROP_FRAME_HEIGHT));
+    webcamp_width = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH));
+    webcamp_height = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT));
+    fmt::println("Initialized capture device. Width: {}, Height: {}", webcamp_width, webcamp_height);
+
+    // Read one frame; we need it because when we change texture (webcamp footage in imgui) size and data format MUST match; so this will be set as initial texture
+    capture.read(initial_frame);
 
     // Init FaceDetector
     if (!face_detector.load_classifier("App/Resources/haarcascade_frontalface_default.xml")) {
@@ -116,6 +119,7 @@ bool App::init()
         // Comment these out to disable anti-aliasing
         glEnable(GL_MULTISAMPLE);
         glfwWindowHint(GLFW_SAMPLES, 4);
+        // ------------------------------------------
 
         // Window is hidden until everything is initialized
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);        

@@ -10,7 +10,7 @@ public:
 
 
 	bool load_classifier(const cv::String& filename) {
-		return m_classifier.load(filename);
+		return classifier.load(filename);
 	}
 
 
@@ -19,7 +19,7 @@ public:
         cv::cvtColor(frame, frame_grayscale, cv::COLOR_BGR2GRAY);
 
         std::vector<cv::Rect> detected_rectangles;
-        m_classifier.detectMultiScale(frame_grayscale, detected_rectangles);
+        classifier.detectMultiScale(frame_grayscale, detected_rectangles);
 
         std::vector<cv::Point2f> detected_centers;
         detected_centers.reserve(detected_rectangles.size());
@@ -38,6 +38,6 @@ public:
 
 private:
 
-	cv::CascadeClassifier m_classifier;
+	cv::CascadeClassifier classifier;
 
 };

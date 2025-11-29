@@ -70,13 +70,18 @@ private:
     // == MEMBERS ==
     FaceDetector face_detector;
     FPSMeter fps_meter_main;
-    SyncedDeque<std::tuple<cv::Mat, std::vector<cv::Point2f>>> synced_deque;
+    SyncedDeque<std::tuple<cv::Mat, int>> synced_deque;
 
     cv::VideoCapture capture;
 
     Camera camera;
 
     std::atomic<bool> do_terminate_worker_threads;
+
+    int n_faces_found = 0;
+    int webcamp_width = 0;
+    int webcamp_height = 0;
+    cv::Mat initial_frame;
 
     // OpenGL members
     GLFWwindow* window{};
@@ -109,7 +114,7 @@ private:
     void enable_or_disable_vsync();
     
     // AppRun
-    void render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);
+    void render_GUI(Color& triangle_color, Color& background_color);
     void update_projection_matrix();
     void process_camera(float delta_t);
     float get_heightmap_y(float position_x, float position_z);
@@ -122,7 +127,10 @@ private:
     static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
     static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
     
-    // Faster compile time ?
+    // Webcam service
+    void webcam_thread();
+
+    // Faster compile time (?): These old Labs don't have to be re-compiled everytime we change anything in App.hpp or any of its imports
 #ifndef SKIP_LABS_COMPILATION
     // Lab 01
     void lab_identify_object_by_luminance() const;

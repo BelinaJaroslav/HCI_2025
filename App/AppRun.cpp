@@ -7,23 +7,9 @@
 
 void App::run()
 {
-	// ------------------------------------------------------------------- //
-	// This creates some redundant threads but it shouldn't matter because
-	// this functionality won't be used in the future: the app will run in 
-	// fullscreen and webcam footage will be part of the main window.
-#ifndef SKIP_LABS_COMPILATION
-    const bool SHOW_WEBCAM_DETECTOR_WINDOW = false;
-	const bool SHOW_WEBCAM_COMPRESSION_WINDOW = false;
-
-	std::jthread t_detector;
-	std::jthread t_compression;
-
-	if (SHOW_WEBCAM_DETECTOR_WINDOW) t_detector = std::jthread(&App::lab_multithread, this);
-	if (SHOW_WEBCAM_COMPRESSION_WINDOW) t_compression = std::jthread(&App::lab_compression_pool, this);
-#endif // !SKIP_LABS_COMPILATION
-	// ------------------------------------------------------------------- //
-
-	FPSMeter fps_meter_main;
+    // Webcam service
+    std::jthread thread_webcam_service;
+    thread_webcam_service = std::jthread(&App::webcam_thread, this);
 
     // Measuring delta time
     double current_timestamp = glfwGetTime();
@@ -41,20 +27,27 @@ void App::run()
 
 	// Main game loop
 	while (!glfwWindowShouldClose(window)) {
+        // Webcam service
+        if (!synced_deque.empty()) {
+            auto tup = synced_deque.pop_front();
+            auto& frame = std::get<0>(tup);
+            n_faces_found = std::get<1>(tup);
+            texture_library.at(key_tex_webcam)->replace_image(frame);
+        }
+
         // Measure delta time
         current_timestamp = glfwGetTime();
         delta_time = static_cast<float>(current_timestamp - last_frame_time);
-        last_frame_time = current_timestamp;
-
-        // Measure FPS
-		fps_meter_main.update();
+        last_frame_time = current_timestamp;        
 
 		// Start ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		render_GUI(fps_meter_main, teapot_color, background_color);
+        // Measure FPS and render GUI
+        fps_meter_main.update();
+		render_GUI(teapot_color, background_color);
 
 		// Clear canvas
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -155,4 +148,33 @@ float App::get_heightmap_y(float position_x, float position_z)
     }
 
     return Y * HEIGHTMAP_SCALE;
+}
+
+
+void App::webcam_thread()
+{
+    cv::Mat frame; // For captured frame
+
+    do {
+        // Get next frame
+        capture.read(frame);
+        if (frame.empty()) {
+            fmt::println("Cam disconnected? End of video?");
+            continue;
+        }
+
+        // Find faces
+        auto face_centers = face_detector.find_faces(frame);
+        int _n_faces_found = static_cast<int>(face_centers.size());
+
+        // Draw face crosses
+        for (const auto& face_center : face_centers) {
+            CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
+        }
+
+        // Push into synced_deque
+        synced_deque.push_back(std::make_tuple(frame, _n_faces_found)); // DATA IS BEING COPIED HERE
+
+        
+    } while (!do_terminate_worker_threads); // Repeat until App sets `do_terminate_worker_threads` to `true`
 }

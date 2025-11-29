@@ -16,7 +16,9 @@ void App::init_assets()
     //shader_library.emplace("rainbow", std::make_shared<ShaderProgram>("Resources/Shaders/basic.vert", "Resources/Shaders/rainbow.frag"));
 
     // TEXTURES
-    texture_library.emplace(key_tex_singlecolor, std::make_shared<Texture>(glm::vec3(255, 0, 255)));
+    texture_library.emplace(key_tex_webcam, std::make_shared<Texture>(initial_frame));
+
+    texture_library.emplace(key_tex_singlecolor, std::make_shared<Texture>(glm::vec3(255, 153, 255)));
     
     std::filesystem::path woodbox_path("./App/Resources/Textures/box_rgb888.png");
     texture_library.emplace(key_tex_woodbox, std::make_shared<Texture>(woodbox_path));

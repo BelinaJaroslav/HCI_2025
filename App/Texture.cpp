@@ -91,6 +91,7 @@ Texture::Texture(cv::Mat const& image, Interpolation interpolation)
     std::cout << "Texture name=" << name << " created.\n";
 }
 
+//Texture::Texture(int width, int height) : Texture{ cv::Mat{height, width, CV_8UC3, cv::Scalar{255, 153, 255}}, Interpolation::nearest } { }
 
 Texture::~Texture()
 {

@@ -1,15 +1,15 @@
 #include "App.hpp"
 
 
-void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color)
+void App::render_GUI(Color& triangle_color, Color& background_color)
 {
     ImGui::Begin("FPS Meter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
         // Display current FPS value
-        ImGui::Text("FPS: %.1f", fps_meter.get());
+        ImGui::Text("FPS: %.1f", fps_meter_main.get());
 
         // Show if the value was just updated
-        if (fps_meter.is_updated()) {
+        if (fps_meter_main.is_updated()) {
             ImGui::SameLine();
             ImGui::TextColored(ImVec4(0, 1, 0, 1), " (Updated)");
         }
@@ -17,9 +17,7 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
         // FPS history graph
         static std::vector<float> fps_history;
         static const int history_size = 100;
-
-        // FIX 1: Use fps_meter (the parameter) not fps_meter_main
-        fps_history.push_back(static_cast<float>(fps_meter.get()));
+        fps_history.push_back(static_cast<float>(fps_meter_main.get()));
         if (fps_history.size() > history_size) {
             fps_history.erase(fps_history.begin());
         }
@@ -32,15 +30,14 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
 
         // Controls
         if (ImGui::Button("Reset FPS Counter")) {
-            fps_meter.reset();
+            fps_meter_main.reset();
             fps_history.clear();
         }
 
         // Interval adjustment
         static float interval_seconds = 1.0f;
-        // FIX 2: Use fps_meter (the parameter) not fps_meter_main
         if (ImGui::SliderFloat("Update Interval (s)", &interval_seconds, 0.1f, 5.0f)) {
-            fps_meter.set_interval(std::chrono::duration<double>(interval_seconds));
+            fps_meter_main.set_interval(std::chrono::duration<double>(interval_seconds));
         }
     }
     ImGui::End();
@@ -110,5 +107,17 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
         ImGui::Checkbox("##readonly_checkbox_freeform", &is_camera_freeform);
         ImGui::EndDisabled();
     }
+    ImGui::End();
+
+    ImGui::Begin("Live reaction");
+
+    const float scale = 0.75f;
+
+    ImGui::Image(
+        (ImTextureID)(intptr_t)texture_library.at(key_tex_webcam)->get_name(),
+        ImVec2(texture_library.at(key_tex_webcam)->get_width()* scale, texture_library.at(key_tex_webcam)->get_height()* scale)
+    );
+    
+    ImGui::Text("No. of detected faces: %d", n_faces_found);
     ImGui::End();
 }
