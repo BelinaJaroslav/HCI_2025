@@ -11,7 +11,8 @@ void App::run()
 	// This creates some redundant threads but it shouldn't matter because
 	// this functionality won't be used in the future: the app will run in 
 	// fullscreen and webcam footage will be part of the main window.
-	const bool SHOW_WEBCAM_DETECTOR_WINDOW = false;
+#ifndef SKIP_LABS_COMPILATION
+    const bool SHOW_WEBCAM_DETECTOR_WINDOW = false;
 	const bool SHOW_WEBCAM_COMPRESSION_WINDOW = false;
 
 	std::jthread t_detector;
@@ -19,6 +20,7 @@ void App::run()
 
 	if (SHOW_WEBCAM_DETECTOR_WINDOW) t_detector = std::jthread(&App::lab_multithread, this);
 	if (SHOW_WEBCAM_COMPRESSION_WINDOW) t_compression = std::jthread(&App::lab_compression_pool, this);
+#endif // !SKIP_LABS_COMPILATION
 
 	FPSMeter fps_meter_main;
 	// ------------------------------------------------------------------- //
@@ -93,14 +95,15 @@ void App::run()
 	}
 }
 
-void App::process_camera( float delta_t) {
+void App::process_camera(float delta_t)
+{
     glm::vec3 movement = camera.process_input(window, delta_t);
     camera.position += movement;
 }
 
 
-void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color) {
-
+void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color)
+{
     ImGui::Begin("FPS Meter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
         // Display current FPS value

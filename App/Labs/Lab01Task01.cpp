@@ -1,3 +1,6 @@
+#include "App/Macros.hpp"
+#ifndef SKIP_LABS_COMPILATION
+
 #include <App/App.hpp>
 
 #include <fmt/core.h>
@@ -45,3 +48,5 @@ void App::lab_identify_object_by_luminance() const
         if (key == 27) break; // test for ESC key
     }
 }
+
+#endif // !SKIP_LABS_COMPILATION

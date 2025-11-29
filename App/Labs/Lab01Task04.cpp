@@ -1,3 +1,6 @@
+#include "App/Macros.hpp"
+#ifndef SKIP_LABS_COMPILATION
+
 #include <App/App.hpp>
 
 #include <fmt/core.h>
@@ -39,3 +42,5 @@ void App::lab_find_face_in_video()
 
 	} while (cv::pollKey() != 27); //message loop untill ESC
 }
+
+#endif // !SKIP_LABS_COMPILATION

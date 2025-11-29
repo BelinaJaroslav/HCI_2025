@@ -1,3 +1,6 @@
+#include "App/Macros.hpp"
+#ifndef SKIP_LABS_COMPILATION
+
 #include <App/App.hpp>
 
 #include <fmt/core.h>
@@ -136,3 +139,4 @@ void App::render_thread() {
 	do_terminate_worker_threads = true;
 }
 
+#endif // !SKIP_LABS_COMPILATION

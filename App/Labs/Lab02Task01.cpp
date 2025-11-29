@@ -1,3 +1,6 @@
+#include "App/Macros.hpp"
+#ifndef SKIP_LABS_COMPILATION
+
 #include <App/App.hpp>
 
 #include <fmt/core.h>
@@ -53,3 +56,5 @@ void App::lab_complex_behaviour()
 
     } while (cv::pollKey() != 27); // Repeat until user presses ESC
 }
+
+#endif // !SKIP_LABS_COMPILATION

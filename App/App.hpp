@@ -24,14 +24,15 @@
 
 // Our libraries
 #include "Assets.hpp"
+#include "Camera.hpp"
 #include "CV2Tools.hpp"
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
+#include "Macros.hpp"
 #include "Model.hpp"
 #include "ThreadPool.hpp"
 #include "ShaderProgram.hpp"
 #include "SyncedDeque.hpp"
-#include "Camera.hpp"
 
 
 class App {
@@ -109,6 +110,8 @@ private:
     static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
     static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
     
+    // Faster compile time ?
+#ifndef SKIP_LABS_COMPILATION
     // Lab 01
     void lab_identify_object_by_luminance() const;
     void lab_find_red_object_in_image() const;
@@ -132,4 +135,5 @@ private:
     void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
     std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
+#endif // !SKIP_LABS_COMPILATION
 };
