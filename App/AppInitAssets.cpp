@@ -16,7 +16,11 @@ void App::init_assets()
     //shader_library.emplace("rainbow", std::make_shared<ShaderProgram>("Resources/Shaders/basic.vert", "Resources/Shaders/rainbow.frag"));
 
     // MODELS
+    // Teapot
     std::filesystem::path teapot_path("./App/Resources/Objects/teapot_tri_vnt.obj");
     auto teapot_model = Model(teapot_path, shader_library.at(key_shader_simple));
     scene.insert({ key_obj_teapot, teapot_model });
+
+    // Cube
+    // ...
 }

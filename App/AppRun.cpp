@@ -74,7 +74,8 @@ void App::run()
 
         current_shader->set_uniform("u_view_mx", mx_view);
 
-        current_shader->set_uniform("u_color", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));        
+        // TODO
+        //current_shader->set_uniform("u_color", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));        
 
         // DRAW MODELS FROM SCENE
         for (auto& [key, value] : scene) {
