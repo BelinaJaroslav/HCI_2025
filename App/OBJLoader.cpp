@@ -11,6 +11,7 @@
 #include <fmt/core.h>
 
 #include "OBJLoader.hpp"
+#include "Macros.hpp"
 
 constexpr auto MAX_LINE_SIZE = 1024;
 
@@ -235,8 +236,6 @@ void load_OBJ_PG2(const std::filesystem::path& file_name, std::vector<vertex>& m
 
 void load_heightmap(const std::filesystem::path& file_name, std::vector<vertex>& mesh_vertices, std::vector<GLuint>& mesh_vertex_indices, std::map<std::pair<float, float>, float>& _heights)
 {
-    const float HEIGHTMAP_SCALE = 0.1f;
-
     mesh_vertices.clear();
     mesh_vertex_indices.clear();
 
@@ -330,6 +329,8 @@ void load_heightmap(const std::filesystem::path& file_name, std::vector<vertex>&
         vertex.normal = glm::normalize(normal_sums[pair]); // no need to divide by four, we can just normalize
 
         _heights[{vertex.position.x* HEIGHTMAP_SCALE, vertex.position.z* HEIGHTMAP_SCALE}] = vertex.position.y; // for heightmap collision
+
+        //std::cout << vertex.position.x << "\n";
     }
 
    std::cout << ", vertices: " << mesh_vertices.size() << " ... (done loading heightmap)\n";

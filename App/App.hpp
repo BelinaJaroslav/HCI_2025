@@ -61,7 +61,8 @@ private:
     const std::string key_obj_heightmap = "obj_heightmap";
     const std::string key_obj_teapot = "obj_teapot";
     const std::string key_obj_cube = "obj_cube";
-    const std::string key_tex_woodbox = "tex_woodbox";    
+    const std::string key_tex_tileatlas = "tex_tileatlas";
+    const std::string key_tex_woodbox = "tex_woodbox";
 
     // == MEMBERS ==
     FaceDetector face_detector;
@@ -88,6 +89,7 @@ private:
     double last_mouse_y = 0.0f;
     bool is_first_mouse = true;
     float FOV{};
+    bool is_camera_freeform = false;
 
     glm::mat4 mx_projection = glm::identity<glm::mat4>();
 
@@ -107,6 +109,7 @@ private:
     void render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color);
     void update_projection_matrix();
     void process_camera(float delta_t);
+    float get_heightmap_y(float position_x, float position_z);
 
     // Callbacks
     static void error_callback(int error, const char* description);

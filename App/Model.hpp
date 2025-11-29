@@ -22,7 +22,7 @@ class Model
 public:
     // origin point of whole model
     glm::vec3 pivot_position{}; // [0,0,0] of the object
-    glm::vec3 euler_angles{};    // pitch, yaw, roll
+    glm::vec3 euler_angles{}; // pitch, yaw, roll
     glm::vec3 scale{ 1.0f };
 
     glm::mat4 local_model_matrix{ 1.0 }; // cache, and for complex transformations (default = identity) 
@@ -63,18 +63,14 @@ public:
     // === HEIGHTMAP ===
     Model(const std::filesystem::path& filename,
         std::shared_ptr<ShaderProgram> shader,
-        std::map<std::pair<float, float>, float>& _heights
+        std::map<std::pair<float, float>, float>& _heights,
+        std::shared_ptr<Texture> texture_shared_ptr
     )
     {
         std::vector<vertex> vertices;
         std::vector<GLuint> indices;
-
-        load_heightmap(filename, vertices, indices, _heights);        
-
+        load_heightmap(filename, vertices, indices, _heights);
         auto mesh_shared_ptr = std::make_shared<Mesh>(vertices, indices, GL_TRIANGLES);
-
-        auto texture_shared_ptr = std::make_shared<Texture>();
-
         add_mesh(mesh_shared_ptr, shader, texture_shared_ptr);
     }
 

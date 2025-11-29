@@ -32,7 +32,8 @@ void App::run()
 
     // State
 	Color triangle_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
-    Color background_color{ 0.1f, 0.1f, 0.1f }; // Dark gray background
+    Color background_color{ 0.549f, 0.823f, 0.858f }; // Sky color
+    glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
 
     // Init view
     update_projection_matrix();
@@ -102,8 +103,12 @@ void App::run()
 
 void App::process_camera(float delta_t)
 {
-    glm::vec3 movement = camera.process_input(window, delta_t);
+    glm::vec3 movement = camera.process_input(window, delta_t, is_camera_freeform);
     camera.position += movement;
+
+    if (!is_camera_freeform) {
+        camera.position.y = get_heightmap_y(camera.position.x, camera.position.z);
+    }
 }
 
 
@@ -154,31 +159,31 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
     // Controls Window
     ImGui::Begin("Render Controls");
     {
-        // Display current FOV value
+        // Display info
         ImGui::Text("FOV: %.1f", FOV);
+
+        ImGui::Text("Camera coors: %.1f/%.1f/%.1f", camera.position.x, camera.position.y, camera.position.z);
 
         ImGui::Separator();
 
         float triangle_color_arr[3] = { triangle_color.r, triangle_color.g, triangle_color.b };
-        if (ImGui::ColorEdit3("Triangle Color", triangle_color_arr)) {
+        if (ImGui::ColorEdit3("Triangle color", triangle_color_arr)) {
             triangle_color.r = triangle_color_arr[0];
             triangle_color.g = triangle_color_arr[1];
             triangle_color.b = triangle_color_arr[2];
         }
 
         float background_color_arr[3] = { background_color.r, background_color.g, background_color.b };
-        if (ImGui::ColorEdit3("Background Color", background_color_arr)) {
+        if (ImGui::ColorEdit3("Sky color", background_color_arr)) {
             background_color.r = background_color_arr[0];
             background_color.g = background_color_arr[1];
             background_color.b = background_color_arr[2];
             glClearColor(background_color_arr[0], background_color_arr[1], background_color_arr[2], 1.0f);
         }
 
-        if (ImGui::Button("Reset Colors")) {
+        if (ImGui::Button("Reset colors")) {
             triangle_color = { 1.0f, 0.6f, 1.0f, 1.0f };
-            background_color.r = 0.1f;
-            background_color.g = 0.1f;
-            background_color.b = 0.1f;
+            background_color = { 0.549f, 0.823f, 0.858f };
             glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
         }        
         
@@ -199,6 +204,14 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
         ImGui::BeginDisabled();
         ImGui::Checkbox("##readonly_checkbox_mouselook", &is_mouselook_on);
         ImGui::EndDisabled();
+
+        if (ImGui::Button("Spectator mode on/off")) {
+            //TODO
+        }
+        ImGui::SameLine();
+        ImGui::BeginDisabled();
+        ImGui::Checkbox("##readonly_checkbox_freeform", &is_camera_freeform);
+        ImGui::EndDisabled();
     }
     ImGui::End();
 }
@@ -215,4 +228,41 @@ void App::update_projection_matrix()
         0.1f,                // Near clipping plane. Keep as big as possible, or you'll get precision issues.
         20000.0f             // Far clipping plane. Keep as little as possible.
     );
+}
+
+
+float App::get_heightmap_y(float position_x, float position_z)
+{
+    float X = position_x + HEIGHTMAP_SHIFT;
+    float Z = position_z + HEIGHTMAP_SHIFT;
+    float Y = 0.0f;
+
+    float X_floor = std::floor(X);
+    float Z_floor = std::floor(Z);
+
+    float X_ceil = std::ceil(X);
+    float Z_ceil = std::ceil(Z);
+
+    if (X - X_floor < 0.5f && Z - Z_floor < 0.5f) {
+        // In the lower-left triangle
+        float x_fraction = X - X_floor;
+        float y_fraction = Z - Z_floor;
+        float common_height = _heights[{X_floor, Z_floor}];
+        float x_difference = _heights[{X_ceil, Z_floor}] - common_height;
+        float y_difference = _heights[{X_floor, Z_ceil}] - common_height;
+        Y = common_height + x_fraction * x_difference + y_fraction * y_difference;
+    }
+    else {
+        // In the upper-right triangle
+        float x_fraction = X_ceil - X;
+        float y_fraction = Z_ceil - Z;
+        float common_height = _heights[{X_ceil, Z_ceil}];
+        float x_difference = common_height - _heights[{X_floor, Z_ceil}];
+        float y_difference = common_height - _heights[{X_ceil, Z_floor}];
+        Y = common_height - x_fraction * x_difference - y_fraction * y_difference;
+    }
+
+    //std::cout << X << " " << Z << " -> " << Y << "\n";
+
+    return Y * HEIGHTMAP_SCALE;
 }

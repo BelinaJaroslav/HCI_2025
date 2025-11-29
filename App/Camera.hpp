@@ -19,7 +19,7 @@ public:
     GLfloat roll = 0.0f;
     
     // Camera options
-    GLfloat movement_speed = 20.0f;
+    GLfloat movement_speed = 50.0f;
     GLfloat mouse_sensitivity = 0.25f;
     
     Camera()
@@ -44,7 +44,7 @@ public:
     }
 
 
-    glm::vec3 process_input(GLFWwindow* window, GLfloat delta_time)
+    glm::vec3 process_input(GLFWwindow* window, GLfloat delta_time, bool is_camera_freeform)
     {
         glm::vec3 direction{0};
           
