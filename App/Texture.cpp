@@ -30,6 +30,9 @@ cv::Mat Texture::load_image(const std::filesystem::path& path)
     if (image.empty()) {
         throw std::runtime_error{ std::string("no texture in file: ").append(path.string()) };
     }
+
+    std::cout << "Loaded texture image: " << path.string() << "\n";
+
     return image;
 }
 
@@ -82,6 +85,8 @@ Texture::Texture(cv::Mat const& image, Interpolation interpolation)
     // Configures the way the texture repeats
     glTextureParameteri(name, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(name, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    std::cout << "Texture name=" << name << " created.\n";
 }
 
 

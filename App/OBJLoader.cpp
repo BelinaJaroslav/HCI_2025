@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 
+#include <opencv2/opencv.hpp>
+
 #include <GL/glew.h> 
 #include <glm/glm.hpp>
 
@@ -228,4 +230,121 @@ void load_OBJ_PG2(const std::filesystem::path& file_name, std::vector<vertex>& m
         mesh_vertex_indices.push_back(u);
     }
     fmt::println("Done loading OBJ file {}", file_name.string());
+}
+
+
+void load_heightmap(const std::filesystem::path& file_name, std::vector<vertex>& mesh_vertices, std::vector<GLuint>& mesh_vertex_indices, std::map<std::pair<float, float>, float>& _heights)
+{
+    const float HEIGHTMAP_SCALE = 0.1f;
+
+    mesh_vertices.clear();
+    mesh_vertex_indices.clear();
+
+    cv::Mat hmap = cv::imread(file_name.string(), cv::IMREAD_GRAYSCALE);
+    if (hmap.empty()) std::cerr << "[!] Height map empty? File: " << file_name << "\n";
+
+    const unsigned int mesh_step_size = 10;
+
+    std::cout << "Heightmap size: " << hmap.size << ", channels: " << hmap.channels();
+
+    if (hmap.channels() != 1) std::cerr << "[!] Height map requested 1 channel, got: " << hmap.channels() << "\n";
+
+    // Create heightmap mesh from TRIANGLES in XZ plane, Y is UP (right hand rule)
+    //
+    //   3-----2
+    //   |    /|
+    //   |  /  |
+    //   |/    |
+    //   0-----1
+    //
+    //   012,023
+
+    glm::vec3 normalA{};
+    glm::vec3 normalB{};
+    glm::vec3 normal{};
+    unsigned int indices_counter = 0;
+
+    std::map<std::pair<unsigned int, unsigned int>, glm::vec3> normal_sums;
+    std::pair<unsigned int, unsigned int> pair, pair0, pair1, pair2, pair3;
+
+    for (unsigned int x_coord = 0; x_coord < (hmap.cols - mesh_step_size); x_coord += mesh_step_size) {
+        for (unsigned int z_coord = 0; z_coord < (hmap.rows - mesh_step_size); z_coord += mesh_step_size) {
+            // Get The (X, Y, Z) Value For The Bottom Left Vertex = 0
+            glm::vec3 p0(x_coord, hmap.at<uchar>(cv::Point(x_coord, z_coord)), z_coord);
+            // Get The (X, Y, Z) Value For The Bottom Right Vertex = 1
+            glm::vec3 p1(x_coord + mesh_step_size, hmap.at<uchar>(cv::Point(x_coord + mesh_step_size, z_coord)), z_coord);
+            // Get The (X, Y, Z) Value For The Top Right Vertex = 2
+            glm::vec3 p2(x_coord + mesh_step_size, hmap.at<uchar>(cv::Point(x_coord + mesh_step_size, z_coord + mesh_step_size)), z_coord + mesh_step_size);
+            // Get The (X, Y, Z) Value For The Top Left Vertex = 3
+            glm::vec3 p3(x_coord, hmap.at<uchar>(cv::Point(x_coord, z_coord + mesh_step_size)), z_coord + mesh_step_size);
+
+            // Get max normalized height for tile, set texture accordingly
+            // Grayscale image returns 0..256, normalize to 0.0f..1.0f by dividing by 256 (255 ?)
+            float max_h = std::max(hmap.at<uchar>(cv::Point(x_coord, z_coord)) / 255.0f,
+                std::max(hmap.at<uchar>(cv::Point(x_coord, z_coord + mesh_step_size)) / 255.0f,
+                    std::max(hmap.at<uchar>(cv::Point(x_coord + mesh_step_size, z_coord + mesh_step_size)) / 255.0f,
+                        hmap.at<uchar>(cv::Point(x_coord + mesh_step_size, z_coord)) / 255.0f
+                    )));
+
+            // Get texture coords in vertices, bottom left of geometry == bottom left of texture
+            glm::vec2 tc0 = heightmap_get_subtex_by_height(max_h);
+            glm::vec2 tc1 = tc0 + glm::vec2((1.0f / 16), 0.0f);		    // add offset for bottom right corner
+            glm::vec2 tc2 = tc0 + glm::vec2((1.0f / 16), (1.0f / 16));  // add offset for top right corner
+            glm::vec2 tc3 = tc0 + glm::vec2(0.0f, (1.0f / 16));         // add offset for bottom left corner
+
+            // - calculate normal vector            
+            normalA = glm::normalize(glm::cross(p1 - p0, p2 - p0));
+            normalB = glm::normalize(glm::cross(p2 - p0, p3 - p0));
+            normal = (normalA + normalB) / 2.0f;
+
+            // - place vertices and ST to mesh
+            mesh_vertices.emplace_back(vertex{ p0, -normal, tc0 });
+            mesh_vertices.emplace_back(vertex{ p1, -normal, tc1 });
+            mesh_vertices.emplace_back(vertex{ p2, -normal, tc2 });
+            mesh_vertices.emplace_back(vertex{ p3, -normal, tc3 });
+
+            // - place indices
+            indices_counter += 4;
+            mesh_vertex_indices.emplace_back(indices_counter - 4);
+            mesh_vertex_indices.emplace_back(indices_counter - 2);
+            mesh_vertex_indices.emplace_back(indices_counter - 3);
+            mesh_vertex_indices.emplace_back(indices_counter - 4);
+            mesh_vertex_indices.emplace_back(indices_counter - 1);
+            mesh_vertex_indices.emplace_back(indices_counter - 2);
+
+            // - normal averaging
+            pair0 = { x_coord, z_coord };
+            pair1 = { x_coord + mesh_step_size, z_coord };
+            pair2 = { x_coord + mesh_step_size, z_coord + mesh_step_size };
+            pair3 = { x_coord, z_coord + mesh_step_size };
+            normal_sums[pair0] -= normal;
+            normal_sums[pair1] -= normal;
+            normal_sums[pair2] -= normal;
+            normal_sums[pair3] -= normal;
+        }
+    }
+
+    // - normal averaging, 2nd iter
+    for (auto& vertex : mesh_vertices) {
+        pair = { static_cast<unsigned int>(vertex.position.x), static_cast<unsigned int>(vertex.position.z) };
+        vertex.normal = glm::normalize(normal_sums[pair]); // no need to divide by four, we can just normalize
+
+        _heights[{vertex.position.x* HEIGHTMAP_SCALE, vertex.position.z* HEIGHTMAP_SCALE}] = vertex.position.y; // for heightmap collision
+    }
+
+   std::cout << ", vertices: " << mesh_vertices.size() << " ... (done loading heightmap)\n";
+}
+
+glm::vec2 heightmap_get_subtex_S_and_T(const int x, const int y)
+{
+    return glm::vec2((x * 1.0f / 16), (y * 1.0f / 16)); // Expects tilemap with 16 rows&cols; interpolation is dealt with via bleeding pixels
+}
+
+glm::vec2 heightmap_get_subtex_by_height(float height)
+{
+    if (height > 0.9) return heightmap_get_subtex_S_and_T(4, 4);
+    else if (height > 0.8) return heightmap_get_subtex_S_and_T(1, 4);
+    else if (height > 0.5) return heightmap_get_subtex_S_and_T(7, 1);
+    else if (height > 0.3) return heightmap_get_subtex_S_and_T(4, 1);
+    else return heightmap_get_subtex_S_and_T(1, 1);
 }

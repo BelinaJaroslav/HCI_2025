@@ -81,8 +81,13 @@ void App::run()
 
         // DRAW MODELS FROM SCENE
         for (auto& [key, value] : scene) {
-            //value.update();
-            value.relative_rotate(glm::vec3(0.0f, delta_time * 100.0f, 0.0f));
+            
+            if (key != key_obj_heightmap) {
+                //value.update();
+                value.relative_rotate(glm::vec3(0.0f, delta_time * 100.0f, 0.0f));
+            }
+            
+            //fmt::print("Drawing {}: ", key);
             value.draw();
         }
 

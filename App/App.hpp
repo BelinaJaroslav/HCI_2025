@@ -9,7 +9,7 @@
 // 3rd party libraries
 #include <opencv2/opencv.hpp>
 
-// Currently (lab05), we need to import GLFW3 to use `GLFWwindow` etc.
+// We need to import GLFW3 to use `GLFWwindow` etc.
 // But importing just GLFW3 gives us bunch of errors (wrong import order),
 // so we import other stuff aswell and import order is correct.
 #include <GL/glew.h> 
@@ -58,7 +58,10 @@ private:
 
     // Map keys that may be used across multiple methods
     const std::string key_shader_simple = "simple_shader";
+    const std::string key_obj_heightmap = "obj_heightmap";
     const std::string key_obj_teapot = "obj_teapot";
+    const std::string key_obj_cube = "obj_cube";
+    const std::string key_tex_woodbox = "tex_woodbox";    
 
     // == MEMBERS ==
     FaceDetector face_detector;
@@ -89,7 +92,10 @@ private:
     glm::mat4 mx_projection = glm::identity<glm::mat4>();
 
     std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shader_library;
+    std::unordered_map<std::string, std::shared_ptr<Texture>> texture_library;
     std::unordered_map<std::string, Model> scene;
+
+    std::map<std::pair<float, float>, float> _heights; // Heightmap
 
     // == METHODS ==
     void init_assets();

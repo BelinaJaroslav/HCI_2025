@@ -42,20 +42,34 @@ public:
     std::vector<mesh_package> meshes;
     
     Model() = default;
-    Model(const std::filesystem::path & filename, std::shared_ptr<ShaderProgram> shader) {
-        // Load mesh (all meshes) of the model, (in the future: load material of each mesh, load textures...)
-        // notice: you can load multiple meshes and place them to proper positions, 
-        //            multiple textures (with reusing) etc. to construct single complicated Model   
-        //
-        // This can be done by extending OBJ file parser (OBJ can load hierarchical models),
-        // or by your own JSON model specification (or keep it simple and set a rule: 1model=1mesh ...) 
-        //
 
+    // === NORMAL MODEL ===
+    Model(const std::filesystem::path& filename,
+        std::shared_ptr<ShaderProgram> shader,
+        std::shared_ptr<Texture> texture_shared_ptr = std::make_shared<Texture>()
+    )
+    {
         std::vector<vertex> vertices;
         std::vector<GLuint> indices;
 
         load_OBJ_GDrive(filename, vertices, indices);
         //load_OBJ_PG2(filename, vertices, indices);
+
+        auto mesh_shared_ptr = std::make_shared<Mesh>(vertices, indices, GL_TRIANGLES);
+
+        add_mesh(mesh_shared_ptr, shader, texture_shared_ptr);
+    }
+
+    // === HEIGHTMAP ===
+    Model(const std::filesystem::path& filename,
+        std::shared_ptr<ShaderProgram> shader,
+        std::map<std::pair<float, float>, float>& _heights
+    )
+    {
+        std::vector<vertex> vertices;
+        std::vector<GLuint> indices;
+
+        load_heightmap(filename, vertices, indices, _heights);        
 
         auto mesh_shared_ptr = std::make_shared<Mesh>(vertices, indices, GL_TRIANGLES);
 
@@ -95,6 +109,8 @@ public:
 
             mesh_pkg.texture->bind();
             mesh_pkg.shader->set_uniform("tex0", 0);
+
+            //std::cout << mesh_pkg.texture->get_name() << "\n";
 
             mesh_pkg.mesh->draw();
         }
