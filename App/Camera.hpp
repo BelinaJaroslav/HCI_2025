@@ -19,7 +19,7 @@ public:
     GLfloat roll = 0.0f;
     
     // Camera options
-    GLfloat movement_speed = 50.0f;
+    GLfloat movement_speed = 5.0f;
     GLfloat mouse_sensitivity = 0.25f;
     
     Camera()
@@ -46,32 +46,51 @@ public:
 
     glm::vec3 process_input(GLFWwindow* window, GLfloat delta_time, bool is_camera_freeform)
     {
-        glm::vec3 direction{0};
-          
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            direction += front;
+        glm::vec3 direction = glm::vec3(0.0f);
+        GLfloat _movement_speed = movement_speed;
 
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            direction -= front;
+        if (is_camera_freeform) {
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+                direction += front;
 
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            direction -= right;       
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+                direction -= front;
 
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            direction += right;
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+                direction -= right;
 
-        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-            direction += up;
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+                direction += right;
 
-        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-            direction -= up;
+            if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+                direction += up;
 
-        //... up, down, diagonal, ... 
+            if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+                direction -= up;
+
+            _movement_speed *= 2.0f;
+        }
+        else {
+            glm::vec3 horizont_front(front.x, 0, front.z);
+            glm::vec3 horizont_right(right.x, 0, right.z);
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+                direction += horizont_front;
+            }
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+                direction += -horizont_front;
+            }
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+                direction += -horizont_right;
+            }
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+                direction += horizont_right;
+            }
+        }
 
         if (glm::length(direction) == 0.0f)
             return glm::vec3(0.0f);
 
-        return glm::normalize(direction) * movement_speed * delta_time;
+        return glm::normalize(direction) * _movement_speed * delta_time;
     }
 
 

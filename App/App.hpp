@@ -29,11 +29,12 @@
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
 #include "Macros.hpp"
-#include "Model.hpp"
+//#include "Model.hpp"
 #include "ThreadPool.hpp"
 #include "ShaderProgram.hpp"
 #include "SyncedDeque.hpp"
 
+#include "ModelSimple.hpp"
 
 class App {
 public:
@@ -95,7 +96,7 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shader_library;
     std::unordered_map<std::string, std::shared_ptr<Texture>> texture_library;
-    std::unordered_map<std::string, Model> scene;
+    std::unordered_map<std::string, ModelSimple> scene;
 
     std::map<std::pair<float, float>, float> _heights; // Heightmap
 

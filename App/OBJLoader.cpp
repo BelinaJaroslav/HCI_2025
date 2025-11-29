@@ -329,8 +329,6 @@ void load_heightmap(const std::filesystem::path& file_name, std::vector<vertex>&
         vertex.normal = glm::normalize(normal_sums[pair]); // no need to divide by four, we can just normalize
 
         _heights[{vertex.position.x* HEIGHTMAP_SCALE, vertex.position.z* HEIGHTMAP_SCALE}] = vertex.position.y; // for heightmap collision
-
-        //std::cout << vertex.position.x << "\n";
     }
 
    std::cout << ", vertices: " << mesh_vertices.size() << " ... (done loading heightmap)\n";

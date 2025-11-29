@@ -83,12 +83,11 @@ void App::run()
         // DRAW MODELS FROM SCENE
         for (auto& [key, value] : scene) {
             
-            if (key != key_obj_heightmap) {
-                //value.update();
-                value.relative_rotate(glm::vec3(0.0f, delta_time * 100.0f, 0.0f));
+            // Rotating teapot
+            if (key == key_obj_teapot) {
+                value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, 23 * glfwGetTime());
             }
-            
-            //fmt::print("Drawing {}: ", key);
+
             value.draw();
         }
 
@@ -108,6 +107,7 @@ void App::process_camera(float delta_t)
 
     if (!is_camera_freeform) {
         camera.position.y = get_heightmap_y(camera.position.x, camera.position.z);
+        camera.position.y += 2.0f; // Add "player height"
     }
 }
 
@@ -189,7 +189,7 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
         
         ImGui::Separator();
 
-        if (ImGui::Button("VSYNC on/off")) {
+        if (ImGui::Button("VSYNC on/off [V]")) {
             enable_or_disable_vsync();
         }
         ImGui::SameLine();
@@ -197,7 +197,7 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
         ImGui::Checkbox("##readonly_checkbox_vsync", &is_vsync_on);
         ImGui::EndDisabled();
 
-        if (ImGui::Button("Mouselook on/off")) {
+        if (ImGui::Button("Mouselook on/off [RMB]")) {
             enable_or_disable_mouselook();
         }
         ImGui::SameLine();
@@ -205,8 +205,8 @@ void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& backgrou
         ImGui::Checkbox("##readonly_checkbox_mouselook", &is_mouselook_on);
         ImGui::EndDisabled();
 
-        if (ImGui::Button("Spectator mode on/off")) {
-            //TODO
+        if (ImGui::Button("Spectator mode on/off [C]")) {
+            is_camera_freeform = !is_camera_freeform;
         }
         ImGui::SameLine();
         ImGui::BeginDisabled();
@@ -261,8 +261,6 @@ float App::get_heightmap_y(float position_x, float position_z)
         float y_difference = common_height - _heights[{X_ceil, Z_floor}];
         Y = common_height - x_fraction * x_difference - y_fraction * y_difference;
     }
-
-    //std::cout << X << " " << Z << " -> " << Y << "\n";
 
     return Y * HEIGHTMAP_SCALE;
 }
