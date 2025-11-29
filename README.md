@@ -20,9 +20,9 @@
 
 * [Zadání 09](./Markdown/LAB09.md)
   * [x] Enable AAx4
-  * [ ] Compare FPS with AA enabled/disabled
+  * [x] Compare FPS with AA enabled/disabled
   * [ ] Add screenshot functionality
-  * [ ] Compare screenshots with AA enabled/disabled (AA can be disabled by commenting-out two lines in `App.cpp`)
+  * [ ] Compare screenshots with AA enabled/disabled (AA can be disabled by commenting-out two lines in `App.cpp` line 119)
   * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color/rotation_speed or something according to the number of detected faces)
   * [x] Display textured object
   * [x] Display dynamic texture to show camera image in ImGui
@@ -41,6 +41,11 @@
 
 &nbsp;
 
-* HW specs: ??
-  * FPS without AA: ??
-  * FPS with AAx4: ??
+* Intel Core i7 6700HQ, 16 GB RAM, NVIDIA GeForce GTX 960M, Laptop battery, maximized window (almost 1080p):
+  * without AA: 270 FPS
+  * with AAx4: 270 FPS
+  * with AAx16: 240 FPS
+* Intel Xeon E3 1270 v3, 16 GB RAM, NVIDIA GeForce GTX 1060 3GB, Desktop PC, maximized window (almost 1080p):
+  * without AA: 1800 FPS
+  * with AAx4: 1600 FPS
+  * with AAx16: 700 FPS
