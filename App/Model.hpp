@@ -10,11 +10,11 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
 
-#include "Assets.hpp"
 #include "Mesh.hpp"
 #include "OBJLoader.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
+#include "vertex.hpp"
 
 
 class Model

@@ -7,8 +7,8 @@
 #include <glm/glm.hpp> 
 #include <glm/ext.hpp>
 
-#include "Assets.hpp"
 #include "NonCopyable.hpp"
+#include "vertex.hpp"
 
 
 class Mesh: private NonCopyable

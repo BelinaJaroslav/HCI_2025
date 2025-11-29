@@ -10,8 +10,8 @@
 
 #include <fmt/core.h>
 
+#include "DefinesAndMacros.hpp"
 #include "OBJLoader.hpp"
-#include "Macros.hpp"
 
 constexpr auto MAX_LINE_SIZE = 1024;
 

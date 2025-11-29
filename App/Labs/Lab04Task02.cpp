@@ -1,4 +1,4 @@
-#include "App/Macros.hpp"
+#include "App/DefinesAndMacros.hpp"
 #ifndef SKIP_LABS_COMPILATION
 
 #include <App/App.hpp>

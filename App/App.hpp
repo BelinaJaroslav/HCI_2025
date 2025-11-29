@@ -23,17 +23,17 @@
 #include "imgui_impl_opengl3.h"
 
 // Our libraries
-#include "Assets.hpp"
 #include "Camera.hpp"
 #include "CV2Tools.hpp"
+#include "DefinesAndMacros.hpp"
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
-#include "Macros.hpp"
 //#include "Model.hpp"
 #include "ModelSimple.hpp"
 #include "ThreadPool.hpp"
 #include "ShaderProgram.hpp"
 #include "SyncedDeque.hpp"
+#include "vertex.hpp"
 
 
 class App {

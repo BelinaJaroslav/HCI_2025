@@ -23,9 +23,9 @@
   * [ ] Compare FPS with AA enabled/disabled
   * [ ] Add screenshot functionality
   * [ ] Compare screenshots with AA enabled/disabled (AA can be disabled by commenting-out two lines in `App.cpp`)
-  * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color or something according to the number of detected faces)
+  * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color/rotation_speed or something according to the number of detected faces)
   * [x] Display textured object
-  * [ ] Display dynamic texture to show camera image in ImGui
+  * [x] Display dynamic texture to show camera image in ImGui
 
 * Issues:
   * App can be exited via ESC, but not by closing the window (because ESC callback terminates webcam thread and then closes main window; how to terminate thread if we close the window directly?)
