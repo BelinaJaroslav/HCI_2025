@@ -44,7 +44,7 @@ public:
     // === HEIGHTMAP ===
     ModelSimple(const std::filesystem::path& filename,
         std::shared_ptr<ShaderProgram> shader,
-        std::map<std::pair<float, float>, float>& _heights,
+        std::map<std::pair<float, float>, float>& heightmap_heights,
         std::shared_ptr<Texture> texture
     ) :
         shader(shader),
@@ -52,7 +52,7 @@ public:
     {
         std::vector<vertex> vertices;
         std::vector<GLuint> indices;
-        load_heightmap(filename, vertices, indices, _heights);
+        load_heightmap(filename, vertices, indices, heightmap_heights);
         mesh = std::make_shared<Mesh>(vertices, indices, GL_TRIANGLES);
     }
 

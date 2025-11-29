@@ -30,11 +30,11 @@
 #include "FPSMeter.hpp"
 #include "Macros.hpp"
 //#include "Model.hpp"
+#include "ModelSimple.hpp"
 #include "ThreadPool.hpp"
 #include "ShaderProgram.hpp"
 #include "SyncedDeque.hpp"
 
-#include "ModelSimple.hpp"
 
 class App {
 public:
@@ -62,6 +62,8 @@ private:
     const std::string key_obj_heightmap = "obj_heightmap";
     const std::string key_obj_teapot = "obj_teapot";
     const std::string key_obj_cube = "obj_cube";
+    const std::string key_tex_webcam = "tex_webcam";
+    const std::string key_tex_singlecolor = "tex_singlecolor";
     const std::string key_tex_tileatlas = "tex_tileatlas";
     const std::string key_tex_woodbox = "tex_woodbox";
 
@@ -98,7 +100,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Texture>> texture_library;
     std::unordered_map<std::string, ModelSimple> scene;
 
-    std::map<std::pair<float, float>, float> _heights; // Heightmap
+    std::map<std::pair<float, float>, float> heightmap_heights;
 
     // == METHODS ==
     void init_assets();
@@ -127,20 +129,15 @@ private:
     void lab_find_red_object_in_image() const;
     void lab_find_red_object_in_video();
     void lab_find_face_in_video();    
-    
     // Lab 02
-    void lab_complex_behaviour();
-    
+    void lab_complex_behaviour();    
     // Lab 03
-    void lab_multithread();
-    
+    void lab_multithread();    
     void tracker_thread();
     void render_thread();
-
     // Lab 04
     int lab_compression(); 
     int lab_compression_pool();
-
     void grabber_thread();
     void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
     std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);

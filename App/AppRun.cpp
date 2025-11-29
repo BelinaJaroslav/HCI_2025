@@ -21,9 +21,9 @@ void App::run()
 	if (SHOW_WEBCAM_DETECTOR_WINDOW) t_detector = std::jthread(&App::lab_multithread, this);
 	if (SHOW_WEBCAM_COMPRESSION_WINDOW) t_compression = std::jthread(&App::lab_compression_pool, this);
 #endif // !SKIP_LABS_COMPILATION
+	// ------------------------------------------------------------------- //
 
 	FPSMeter fps_meter_main;
-	// ------------------------------------------------------------------- //
 
     // Measuring delta time
     double current_timestamp = glfwGetTime();
@@ -31,7 +31,7 @@ void App::run()
     float delta_time = 0.0f;
 
     // State
-	Color triangle_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
+	Color teapot_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
     Color background_color{ 0.549f, 0.823f, 0.858f }; // Sky color
     glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
 
@@ -54,7 +54,7 @@ void App::run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		render_GUI(fps_meter_main, triangle_color, background_color);
+		render_GUI(fps_meter_main, teapot_color, background_color);
 
 		// Clear canvas
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -74,11 +74,7 @@ void App::run()
 
         // View matrix is handled by the camera
         glm::mat4 mx_view = camera.get_view_matrix();
-
-        current_shader->set_uniform("u_view_mx", mx_view);
-
-        // TODO
-        //current_shader->set_uniform("u_color", glm::vec4(triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a));        
+        current_shader->set_uniform("u_view_mx", mx_view);       
 
         // DRAW MODELS FROM SCENE
         for (auto& [key, value] : scene) {
@@ -112,110 +108,6 @@ void App::process_camera(float delta_t)
 }
 
 
-void App::render_GUI(FPSMeter& fps_meter, Color& triangle_color, Color& background_color)
-{
-    ImGui::Begin("FPS Meter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-    {
-        // Display current FPS value
-        ImGui::Text("FPS: %.1f", fps_meter.get());
-
-        // Show if the value was just updated
-        if (fps_meter.is_updated()) {
-            ImGui::SameLine();
-            ImGui::TextColored(ImVec4(0, 1, 0, 1), " (Updated)");
-        }
-
-        // FPS history graph
-        static std::vector<float> fps_history;
-        static const int history_size = 100;
-
-        // FIX 1: Use fps_meter (the parameter) not fps_meter_main
-        fps_history.push_back(static_cast<float>(fps_meter.get()));
-        if (fps_history.size() > history_size) {
-            fps_history.erase(fps_history.begin());
-        }
-
-        // Plot the FPS history
-        ImGui::PlotLines("FPS History", fps_history.data(),
-            static_cast<int>(fps_history.size()), 0,
-            nullptr, 0.0f, 200.0f,
-            ImVec2(200, 50));
-
-        // Controls
-        if (ImGui::Button("Reset FPS Counter")) {
-            fps_meter.reset();
-            fps_history.clear();
-        }
-
-        // Interval adjustment
-        static float interval_seconds = 1.0f;
-        // FIX 2: Use fps_meter (the parameter) not fps_meter_main
-        if (ImGui::SliderFloat("Update Interval (s)", &interval_seconds, 0.1f, 5.0f)) {
-            fps_meter.set_interval(std::chrono::duration<double>(interval_seconds));
-        }
-    }
-    ImGui::End();
-
-    // Controls Window
-    ImGui::Begin("Render Controls");
-    {
-        // Display info
-        ImGui::Text("FOV: %.1f", FOV);
-
-        ImGui::Text("Camera coors: %.1f/%.1f/%.1f", camera.position.x, camera.position.y, camera.position.z);
-
-        ImGui::Separator();
-
-        float triangle_color_arr[3] = { triangle_color.r, triangle_color.g, triangle_color.b };
-        if (ImGui::ColorEdit3("Triangle color", triangle_color_arr)) {
-            triangle_color.r = triangle_color_arr[0];
-            triangle_color.g = triangle_color_arr[1];
-            triangle_color.b = triangle_color_arr[2];
-        }
-
-        float background_color_arr[3] = { background_color.r, background_color.g, background_color.b };
-        if (ImGui::ColorEdit3("Sky color", background_color_arr)) {
-            background_color.r = background_color_arr[0];
-            background_color.g = background_color_arr[1];
-            background_color.b = background_color_arr[2];
-            glClearColor(background_color_arr[0], background_color_arr[1], background_color_arr[2], 1.0f);
-        }
-
-        if (ImGui::Button("Reset colors")) {
-            triangle_color = { 1.0f, 0.6f, 1.0f, 1.0f };
-            background_color = { 0.549f, 0.823f, 0.858f };
-            glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
-        }        
-        
-        ImGui::Separator();
-
-        if (ImGui::Button("VSYNC on/off [V]")) {
-            enable_or_disable_vsync();
-        }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_vsync", &is_vsync_on);
-        ImGui::EndDisabled();
-
-        if (ImGui::Button("Mouselook on/off [RMB]")) {
-            enable_or_disable_mouselook();
-        }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_mouselook", &is_mouselook_on);
-        ImGui::EndDisabled();
-
-        if (ImGui::Button("Spectator mode on/off [C]")) {
-            is_camera_freeform = !is_camera_freeform;
-        }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_freeform", &is_camera_freeform);
-        ImGui::EndDisabled();
-    }
-    ImGui::End();
-}
-
 void App::update_projection_matrix()
 {
     if (win_height < 1) win_height = 1; // avoid division by 0
@@ -247,18 +139,18 @@ float App::get_heightmap_y(float position_x, float position_z)
         // In the lower-left triangle
         float x_fraction = X - X_floor;
         float y_fraction = Z - Z_floor;
-        float common_height = _heights[{X_floor, Z_floor}];
-        float x_difference = _heights[{X_ceil, Z_floor}] - common_height;
-        float y_difference = _heights[{X_floor, Z_ceil}] - common_height;
+        float common_height = heightmap_heights[{X_floor, Z_floor}];
+        float x_difference = heightmap_heights[{X_ceil, Z_floor}] - common_height;
+        float y_difference = heightmap_heights[{X_floor, Z_ceil}] - common_height;
         Y = common_height + x_fraction * x_difference + y_fraction * y_difference;
     }
     else {
         // In the upper-right triangle
         float x_fraction = X_ceil - X;
         float y_fraction = Z_ceil - Z;
-        float common_height = _heights[{X_ceil, Z_ceil}];
-        float x_difference = common_height - _heights[{X_floor, Z_ceil}];
-        float y_difference = common_height - _heights[{X_ceil, Z_floor}];
+        float common_height = heightmap_heights[{X_ceil, Z_ceil}];
+        float x_difference = common_height - heightmap_heights[{X_floor, Z_ceil}];
+        float y_difference = common_height - heightmap_heights[{X_ceil, Z_floor}];
         Y = common_height - x_fraction * x_difference - y_fraction * y_difference;
     }
 

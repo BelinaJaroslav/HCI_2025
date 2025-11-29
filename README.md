@@ -20,20 +20,23 @@
 
 * [Zadání 09](./Markdown/LAB09.md)
   * [x] Enable AAx4
-  * [ ] Add screenshot functionality
-  * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color or something according to the number of detected faces)
-  * [ ] Display textured object
-  * [ ] Display dynamic texture to show camera image (on a Model or by the ImGUI)
-
-* S těmahle bodama počkat, až budeme mít komplexnější scénu (?):
   * [ ] Compare FPS with AA enabled/disabled
+  * [ ] Add screenshot functionality
   * [ ] Compare screenshots with AA enabled/disabled
+  * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color or something according to the number of detected faces)
+  * [x] Display textured object
+  * [ ] Display dynamic texture to show camera image (on a Model or by the ImGUI)
 
 &nbsp;
 
 * `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ...
+* `AppGUI.cpp` – Dear ImGui
 * `AppCallbacks.cpp` – callbacky
 * `AppInitAssets.cpp` – načtení shaderů, modelů, textur, ...
 * `AppRun.cpp` – hlavní smyčka: runtime logika a vykreslování
 
 &nbsp;
+
+* HW specs: ??
+  * FPS without AA: ??
+  * FPS with AAx4: ??

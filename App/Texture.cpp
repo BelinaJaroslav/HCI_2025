@@ -1,3 +1,5 @@
+#include <fmt/core.h>
+
 #include "Texture.hpp"
 
 
@@ -184,4 +186,11 @@ void Texture::replace_image(const cv::Mat& image)
     default:
         throw std::runtime_error{ "unsupported number of channels or channel depth in texture" };
     }
+}
+
+
+void Texture::replace_color(const glm::vec3& vec)
+{
+    //fmt::println("Replacing color for {} {} {}", vec.x, vec.y, vec.z);
+    replace_image(cv::Mat{ 1, 1, CV_8UC3, cv::Scalar{vec.b, vec.g, vec.r} });
 }

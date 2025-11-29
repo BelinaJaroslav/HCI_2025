@@ -26,7 +26,7 @@ void load_heightmap(
 	const std::filesystem::path& file_name,
 	std::vector<vertex>& vertices,
 	std::vector<GLuint>& indices,
-	std::map<std::pair<float, float>, float>& _heights
+	std::map<std::pair<float, float>, float>& heightmap_heights
 );
 
 // Heightmap helper methods

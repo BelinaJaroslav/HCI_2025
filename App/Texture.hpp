@@ -32,6 +32,7 @@ public:
     int get_width(void);
     void set_interpolation(Interpolation interpolation);
     void replace_image(const cv::Mat& image);
+    void replace_color(const glm::vec3& vec);
 
 private:
     cv::Mat load_image(const std::filesystem::path& path);

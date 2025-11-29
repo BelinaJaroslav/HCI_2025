@@ -16,13 +16,15 @@ void App::init_assets()
     //shader_library.emplace("rainbow", std::make_shared<ShaderProgram>("Resources/Shaders/basic.vert", "Resources/Shaders/rainbow.frag"));
 
     // TEXTURES
+    texture_library.emplace(key_tex_singlecolor, std::make_shared<Texture>(glm::vec3(255, 0, 255)));
+    
     std::filesystem::path woodbox_path("./App/Resources/Textures/box_rgb888.png");
     texture_library.emplace(key_tex_woodbox, std::make_shared<Texture>(woodbox_path));
 
     // MODELS
     // Teapot
     std::filesystem::path teapot_path("./App/Resources/Objects/teapot_tri_vnt.obj");
-    auto teapot_model = ModelSimple(teapot_path, shader_library.at(key_shader_simple));
+    auto teapot_model = ModelSimple(teapot_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_singlecolor));
     teapot_model.position = glm::vec3(4.0f, 1.0f, 3.0f);
     teapot_model.scale = glm::vec3(0.1f);
     scene.emplace(key_obj_teapot, teapot_model);
@@ -38,7 +40,7 @@ void App::init_assets()
     std::filesystem::path tileatlas_path("./App/Resources/Textures/TILE_ATLAS.png");
     texture_library.emplace(key_tex_tileatlas, std::make_shared<Texture>(tileatlas_path));
     std::filesystem::path heightmap_path("./App/Resources/Objects/HEIGHTMAP.png");
-    auto heightmap_model = ModelSimple(heightmap_path, shader_library.at(key_shader_simple), _heights, texture_library.at(key_tex_tileatlas));    
+    auto heightmap_model = ModelSimple(heightmap_path, shader_library.at(key_shader_simple), heightmap_heights, texture_library.at(key_tex_tileatlas));    
     heightmap_model.position = glm::vec3(-HEIGHTMAP_SHIFT, 0.0f, -HEIGHTMAP_SHIFT);
     heightmap_model.scale = glm::vec3(HEIGHTMAP_SCALE);
     scene.emplace(key_obj_heightmap, heightmap_model);
