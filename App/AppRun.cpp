@@ -31,6 +31,7 @@ void App::run()
         if (!synced_deque.empty()) {
             auto tup = synced_deque.pop_front();
             auto& frame = std::get<0>(tup);
+            fmt::println("GL FRAME PTR  = {}", (void*)frame.data);
             n_faces_found = std::get<1>(tup);
             texture_library.at(key_tex_webcam)->replace_image(frame);
         }
@@ -87,6 +88,9 @@ void App::run()
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
+
+    // closing graphics window -> app ends
+    do_terminate_worker_threads = true;
 }
 
 void App::process_camera(float delta_t)
@@ -151,6 +155,7 @@ float App::get_heightmap_y(float position_x, float position_z)
 }
 
 
+// this is not the problem of disappearing cross
 void App::webcam_thread()
 {
     cv::Mat frame; // For captured frame
@@ -171,9 +176,11 @@ void App::webcam_thread()
         for (const auto& face_center : face_centers) {
             CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
         }
+        
+        fmt::println("WEB FRAME PTR = {}", (void*)frame.data);
 
         // Push into synced_deque
-        synced_deque.push_back(std::make_tuple(frame, _n_faces_found)); // DATA IS BEING COPIED HERE
+        synced_deque.push_back(std::make_tuple(frame.clone(), _n_faces_found)); // DATA IS BEING COPIED HERE
 
         
     } while (!do_terminate_worker_threads); // Repeat until App sets `do_terminate_worker_threads` to `true`
