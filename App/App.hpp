@@ -93,6 +93,7 @@ private:
     
     bool is_vsync_on{};
     bool is_mouselook_on{};
+    bool is_antialiasing_on{};
     double last_mouse_x = 0.0f;
     double last_mouse_y = 0.0f;
     bool is_first_mouse = true;
@@ -110,8 +111,9 @@ private:
     // == METHODS ==
     void init_assets();
     void print_gl_info();
-    void enable_or_disable_mouselook();
-    void enable_or_disable_vsync();
+    void enable_or_disable_mouselook(bool do_update_bool);
+    void enable_or_disable_vsync(bool do_update_bool);
+    void enable_or_disable_antialiasing(bool do_update_bool);
     
     // AppRun
     void render_GUI(Color& triangle_color, Color& background_color);

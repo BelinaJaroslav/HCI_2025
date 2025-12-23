@@ -81,31 +81,21 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
             );
         }
 
-        ImGui::Separator();
+        ImGui::Separator();        
 
-        if (ImGui::Button("VSYNC on/off [V]")) {
-            enable_or_disable_vsync();
+        if (ImGui::Checkbox("[RMB] :: Mouselook on/off", &is_mouselook_on)) {
+            enable_or_disable_mouselook(false);
         }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_vsync", &is_vsync_on);
-        ImGui::EndDisabled();
 
-        if (ImGui::Button("Mouselook on/off [RMB]")) {
-            enable_or_disable_mouselook();
-        }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_mouselook", &is_mouselook_on);
-        ImGui::EndDisabled();
+        ImGui::Checkbox("[C] :: Spectator mode on/off", &is_camera_freeform);
 
-        if (ImGui::Button("Spectator mode on/off [C]")) {
-            is_camera_freeform = !is_camera_freeform;
+        if (ImGui::Checkbox("[V] :: VSYNC on/off", &is_vsync_on)) {
+            enable_or_disable_vsync(false);
         }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_freeform", &is_camera_freeform);
-        ImGui::EndDisabled();
+
+        if (ImGui::Checkbox("[B] :: Anti-aliasing on/off", &is_antialiasing_on)) {
+            enable_or_disable_antialiasing(false);
+        }
     }
     ImGui::End();
 

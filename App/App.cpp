@@ -116,10 +116,10 @@ bool App::init()
         // Set OpenGL profile
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Core, comment-out this line for Compatible
 
-        // Comment these out to disable anti-aliasing
+        // Anti-aliasing
+        is_antialiasing_on = true;
         glEnable(GL_MULTISAMPLE);
         glfwWindowHint(GLFW_SAMPLES, 4);
-        // ------------------------------------------
 
         // Window is hidden until everything is initialized
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);        
@@ -259,15 +259,16 @@ void App::print_gl_info()
 }
 
 
-void App::enable_or_disable_mouselook()
+void App::enable_or_disable_mouselook(bool do_update_bool)
 {
+    if (do_update_bool) is_mouselook_on = !is_mouselook_on;
+
     ImGuiIO& io = ImGui::GetIO();
 
-    is_mouselook_on = !is_mouselook_on;
     if (is_mouselook_on) {
         // Mouselook was enabled => cursor needs to be disabled
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+        io.ConfigFlags |= ImGuiConfigFlags_NoMouse; // GUI elements will ignore the cursor
     }
     else {
         // Mouselook was disabled => cursor needs to be enabled
@@ -277,9 +278,24 @@ void App::enable_or_disable_mouselook()
 }
 
 
-void App::enable_or_disable_vsync()
+void App::enable_or_disable_vsync(bool do_update_bool)
 {
-    is_vsync_on = !is_vsync_on;
+    if (do_update_bool) is_vsync_on = !is_vsync_on;
     glfwSwapInterval(is_vsync_on);
     fmt::println("VSync: {}", is_vsync_on);
+}
+
+
+void App::enable_or_disable_antialiasing(bool do_update_bool)
+{
+    if (do_update_bool) is_antialiasing_on = !is_antialiasing_on;
+    
+    if (is_antialiasing_on) {
+        glEnable(GL_MULTISAMPLE);
+    }
+    else {
+        glDisable(GL_MULTISAMPLE);
+    }
+    
+    fmt::println("AA: {}", is_vsync_on);
 }

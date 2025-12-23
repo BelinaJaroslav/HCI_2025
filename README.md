@@ -1,5 +1,25 @@
 # HCI_2025
 
+## How to run on Linux with vcpkg
+
+//TODO test if this actually works
+
+```bash
+export VCPKG_ROOT=<path_to_bootstrapped_vcpkg> && export PATH=$VCPKG_ROOT:$PATH
+
+cmake --preset=vcpkg
+
+cmake --build build
+
+./build/HCI
+```
+
+## Tasks
+
+//Waiting for JJ
+
+## Misc
+
 * [Jak hoblovat](./Markdown/jak_hoblovat.md)
 
 * [Zadání 01](./Markdown/LAB01.md)
@@ -12,24 +32,18 @@
 
 * [Zadání 05 (OpenGL init)](./Markdown/LAB05.md)
 
-* [Zadání 06](./Markdown/LAB06.md)
+* [Zadání 06 (GUI)](./Markdown/LAB06.md)
 
-* [Zadání 07](./Markdown/LAB07.md)
+* [Zadání 07 (Shaders)](./Markdown/LAB07.md)
 
-* [Zadání 08](./Markdown/LAB08.md)
+* [Zadání 08 (Transformations)](./Markdown/LAB08.md)
 
-* [Zadání 09](./Markdown/LAB09.md)
-  * [x] Enable AAx4
-  * [x] Compare FPS with AA enabled/disabled
+* [Zadání 09 (Textures)](./Markdown/LAB09.md)
   * [ ] Add screenshot functionality
-  * [ ] Compare screenshots with AA enabled/disabled (AA can be disabled by commenting-out two lines in `App.cpp` line 119)
+  * [ ] Compare screenshots with AA enabled/disabled, use the `B` key
   * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color/rotation_speed or something according to the number of detected faces)
-  * [x] Display textured object
-  * [x] Display dynamic texture to show camera image in ImGui
 
-* Issues:
-  * App can be exited via ESC, but not by closing the window (because ESC callback terminates webcam thread and then closes main window; how to terminate thread if we close the window directly?)
-  * Proč křížek na detekovaném obličeji bliká ?
+* [Zadání 10 (Audio)](./Markdown/LAB10.pdf)
 
 &nbsp;
 
