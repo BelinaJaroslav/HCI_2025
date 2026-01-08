@@ -57,6 +57,7 @@ void App::run()
 
 		// Update camera position
         process_camera(delta_time);
+        audio_manager.set_listener_position(camera.position.x, camera.position.y, camera.position.z, camera.front.x, camera.front.y, camera.front.z);
 
         // SHADER
         auto current_shader = shader_library.at(key_shader_simple);

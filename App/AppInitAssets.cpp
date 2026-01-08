@@ -8,14 +8,12 @@ void App::init_assets()
 {
     fmt::println("Initializing assets");
 
-    // SHADERS
+    // = SHADERS =
     std::filesystem::path VS_path("./App/Resources/Shaders/basic.vert");
     std::filesystem::path FS_path("./App/Resources/Shaders/basic.frag");
-
     shader_library.emplace(key_shader_simple, std::make_shared<ShaderProgram>(VS_path, FS_path));
-    //shader_library.emplace("rainbow", std::make_shared<ShaderProgram>("Resources/Shaders/basic.vert", "Resources/Shaders/rainbow.frag"));
 
-    // TEXTURES
+    // = TEXTURES =
     texture_library.emplace(key_tex_webcam, std::make_shared<Texture>(initial_frame));
 
     texture_library.emplace(key_tex_singlecolor, std::make_shared<Texture>(glm::vec3(255, 153, 255)));
@@ -23,7 +21,7 @@ void App::init_assets()
     std::filesystem::path woodbox_path("./App/Resources/Textures/box_rgb888.png");
     texture_library.emplace(key_tex_woodbox, std::make_shared<Texture>(woodbox_path));
 
-    // MODELS
+    // = MODELS =
     // Teapot
     std::filesystem::path teapot_path("./App/Resources/Objects/teapot_tri_vnt.obj");
     auto teapot_model = ModelSimple(teapot_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_singlecolor));
@@ -38,7 +36,7 @@ void App::init_assets()
     cube_model.scale = glm::vec3(1.0f);
     scene.emplace(key_obj_cube, cube_model);
 
-    // HEIGHTMAP
+    // = HEIGHTMAP =
     std::filesystem::path tileatlas_path("./App/Resources/Textures/TILE_ATLAS.png");
     texture_library.emplace(key_tex_tileatlas, std::make_shared<Texture>(tileatlas_path));
     std::filesystem::path heightmap_path("./App/Resources/Objects/HEIGHTMAP.png");
@@ -46,4 +44,7 @@ void App::init_assets()
     heightmap_model.position = glm::vec3(-HEIGHTMAP_SHIFT, 0.0f, -HEIGHTMAP_SHIFT);
     heightmap_model.scale = glm::vec3(HEIGHTMAP_SCALE);
     scene.emplace(key_obj_heightmap, heightmap_model);
+
+    // = AUDIO =
+    audio_manager.load("pop", "./App/Resources/Audio/pop_sfx.mp3");
 }

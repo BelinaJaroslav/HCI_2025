@@ -52,3 +52,7 @@ Implement some interaction.
   ImGui::Image((ImTextureID)(intptr_t)texture_library.at("my_tex").get_name(), ImVec2(texture_library.at("my_tex").get_width(), texture_library.at("my_tex").get_height()));
   ImGui::End();
   ```
+
+- [ ] Add screenshot functionality
+- [ ] Compare screenshots with AA enabled/disabled, use the `B` key
+- [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color/rotation_speed or something according to the number of detected faces)
