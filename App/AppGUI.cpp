@@ -3,7 +3,11 @@
 
 void App::render_GUI(Color& triangle_color, Color& background_color)
 {
-    ImGui::Begin("FPS Meter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    ImVec2 viewport_size = ImGui::GetMainViewport()->Size;
+
+    // = WINDOW 1 :: FPS and GL info =
+    ImGui::SetNextWindowPos(ImVec2(viewport_size.x, 0.0f), 0, ImVec2(1.0f, 0.0f));
+    ImGui::Begin("FPS Meter and GL info", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
         // Display current FPS value
         ImGui::Text("FPS: %.1f", fps_meter_main.get());
@@ -39,11 +43,55 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
         if (ImGui::SliderFloat("Update Interval (s)", &interval_seconds, 0.1f, 5.0f)) {
             fps_meter_main.set_interval(std::chrono::duration<double>(interval_seconds));
         }
+
+        // GL info:        
+        ImGui::Separator();
+        if (ImGui::CollapsingHeader("GL info")) {
+            if (ImGui::BeginTable("table", 2)) {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Vendor");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", gl_info_vendor);
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Renderer");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", gl_info_renderer);
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Version");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", gl_info_version);
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Shading version");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", gl_info_shading_version);
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Texture units");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%d", gl_info_n_texture_units);
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Profile");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", gl_info_profile);
+                ImGui::EndTable();
+            }
+        }
     }
     ImGui::End();
 
-    // Controls Window
-    ImGui::Begin("Render Controls");
+    // = WINDOW 2 :: Render Controls =
+    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), 0, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("Render Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
         // Display info
         ImGui::Text("FOV: %.1f", FOV);
@@ -81,35 +129,27 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
             );
         }
 
-        ImGui::Separator();
+        ImGui::Separator();        
 
-        if (ImGui::Button("VSYNC on/off [V]")) {
-            enable_or_disable_vsync();
+        if (ImGui::Checkbox("[RMB] :: Mouselook on/off", &is_mouselook_on)) {
+            enable_or_disable_mouselook(false);
         }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_vsync", &is_vsync_on);
-        ImGui::EndDisabled();
 
-        if (ImGui::Button("Mouselook on/off [RMB]")) {
-            enable_or_disable_mouselook();
-        }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_mouselook", &is_mouselook_on);
-        ImGui::EndDisabled();
+        ImGui::Checkbox("[C] :: Spectator mode on/off", &is_camera_freeform);
 
-        if (ImGui::Button("Spectator mode on/off [C]")) {
-            is_camera_freeform = !is_camera_freeform;
+        if (ImGui::Checkbox("[V] :: VSYNC on/off", &is_vsync_on)) {
+            enable_or_disable_vsync(false);
         }
-        ImGui::SameLine();
-        ImGui::BeginDisabled();
-        ImGui::Checkbox("##readonly_checkbox_freeform", &is_camera_freeform);
-        ImGui::EndDisabled();
+
+        if (ImGui::Checkbox("[B] :: Anti-aliasing on/off", &is_antialiasing_on)) {
+            enable_or_disable_antialiasing(false);
+        }
     }
     ImGui::End();
 
-    ImGui::Begin("Live reaction");
+    // = WINDOW 3 :: webcam =
+    ImGui::SetNextWindowPos(viewport_size, 0, ImVec2(1.0f, 1.0f));
+    ImGui::Begin("Live reaction", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     const float scale = 0.75f;
 

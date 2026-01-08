@@ -31,9 +31,7 @@
 
 App::App()
     : do_terminate_worker_threads(false)
-{
-    fmt::println("Startujem.");
-}
+{}
 
 
 bool App::init() 
@@ -116,10 +114,10 @@ bool App::init()
         // Set OpenGL profile
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Core, comment-out this line for Compatible
 
-        // Comment these out to disable anti-aliasing
+        // Anti-aliasing
+        is_antialiasing_on = true;
         glEnable(GL_MULTISAMPLE);
         glfwWindowHint(GLFW_SAMPLES, 4);
-        // ------------------------------------------
 
         // Window is hidden until everything is initialized
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);        
@@ -214,7 +212,24 @@ bool App::init()
 
     fmt::println("App initialized.\n================");
 
-    print_gl_info();
+    // Store OpenGL info
+    gl_info_vendor = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
+    gl_info_renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    gl_info_version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+    gl_info_shading_version = reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &gl_info_n_texture_units);
+
+    GLint profile;
+    glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile);
+    if (const auto errorCode = glGetError()) {
+        std::cout << "[!] Pending GL error while obtaining profile: " << errorCode << "\n";
+    }
+    if (profile & GL_CONTEXT_CORE_PROFILE_BIT) {
+        gl_info_profile = "Core";
+    }
+    else {
+        gl_info_profile = "Compatibility";
+    }
 
     return true;
 }
@@ -231,43 +246,16 @@ App::~App()
 }
 
 
-void App::print_gl_info()
+void App::enable_or_disable_mouselook(bool do_update_bool)
 {
-    std::cout << "\n======================= :: GL Info :: =======================\n";
-    std::cout << "GL Vendor:\t\t" << glGetString(GL_VENDOR) << "\n";
-    std::cout << "GL Renderer:\t\t" << glGetString(GL_RENDERER) << "\n";
-    std::cout << "GL Version:\t\t" << glGetString(GL_VERSION) << "\n";
-    std::cout << "GL Shading version:\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
-    
-    int n_texture_units = -1;
-    glGetIntegerv(GL_MAX_TEXTURE_UNITS, &n_texture_units);
-    std::cout << "No. of texture units:\t" << n_texture_units << "\n";
+    if (do_update_bool) is_mouselook_on = !is_mouselook_on;
 
-    std::cout << "\n";
-    GLint profile;
-    glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &profile);
-    if (const auto errorCode = glGetError()) {
-        std::cout << "[!] Pending GL error while obtaining profile: " << errorCode << "\n";
-    }
-    if (profile & GL_CONTEXT_CORE_PROFILE_BIT) {
-        std::cout << "Core profile" << "\n";
-    }
-    else {
-        std::cout << "Compatibility profile" << "\n";
-    }
-    std::cout << "=============================================================\n\n";
-}
-
-
-void App::enable_or_disable_mouselook()
-{
     ImGuiIO& io = ImGui::GetIO();
 
-    is_mouselook_on = !is_mouselook_on;
     if (is_mouselook_on) {
         // Mouselook was enabled => cursor needs to be disabled
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+        io.ConfigFlags |= ImGuiConfigFlags_NoMouse; // GUI elements will ignore the cursor
     }
     else {
         // Mouselook was disabled => cursor needs to be enabled
@@ -277,9 +265,21 @@ void App::enable_or_disable_mouselook()
 }
 
 
-void App::enable_or_disable_vsync()
+void App::enable_or_disable_vsync(bool do_update_bool)
 {
-    is_vsync_on = !is_vsync_on;
+    if (do_update_bool) is_vsync_on = !is_vsync_on;
     glfwSwapInterval(is_vsync_on);
-    fmt::println("VSync: {}", is_vsync_on);
+}
+
+
+void App::enable_or_disable_antialiasing(bool do_update_bool)
+{
+    if (do_update_bool) is_antialiasing_on = !is_antialiasing_on;
+    
+    if (is_antialiasing_on) {
+        glEnable(GL_MULTISAMPLE);
+    }
+    else {
+        glDisable(GL_MULTISAMPLE);
+    }
 }

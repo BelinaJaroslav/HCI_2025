@@ -1,5 +1,53 @@
 # HCI_2025
 
+## How to run on Linux with vcpkg
+
+//TODO test if this actually works
+
+```bash
+export VCPKG_ROOT=<path_to_bootstrapped_vcpkg> && export PATH=$VCPKG_ROOT:$PATH
+
+cmake --preset=vcpkg
+
+cmake --build build
+
+./build/HCI
+```
+
+## Tasks
+
+```markdown
+## ESSENTIALS
+
+[ ] realtime 2D raster processing = tracker, constant quality video encoder (can be separate project) 
+[ ] multiple threads + synchronisation 
+[√] 3D GL Core profile + shaders version 4.6, enabled GL debug, used DSA (Direct State Access) 
+[ ] high performance => at least 60 FPS
+[ ] allow VSync control, fullscreen vs. windowed switching (restore window position & size), screenshot, antialiasing toggle
+[√] simple GUI: display (at least) GL version, profile, FPS
+[ ] event processing: camera, object, app behaviour etc. controlled by mouse (both axes, wheel), keyboard, window resize, etc.
+[ ] multiple different independently moving 3D models, at leats two loaded from file
+[√] free floating and first-person-view camera
+[ ] at least three different textures (or subtextures from texture atlas etc.)
+[ ] 3D positional audio (multiple sources, background sound)
+
+## EXTRAS
+
+[ ] lighting model, at least 3 lights (1x ambient, 1x directional, 1x reflector: at least one is moving; + possible other lights)
+[ ] correct full scale transparency (at least one transparent object; NOT if(alpha<0.1) {discard;} )
+[√] height map textured by height, proper player height coords
+[ ] particles
+[ ] scripting (useful)
+[ ] correct collisions
+[ ] some other nice complicated effect...
+
+## INSTAFAIL
+
+Obsolete functionality used: GLUT, GL compatible profile
+```
+
+## Misc
+
 * [Jak hoblovat](./Markdown/jak_hoblovat.md)
 
 * [Zadání 01](./Markdown/LAB01.md)
@@ -12,24 +60,15 @@
 
 * [Zadání 05 (OpenGL init)](./Markdown/LAB05.md)
 
-* [Zadání 06](./Markdown/LAB06.md)
+* [Zadání 06 (GUI)](./Markdown/LAB06.md)
 
-* [Zadání 07](./Markdown/LAB07.md)
+* [Zadání 07 (Shaders)](./Markdown/LAB07.md)
 
-* [Zadání 08](./Markdown/LAB08.md)
+* [Zadání 08 (Transformations)](./Markdown/LAB08.md)
 
-* [Zadání 09](./Markdown/LAB09.md)
-  * [x] Enable AAx4
-  * [x] Compare FPS with AA enabled/disabled
-  * [ ] Add screenshot functionality
-  * [ ] Compare screenshots with AA enabled/disabled (AA can be disabled by commenting-out two lines in `App.cpp` line 119)
-  * [ ] Basic control of 3D scene from the camera tracker (maybe change the teapot color/rotation_speed or something according to the number of detected faces)
-  * [x] Display textured object
-  * [x] Display dynamic texture to show camera image in ImGui
+* [Zadání 09 (Textures)](./Markdown/LAB09.md)
 
-* Issues:
-  * App can be exited via ESC, but not by closing the window (because ESC callback terminates webcam thread and then closes main window; how to terminate thread if we close the window directly?)
-  * Proč křížek na detekovaném obličeji bliká ?
+* [Zadání 10 (Audio)](./Markdown/LAB10.pdf)
 
 &nbsp;
 

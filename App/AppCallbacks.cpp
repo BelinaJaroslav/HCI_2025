@@ -29,9 +29,20 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 
 		case GLFW_KEY_V:
 			// `V` to on/off VSYNC
-			this_inst->enable_or_disable_vsync();
+			this_inst->enable_or_disable_vsync(true);
 			break;
+
+		case GLFW_KEY_B:
+			// `B` to on/off AA
+			this_inst->enable_or_disable_antialiasing(true);
+			break;
+
+		case GLFW_KEY_P: // (Temporary key to test the audio (so far not so good))
+			std::cout << this_inst->audio_manager.play3D("pop", 0, 0, 0);
+			break;
+		// End switch
 		}
+
 	}
 }
 
@@ -98,7 +109,7 @@ void App::mouse_button_callback(GLFWwindow* window, int button, int action, int 
 
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 		// RMB was pressed...
-		this_inst->enable_or_disable_mouselook();
+		this_inst->enable_or_disable_mouselook(true);
 	}
 }
 

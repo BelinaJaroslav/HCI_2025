@@ -31,7 +31,7 @@ void App::run()
         if (!synced_deque.empty()) {
             auto tup = synced_deque.pop_front();
             auto& frame = std::get<0>(tup);
-            fmt::println("GL FRAME PTR  = {}", (void*)frame.data);
+            //fmt::println("GL FRAME PTR  = {}", (void*)frame.data);
             n_faces_found = std::get<1>(tup);
             texture_library.at(key_tex_webcam)->replace_image(frame);
         }
@@ -57,6 +57,7 @@ void App::run()
 
 		// Update camera position
         process_camera(delta_time);
+        audio_manager.set_listener_position(camera.position.x, camera.position.y, camera.position.z, camera.front.x, camera.front.y, camera.front.z);
 
         // SHADER
         auto current_shader = shader_library.at(key_shader_simple);
@@ -155,7 +156,6 @@ float App::get_heightmap_y(float position_x, float position_z)
 }
 
 
-// this is not the problem of disappearing cross
 void App::webcam_thread()
 {
     cv::Mat frame; // For captured frame
@@ -177,7 +177,7 @@ void App::webcam_thread()
             CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
         }
         
-        fmt::println("WEB FRAME PTR = {}", (void*)frame.data);
+        //fmt::println("WEB FRAME PTR = {}", (void*)frame.data);
 
         // Push into synced_deque
         synced_deque.push_back(std::make_tuple(frame.clone(), _n_faces_found)); // DATA IS BEING COPIED HERE
