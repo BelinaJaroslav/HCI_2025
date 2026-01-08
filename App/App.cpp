@@ -269,7 +269,6 @@ void App::enable_or_disable_vsync(bool do_update_bool)
 {
     if (do_update_bool) is_vsync_on = !is_vsync_on;
     glfwSwapInterval(is_vsync_on);
-    fmt::println("VSync: {}", is_vsync_on);
 }
 
 
@@ -283,6 +282,4 @@ void App::enable_or_disable_antialiasing(bool do_update_bool)
     else {
         glDisable(GL_MULTISAMPLE);
     }
-    
-    fmt::println("AA: {}", is_vsync_on);
 }

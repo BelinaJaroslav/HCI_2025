@@ -24,14 +24,14 @@ void App::init_assets()
     // = MODELS =
     // Teapot
     std::filesystem::path teapot_path("./App/Resources/Objects/teapot_tri_vnt.obj");
-    auto teapot_model = ModelSimple(teapot_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_singlecolor));
+    auto teapot_model = Model(teapot_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_singlecolor));
     teapot_model.position = glm::vec3(4.0f, 1.0f, 3.0f);
     teapot_model.scale = glm::vec3(0.1f);
     scene.emplace(key_obj_teapot, teapot_model);
 
     // Cube
     std::filesystem::path cube_path("./App/Resources/Objects/cube_tri_vnt.obj");
-    auto cube_model = ModelSimple(cube_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_woodbox));
+    auto cube_model = Model(cube_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_woodbox));
     cube_model.position = glm::vec3(4.0f, 0.5f, 3.0f);
     cube_model.scale = glm::vec3(1.0f);
     scene.emplace(key_obj_cube, cube_model);
@@ -40,7 +40,7 @@ void App::init_assets()
     std::filesystem::path tileatlas_path("./App/Resources/Textures/TILE_ATLAS.png");
     texture_library.emplace(key_tex_tileatlas, std::make_shared<Texture>(tileatlas_path));
     std::filesystem::path heightmap_path("./App/Resources/Objects/HEIGHTMAP.png");
-    auto heightmap_model = ModelSimple(heightmap_path, shader_library.at(key_shader_simple), heightmap_heights, texture_library.at(key_tex_tileatlas));    
+    auto heightmap_model = Model(heightmap_path, shader_library.at(key_shader_simple), heightmap_heights, texture_library.at(key_tex_tileatlas));    
     heightmap_model.position = glm::vec3(-HEIGHTMAP_SHIFT, 0.0f, -HEIGHTMAP_SHIFT);
     heightmap_model.scale = glm::vec3(HEIGHTMAP_SCALE);
     scene.emplace(key_obj_heightmap, heightmap_model);
