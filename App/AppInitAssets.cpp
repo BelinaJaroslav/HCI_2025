@@ -6,7 +6,7 @@
 
 void App::init_assets()
 {
-    fmt::println("Initializing assets");
+    fmt::println("Initializing assets:");
 
     // = SHADERS =
     std::filesystem::path VS_path("./App/Resources/Shaders/basic.vert");

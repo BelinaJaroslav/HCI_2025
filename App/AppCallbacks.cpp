@@ -37,7 +37,7 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 			this_inst->enable_or_disable_antialiasing(true);
 			break;
 
-		case GLFW_KEY_P: // (Temporary key to test the audio (so far not so good))
+		case GLFW_KEY_P: // (Temporary key to test the audio)
 			std::cout << this_inst->audio_manager.play3D("pop", 0, 0, 0);
 			break;
 		// End switch
