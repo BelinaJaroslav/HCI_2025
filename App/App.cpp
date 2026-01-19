@@ -31,6 +31,7 @@
 
 App::App()
     : do_terminate_worker_threads(false)
+    , do_terminate_encoder_threads(false)
 {}
 
 
@@ -75,6 +76,8 @@ bool App::init()
     win_height = 480;
     is_vsync_on = true;
     is_mouselook_on = false;
+    is_antialiasing_on = true;
+    is_encoder_on = false;
     FOV = 110.0f;
 
     if (settings["app_name"].is_string()) {
@@ -93,6 +96,12 @@ bool App::init()
     }
     if (settings["mouselook"].is_boolean()) {
         is_mouselook_on = settings["mouselook"].template get<bool>();
+    }
+    if (settings["antialiasing"].is_boolean()) {
+        is_antialiasing_on = settings["antialiasing"].template get<bool>();
+    }
+    if (settings["webcam_encoder"].is_boolean()) {
+        is_encoder_on = settings["webcam_encoder"].template get<bool>();
     }
     if (settings["FOV"].is_number_integer()) {
         FOV = static_cast<float>(settings["FOV"].template get<int>());
@@ -114,8 +123,7 @@ bool App::init()
         // Set OpenGL profile
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Core, comment-out this line for Compatible
 
-        // Anti-aliasing
-        is_antialiasing_on = true;
+        // Anti-aliasing        
         glEnable(GL_MULTISAMPLE);
         glfwWindowHint(GLFW_SAMPLES, 4);
 

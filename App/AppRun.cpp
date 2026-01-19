@@ -7,6 +7,10 @@
 
 void App::run()
 {
+    // Constant quality encoder service
+    std::jthread t_compression;
+    if (is_encoder_on) t_compression = std::jthread(&App::lab_compression_pool, this);
+
     // Webcam service
     std::jthread thread_webcam_service;
     thread_webcam_service = std::jthread(&App::webcam_thread, this);
@@ -72,15 +76,7 @@ void App::run()
         current_shader->set_uniform("u_view_mx", mx_view);       
 
         // DRAW MODELS FROM SCENE
-        for (auto& [key, value] : scene) {
-            
-            // Rotating teapot
-            if (key == key_obj_teapot) {
-                value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, 23 * glfwGetTime());
-            }
-
-            value.draw();
-        }
+        update_and_draw_models(delta_time);
 
         // IMGUI DRAW
         ImGui::Render();
@@ -92,7 +88,46 @@ void App::run()
 
     // closing graphics window -> app ends
     do_terminate_worker_threads = true;
+    do_terminate_encoder_threads = true;
 }
+
+
+void App::update_and_draw_models(float delta_t)
+{
+    for (auto& [key, value] : scene) {
+
+        // Rotating teapot
+        if (key == key_obj_teapot) {
+            value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, teapot_rotation_speed * glfwGetTime());
+        }
+        // Cat movement
+        else if (key == key_obj_cat) {
+            auto x = value.position.x;
+            auto y = value.position.y;
+            auto z = value.position.z;
+            
+            if (x < cat_min_x || x > cat_max_x) {
+                cat_direction.x *= -1;
+                audio_manager.play3D(key_snd_meow, x, y, z);
+            }
+            if (z < cat_min_z || z > cat_max_z) {
+                cat_direction.y *= -1;
+                audio_manager.play3D(key_snd_meow, x, y, z);
+            }
+            
+            x += cat_direction.x * cat_speed * delta_t;
+            z += cat_direction.y * cat_speed * delta_t;
+            y = get_heightmap_y(x, z);
+            value.position = glm::vec3(x, y, z);
+
+            float angles = glm::degrees(atan2(-cat_direction.y, cat_direction.x)) + 90;
+            value.rotation = glm::vec4(0.0f, 0.0f, 1.0f, angles);
+        }
+
+        value.draw();
+    }
+}
+
 
 void App::process_camera(float delta_t)
 {
@@ -177,7 +212,7 @@ void App::webcam_thread()
             CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
         }
         
-        //fmt::println("WEB FRAME PTR = {}", (void*)frame.data);
+        //fmt::println("WEBCAM FRAME PTR = {}", (void*)frame.data);
 
         // Push into synced_deque
         synced_deque.push_back(std::make_tuple(frame.clone(), _n_faces_found)); // DATA IS BEING COPIED HERE

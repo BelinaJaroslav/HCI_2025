@@ -36,8 +36,7 @@ public:
     {
         std::vector<vertex> vertices;
         std::vector<GLuint> indices;
-        load_OBJ_GDrive(filename, vertices, indices);
-        //load_OBJ_PG2(filename, vertices, indices);
+        load_OBJ(filename, vertices, indices);
         mesh = std::make_shared<Mesh>(vertices, indices, GL_TRIANGLES);
     }
 
@@ -60,6 +59,7 @@ public:
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 scale = glm::vec3(1.0f);
     glm::vec4 rotation = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f); // axes xyz + angle (deg)
+    glm::vec4 rotation_base = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f); // if model is weirdly rotated, it can be fixed by setting this; other rotations are relative to this
 
     // Draw
     void draw()
@@ -73,8 +73,8 @@ public:
         // Scale object
         model_mx = glm::scale(model_mx, glm::vec3(scale));
         // Rotate
-        model_mx = glm::rotate(model_mx, glm::radians(rotation.w), glm::vec3(rotation.x, rotation.y, rotation.z));
-        
+        model_mx = glm::rotate(model_mx, glm::radians(rotation_base.w), glm::vec3(rotation_base.x, rotation_base.y, rotation_base.z));
+        model_mx = glm::rotate(model_mx, glm::radians(rotation.w), glm::vec3(rotation.x, rotation.y, rotation.z));        
 
         shader->set_uniform("u_model_mx", model_mx);
 

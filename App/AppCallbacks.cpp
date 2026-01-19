@@ -17,7 +17,7 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 	if ((action == GLFW_PRESS) || (action == GLFW_REPEAT)) {
 		switch (key) {
 		case GLFW_KEY_ESCAPE:
-			// `Escape` was pressed... Exit The App
+			// `Escape` to exit the app
 			this_inst->do_terminate_worker_threads = true;
 			glfwSetWindowShouldClose(window, GLFW_TRUE);
 			break;
@@ -37,9 +37,11 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 			this_inst->enable_or_disable_antialiasing(true);
 			break;
 
-		case GLFW_KEY_P: // (Temporary key to test the audio (so far not so good))
-			std::cout << this_inst->audio_manager.play3D("pop", 0, 0, 0);
+		case GLFW_KEY_P:
+			// `P` to test the audio
+			this_inst->audio_manager.play3D(this_inst->key_snd_pop, 0, 1, 0);
 			break;
+
 		// End switch
 		}
 

@@ -1,5 +1,8 @@
+// "constant quality video encoder" is part of the final assignment
+/*
 #include "App/DefinesAndMacros.hpp"
 #ifndef SKIP_LABS_COMPILATION
+/**/
 
 #include <App/App.hpp>
 
@@ -39,7 +42,7 @@ void App::grabber_thread() {
 
     cv::Mat frame;
 
-    while (capture.isOpened() && !do_terminate_worker_threads)
+    while (capture.isOpened() && !do_terminate_encoder_threads)
     {
         // loads next captured frame
         capture >> frame;
@@ -136,8 +139,7 @@ int App::lab_compression_pool() {
         cv::namedWindow("original", cv::WINDOW_AUTOSIZE);
         cv::namedWindow("decoded", cv::WINDOW_AUTOSIZE);
 
-        while (capture.isOpened() && !do_terminate_worker_threads)
-        {
+        while (capture.isOpened() && !do_terminate_encoder_threads) {
             ProcessedFrame compressed_frame = result_queue.pop_front_wait();
 
             if (compressed_frame.id != expected_frame_id) {
@@ -146,7 +148,7 @@ int App::lab_compression_pool() {
             }
 
             // Process and look ahead for next frames
-            while (true) {
+            while (!do_terminate_encoder_threads) {
                 // --- Display Frame ---
                 auto size_uncompressed = compressed_frame.original_image.elemSize() * compressed_frame.original_image.total();
                 auto size_compressed = compressed_frame.processed_image.elemSize() * compressed_frame.processed_image.total();
@@ -160,7 +162,8 @@ int App::lab_compression_pool() {
                 int c = cv::pollKey();
                 switch (c) {
                 case 27:
-                    do_terminate_worker_threads = true;
+                    do_terminate_encoder_threads = true;
+                    std::cout << "'lab_compression_pool' exited by user...\n";
                     return EXIT_SUCCESS;
                 case 'q':
                     PSNR_threshold += 5;
@@ -184,19 +187,19 @@ int App::lab_compression_pool() {
                 compressed_frame = std::move(it->second);
                 buffer.erase(it);
             }
-            // Measure main thread "FPS"
-            if (fps_meter_main.is_updated()) fmt::println("Main thread \"FPS\": {:.3f}", fps_meter_main.get());
-            fps_meter_main.update();
+            // Measure thread's "FPS"
+            if (fps_meter_main.is_updated()) fmt::println("'lab_compression_pool' thread \"FPS\": {:.3f}", fps_meter_encoder.get());
+            fps_meter_encoder.update();
         }
     }
     catch (std::exception const& e) {
-        std::cerr << "App failed : " << e.what() << std::endl;
+        std::cerr << "'lab_compression_pool' failed : " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 
     cv::destroyAllWindows();
-    std::cout << "Finished OK...\n";
+    std::cout << "'lab_compression_pool' finished OK...\n";
     return EXIT_SUCCESS;
 }
 
-#endif // !SKIP_LABS_COMPILATION
+//#endif // !SKIP_LABS_COMPILATION

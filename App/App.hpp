@@ -59,23 +59,33 @@ private:
 
     // Map keys that may be used across multiple methods
     const std::string key_shader_simple = "simple_shader";
+    
+    const std::string key_obj_cat = "obj_cat";
+    const std::string key_obj_cube = "obj_cube";
     const std::string key_obj_heightmap = "obj_heightmap";
     const std::string key_obj_teapot = "obj_teapot";
-    const std::string key_obj_cube = "obj_cube";
-    const std::string key_tex_webcam = "tex_webcam";
+    
+    const std::string key_tex_cat = "tex_cat";
     const std::string key_tex_singlecolor = "tex_singlecolor";
     const std::string key_tex_tileatlas = "tex_tileatlas";
+    const std::string key_tex_webcam = "tex_webcam";
     const std::string key_tex_woodbox = "tex_woodbox";
+
+    const std::string key_snd_pop = "snd_pop";
+    const std::string key_snd_meow = "snd_meow";
 
     // == MEMBERS ==
     FaceDetector face_detector;
     FPSMeter fps_meter_main;
+    FPSMeter fps_meter_encoder;
     SyncedDeque<std::tuple<cv::Mat, int>> synced_deque;
     cv::VideoCapture capture;
     Camera camera;
     AudioManager audio_manager;
 
     std::atomic<bool> do_terminate_worker_threads;
+    std::atomic<bool> do_terminate_encoder_threads;
+
     int n_faces_found = 0;
     int webcamp_width = 0;
     int webcamp_height = 0;
@@ -92,6 +102,8 @@ private:
     bool is_vsync_on{};
     bool is_mouselook_on{};
     bool is_antialiasing_on{};
+    bool is_encoder_on{};
+    
     double last_mouse_x = 0.0f;
     double last_mouse_y = 0.0f;
     bool is_first_mouse = true;
@@ -106,8 +118,21 @@ private:
 
     std::map<std::pair<float, float>, float> heightmap_heights;
 
+    // Object dynamics
+    // Teapot
+    const float teapot_rotation_speed = 23.0f;
+    // Cat
+    const float cat_speed = 6.5f;
+    const float cat_min_x = -8;
+    const float cat_max_x = 10;
+    const float cat_min_z = -3;
+    const float cat_max_z = 13;
+    glm::vec2 cat_direction{};
+
     // == METHODS ==
     void init_assets();
+
+    // Switches (do_update_bool is set to true when switching via key press and to false when switching via ImGui (because ImGui checkbox already updates the bool))
     void enable_or_disable_mouselook(bool do_update_bool);
     void enable_or_disable_vsync(bool do_update_bool);
     void enable_or_disable_antialiasing(bool do_update_bool);
@@ -115,6 +140,7 @@ private:
     // AppRun
     void render_GUI(Color& triangle_color, Color& background_color);
     void update_projection_matrix();
+    void update_and_draw_models(float delta_t);
     void process_camera(float delta_t);
     float get_heightmap_y(float position_x, float position_z);
 
@@ -152,10 +178,12 @@ private:
     void render_thread();
     // Lab 04
     int lab_compression(); 
-    int lab_compression_pool();
-    void grabber_thread();
-    void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
     std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);
     std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
 #endif // !SKIP_LABS_COMPILATION
+
+    // "constant quality video encoder" is part of the final assignment
+    void grabber_thread();
+    void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
+    int lab_compression_pool();
 };

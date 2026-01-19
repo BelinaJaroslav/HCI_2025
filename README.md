@@ -14,21 +14,23 @@ cmake --build build
 ./build/HCI
 ```
 
+To turn on the _constant quality video encoder_, go to `./build/App/Resources/app_settings.json` and set `"webcam_encoder"` to `true` (default is `false`). Then you can use `Q`/`A` to increase/decrease the quality.
+
 ## Tasks
 
 ```markdown
 ## ESSENTIALS
 
-[ ] realtime 2D raster processing = tracker, constant quality video encoder (can be separate project) 
-[ ] multiple threads + synchronisation 
+[√] realtime 2D raster processing = tracker, constant quality video encoder (can be separate project) 
+[√] multiple threads + synchronisation 
 [√] 3D GL Core profile + shaders version 4.6, enabled GL debug, used DSA (Direct State Access) 
-[ ] high performance => at least 60 FPS
+[√] high performance => at least 60 FPS
 [ ] allow VSync control, fullscreen vs. windowed switching (restore window position & size), screenshot, antialiasing toggle
 [√] simple GUI: display (at least) GL version, profile, FPS
 [ ] event processing: camera, object, app behaviour etc. controlled by mouse (both axes, wheel), keyboard, window resize, etc.
 [ ] multiple different independently moving 3D models, at leats two loaded from file
 [√] free floating and first-person-view camera
-[ ] at least three different textures (or subtextures from texture atlas etc.)
+[√] at least three different textures (or subtextures from texture atlas etc.)
 [ ] 3D positional audio (multiple sources, background sound)
 
 ## EXTRAS
@@ -46,31 +48,15 @@ cmake --build build
 Obsolete functionality used: GLUT, GL compatible profile
 ```
 
+* TODO:
+  * [x] incorporate constant quality video encoder into the final app?
+  * [ ] fullscreen vs. windowed switching (restore window position & size)
+  * [ ] screenshot button
+  * [ ] basic control of 3D scene from the camera tracker
+  * [ ] multiple different independently moving 3D models, at leats two loaded from file
+  * [ ] 3D positional audio (multiple sources, background sound)
+
 ## Misc
-
-* [Jak hoblovat](./Markdown/jak_hoblovat.md)
-
-* [Zadání 01](./Markdown/LAB01.md)
-
-* [Zadání 02](./Markdown/LAB02.md)
-
-* [Zadání 03](./Markdown/LAB03.md)
-
-* [Zadání 04 (JPEG video sidequest)](./Markdown/LAB04.md)
-
-* [Zadání 05 (OpenGL init)](./Markdown/LAB05.md)
-
-* [Zadání 06 (GUI)](./Markdown/LAB06.md)
-
-* [Zadání 07 (Shaders)](./Markdown/LAB07.md)
-
-* [Zadání 08 (Transformations)](./Markdown/LAB08.md)
-
-* [Zadání 09 (Textures)](./Markdown/LAB09.md)
-
-* [Zadání 10 (Audio)](./Markdown/LAB10.pdf)
-
-&nbsp;
 
 * `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ...
 * `AppGUI.cpp` – Dear ImGui
@@ -88,3 +74,17 @@ Obsolete functionality used: GLUT, GL compatible profile
   * without AA: 1800 FPS
   * with AAx4: 1600 FPS
   * with AAx16: 700 FPS
+
+&nbsp;
+
+* [Jak hoblovat](./Markdown/jak_hoblovat.md)
+* [Zadání 01](./Markdown/LAB01.md)
+* [Zadání 02](./Markdown/LAB02.md)
+* [Zadání 03](./Markdown/LAB03.md)
+* [Zadání 04 (JPEG video sidequest)](./Markdown/LAB04.md)
+* [Zadání 05 (OpenGL init)](./Markdown/LAB05.md)
+* [Zadání 06 (GUI)](./Markdown/LAB06.md)
+* [Zadání 07 (Shaders)](./Markdown/LAB07.md)
+* [Zadání 08 (Transformations)](./Markdown/LAB08.md)
+* [Zadání 09 (Textures)](./Markdown/LAB09.md)
+* [Zadání 10 (Audio)](./Markdown/LAB10.pdf)

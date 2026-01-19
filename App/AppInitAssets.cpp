@@ -6,7 +6,7 @@
 
 void App::init_assets()
 {
-    fmt::println("Initializing assets");
+    fmt::println("Initializing assets:");
 
     // = SHADERS =
     std::filesystem::path VS_path("./App/Resources/Shaders/basic.vert");
@@ -18,8 +18,11 @@ void App::init_assets()
 
     texture_library.emplace(key_tex_singlecolor, std::make_shared<Texture>(glm::vec3(255, 153, 255)));
     
-    std::filesystem::path woodbox_path("./App/Resources/Textures/box_rgb888.png");
-    texture_library.emplace(key_tex_woodbox, std::make_shared<Texture>(woodbox_path));
+    std::filesystem::path woodbox_tex_path("./App/Resources/Textures/box_rgb888.png");
+    texture_library.emplace(key_tex_woodbox, std::make_shared<Texture>(woodbox_tex_path));
+
+    std::filesystem::path cat_tex_path("./App/Resources/Textures/cat.jpg");
+    texture_library.emplace(key_tex_cat, std::make_shared<Texture>(cat_tex_path));
 
     // = MODELS =
     // Teapot
@@ -36,6 +39,17 @@ void App::init_assets()
     cube_model.scale = glm::vec3(1.0f);
     scene.emplace(key_obj_cube, cube_model);
 
+    // Cat
+    std::filesystem::path cat_path("./App/Resources/Objects/cat.obj");
+    auto cat_model = Model(cat_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_cat));
+    cat_model.position = glm::vec3(2.0f, 0.5f, 3.0f);
+    cat_model.scale = glm::vec3(0.04f);
+    cat_model.rotation_base = glm::vec4(1.0f, 0.0f, 0.0f, -90.0f);
+    scene.emplace(key_obj_cat, cat_model);
+
+    srand(static_cast<unsigned int>(time(0))); // Seed the random generator
+    cat_direction = glm::normalize(glm::circularRand(1.0f)); // Random direction (vector with coordinates on a circle)
+
     // = HEIGHTMAP =
     std::filesystem::path tileatlas_path("./App/Resources/Textures/TILE_ATLAS.png");
     texture_library.emplace(key_tex_tileatlas, std::make_shared<Texture>(tileatlas_path));
@@ -46,5 +60,6 @@ void App::init_assets()
     scene.emplace(key_obj_heightmap, heightmap_model);
 
     // = AUDIO =
-    audio_manager.load("pop", "./App/Resources/Audio/pop_sfx.mp3");
+    audio_manager.load(key_snd_pop, "./App/Resources/Audio/pop_sfx.mp3", 0.5f, 100.0f, 5.0f);
+    audio_manager.load(key_snd_meow, "./App/Resources/Audio/meow_sfx.mp3", 0.5f, 100.0f, 5.0f);
 }

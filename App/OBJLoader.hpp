@@ -8,14 +8,7 @@
 #include "vertex.hpp"
 
 
-bool load_OBJ_GDrive(
-	const std::filesystem::path& file_name,
-	std::vector <vertex>& vertices,
-	std::vector <GLuint>& indices
-);
-
-
-void load_OBJ_PG2(
+void load_OBJ(
 	const std::filesystem::path& file_name,
 	std::vector<vertex>& vertices,
 	std::vector<GLuint>& indices
