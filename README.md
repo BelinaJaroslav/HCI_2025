@@ -14,15 +14,17 @@ cmake --build build
 ./build/HCI
 ```
 
+To turn on the _constant quality video encoder_, go to `/App/Resources/app_settings.json` and set `"webcam_encoder"` to `true` (default is `false`). Then you can use `Q`/`A` to increase/decrease the quality.
+
 ## Tasks
 
 ```markdown
 ## ESSENTIALS
 
-[ ] realtime 2D raster processing = tracker, constant quality video encoder (can be separate project) 
-[ ] multiple threads + synchronisation 
+[√] realtime 2D raster processing = tracker, constant quality video encoder (can be separate project) 
+[√] multiple threads + synchronisation 
 [√] 3D GL Core profile + shaders version 4.6, enabled GL debug, used DSA (Direct State Access) 
-[ ] high performance => at least 60 FPS
+[√] high performance => at least 60 FPS
 [ ] allow VSync control, fullscreen vs. windowed switching (restore window position & size), screenshot, antialiasing toggle
 [√] simple GUI: display (at least) GL version, profile, FPS
 [ ] event processing: camera, object, app behaviour etc. controlled by mouse (both axes, wheel), keyboard, window resize, etc.
@@ -47,7 +49,7 @@ Obsolete functionality used: GLUT, GL compatible profile
 ```
 
 * TODO:
-  * [ ] icorporate constant quality video encoder into the final app?
+  * [x] incorporate constant quality video encoder into the final app?
   * [ ] fullscreen vs. windowed switching (restore window position & size)
   * [ ] screenshot button
   * [ ] basic control of 3D scene from the camera tracker

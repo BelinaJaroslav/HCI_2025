@@ -6,5 +6,7 @@
   },
   "vsync": true,
   "mouselook": false,
+  "antialiasing": true,
+  "webcam_encoder": false,
   "FOV": 110
 }

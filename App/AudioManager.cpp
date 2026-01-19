@@ -19,7 +19,6 @@ AudioManager::AudioManager()
 
 AudioManager::~AudioManager()
 {
-    //sound_bank.clear();
     ma_engine_uninit(&engine);
 }
 
