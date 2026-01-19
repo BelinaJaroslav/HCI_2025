@@ -14,7 +14,7 @@ cmake --build build
 ./build/HCI
 ```
 
-To turn on the _constant quality video encoder_, go to `/App/Resources/app_settings.json` and set `"webcam_encoder"` to `true` (default is `false`). Then you can use `Q`/`A` to increase/decrease the quality.
+To turn on the _constant quality video encoder_, go to `./build/App/Resources/app_settings.json` and set `"webcam_encoder"` to `true` (default is `false`). Then you can use `Q`/`A` to increase/decrease the quality.
 
 ## Tasks
 

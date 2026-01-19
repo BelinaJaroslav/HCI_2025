@@ -23,7 +23,7 @@ AudioManager::~AudioManager()
 }
 
 
-void AudioManager::load(const std::string& name, const std::filesystem::path& filename)
+void AudioManager::load(const std::string& name, const std::filesystem::path& filename, float min_distance, float max_distance, float volume)
 {
     // Create sound with custom deleter
     auto new_sound = std::make_unique<ma_sound>();
@@ -34,9 +34,9 @@ void AudioManager::load(const std::string& name, const std::filesystem::path& fi
     }
 
     // Set some sound parameters...
-    ma_sound_set_min_distance(new_sound.get(), 0.5f);
-    ma_sound_set_max_distance(new_sound.get(), 100.0f);
-    ma_sound_set_volume(new_sound.get(), 2.0f);
+    ma_sound_set_min_distance(new_sound.get(), min_distance);
+    ma_sound_set_max_distance(new_sound.get(), max_distance);
+    ma_sound_set_volume(new_sound.get(), volume);
     // Move the sound into the bank: owned by std::unique_ptr => MUST move (non-copyable)
     sound_bank.emplace(name, std::move(new_sound));
     fmt::println("Loaded audio file: {}", filename.string());

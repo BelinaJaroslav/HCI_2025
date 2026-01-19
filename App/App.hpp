@@ -60,14 +60,19 @@ private:
     // Map keys that may be used across multiple methods
     const std::string key_shader_simple = "simple_shader";
     
+    const std::string key_obj_cat = "obj_cat";
     const std::string key_obj_cube = "obj_cube";
     const std::string key_obj_heightmap = "obj_heightmap";
     const std::string key_obj_teapot = "obj_teapot";
     
+    const std::string key_tex_cat = "tex_cat";
     const std::string key_tex_singlecolor = "tex_singlecolor";
     const std::string key_tex_tileatlas = "tex_tileatlas";
     const std::string key_tex_webcam = "tex_webcam";
     const std::string key_tex_woodbox = "tex_woodbox";
+
+    const std::string key_snd_pop = "snd_pop";
+    const std::string key_snd_meow = "snd_meow";
 
     // == MEMBERS ==
     FaceDetector face_detector;
@@ -113,6 +118,17 @@ private:
 
     std::map<std::pair<float, float>, float> heightmap_heights;
 
+    // Object dynamics
+    // Teapot
+    const float teapot_rotation_speed = 23.0f;
+    // Cat
+    const float cat_speed = 6.5f;
+    const float cat_min_x = -8;
+    const float cat_max_x = 10;
+    const float cat_min_z = -3;
+    const float cat_max_z = 13;
+    glm::vec2 cat_direction{};
+
     // == METHODS ==
     void init_assets();
 
@@ -124,6 +140,7 @@ private:
     // AppRun
     void render_GUI(Color& triangle_color, Color& background_color);
     void update_projection_matrix();
+    void update_and_draw_models(float delta_t);
     void process_camera(float delta_t);
     float get_heightmap_y(float position_x, float position_z);
 

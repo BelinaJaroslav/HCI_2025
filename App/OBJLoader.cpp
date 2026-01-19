@@ -13,94 +13,8 @@
 #include "DefinesAndMacros.hpp"
 #include "OBJLoader.hpp"
 
-constexpr auto MAX_LINE_SIZE = 1024;
 
-bool load_OBJ_GDrive(const std::filesystem::path& file_name, std::vector<vertex>& vertices, std::vector<GLuint>& indices)
-{
-    fmt::println("Loading OBJ file {} ...", file_name.string());
-
-	std::vector< glm::vec3 > temp_vertices;
-	std::vector< glm::vec2 > temp_uvs;
-	std::vector< glm::vec3 > temp_normals;
-
-	vertices.clear();
-	indices.clear();
-
-	FILE * file = nullptr;
-	fopen_s(&file, file_name.string().c_str(), "r");
-	if (file == NULL) {
-		printf("Impossible to open the file !\n");
-		return false;
-	}
-
-	while (1) {
-
-		char line_header[MAX_LINE_SIZE];
-		int res = fscanf_s(file, "%s", line_header, MAX_LINE_SIZE);
-		if (res == EOF) {
-			break;
-		}
-
-		if (strcmp(line_header, "v") == 0) {
-			glm::vec3 vertex;
-			fscanf_s(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-			temp_vertices.push_back(vertex);
-		}
-		else if (strcmp(line_header, "vt") == 0) {
-			glm::vec2 uv;
-			fscanf_s(file, "%f %f\n", &uv.x, &uv.y);
-			temp_uvs.push_back(uv);
-		}
-		else if (strcmp(line_header, "vn") == 0) {
-			glm::vec3 normal;
-			fscanf_s(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-			temp_normals.push_back(normal);
-		}
-		else if (strcmp(line_header, "f") == 0) {
-			std::string vertex1, vertex2, vertex3;
-			unsigned int vertex_index[3], uv_index[3], normal_index[3];
-			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertex_index[0], &uv_index[0], &normal_index[0], &vertex_index[1], &uv_index[1], &normal_index[1], &vertex_index[2], &uv_index[2], &normal_index[2]);
-			if (matches != 9) {
-				printf("File can't be read by simple parser :( Try exporting with other options\n");
-				return false;
-			}
-
-			for (int i = 0; i < 3; i++) {
-				GLuint current_index;
-				vertex current_vertex;
-				current_vertex.position = temp_vertices[vertex_index[i]-1]; // OBJ array start from 1
-				current_vertex.normal = temp_normals[normal_index[i]-1];
-				current_vertex.texture_coordinates = temp_uvs[uv_index[i]-1];
-
-                // avoid duplicit vertices
-				auto t = std::find_if(vertices.begin(),
-					vertices.end(),
-					[&current_vertex]
-					(const vertex& v2) -> bool {
-						return (current_vertex == v2);
-					});
-                    
-				if (t == vertices.end()) {
-					vertices.push_back(current_vertex);
-					current_index = GLuint(vertices.size() - 1);
-				}
-				else {
-					current_index = GLuint(t - vertices.begin());
-				}
-				indices.push_back(current_index);
-			}
-
-		}
-	}
-	
-    fmt::println("Done loading OBJ file {}", file_name.string());
-
-	fclose(file);
-	return true;
-}
-
-
-void load_OBJ_PG2(const std::filesystem::path& file_name, std::vector<vertex>& mesh_vertices, std::vector<GLuint>& mesh_vertex_indices)
+void load_OBJ(const std::filesystem::path& file_name, std::vector<vertex>& mesh_vertices, std::vector<GLuint>& mesh_vertex_indices)
 {
     fmt::println("Loading OBJ file {} ...", file_name.string());
 
@@ -195,7 +109,7 @@ void load_OBJ_PG2(const std::filesystem::path& file_name, std::vector<vertex>& m
             }
 
             if (!line_success && first_two_chars != "# ") {
-                fmt::println("load_OBJ_PG2: Ignoring line '{}' in file '{}'", line, file_name.string());
+                fmt::println("OBJLoader@{}> Ignoring line '{}'", file_name.string(), line);
             }
         }
     }
@@ -216,12 +130,10 @@ void load_OBJ_PG2(const std::filesystem::path& file_name, std::vector<vertex>& m
         vertex_normals_direct.push_back(vertex_normals[indices_vertex_normal[u] - 1]);
     }
 
-    ///* Uncomment these if you don't like to live dangerously
     auto n_direct_uvs = texture_coordinates_direct.size();
     auto n_direct_normals = vertex_normals_direct.size();
-    /**/
 
-    // vectors to Vertex vector
+    // Vectors to Vertex vector
     for (unsigned int u = 0; u < vertices_direct.size(); u++) {
         vertex vertex{};
         vertex.position = vertices_direct[u];
