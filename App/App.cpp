@@ -7,8 +7,6 @@
 
 // OpenGL Extension Wrangler: allow all multiplatform GL functions
 #include <GL/glew.h> 
-// WGLEW = Windows GL Extension Wrangler :: platform specific functions (in this case Windows)
-//#include <GL/wglew.h> // Not needed for our App
 
 // GLFW toolkit
 // Uses GL calls to open GL context, i.e. GLEW must be first.
@@ -166,7 +164,6 @@ bool App::init()
         if (GLEW_OK != err) {
             fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
         }
-        //wglewInit();
 
         //...after ALL GLFW & GLEW init ...
         if (GLEW_ARB_debug_output) {
@@ -269,6 +266,22 @@ void App::enable_or_disable_mouselook(bool do_update_bool)
         // Mouselook was disabled => cursor needs to be enabled
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+    }
+}
+
+
+void App::enable_or_disable_fullscreen(bool do_update_bool)
+{
+    if (do_update_bool) is_fullscreen_on = !is_fullscreen_on;
+    
+    if (is_fullscreen_on) { // Remember window info and enable fullscreen
+        glfwGetWindowPos(window, &win_xcor, &win_ycor);
+        glfwGetWindowSize(window, &win_width_memory, &win_height_memory);
+        if (win_height_memory == 0) win_height_memory++; // Prevent zero height window
+        glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+    }
+    else { // Disable fullscreen and restore window to memorized position/size
+        glfwSetWindowMonitor(window, nullptr, win_xcor, win_ycor, win_width_memory, win_height_memory, 0);
     }
 }
 

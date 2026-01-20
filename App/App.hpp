@@ -71,8 +71,9 @@ private:
     const std::string key_tex_webcam = "tex_webcam";
     const std::string key_tex_woodbox = "tex_woodbox";
 
-    const std::string key_snd_pop = "snd_pop";
     const std::string key_snd_meow = "snd_meow";
+    const std::string key_snd_pop = "snd_pop";
+    const std::string key_snd_teleport = "snd_teleport";
 
     // == MEMBERS ==
     FaceDetector face_detector;
@@ -96,10 +97,15 @@ private:
     GLFWmonitor* monitor{};
     const GLFWvidmode* mode{};
 
-    int win_width;
-    int win_height;
+    int win_width{};
+    int win_height{};
+    int win_xcor{};
+    int win_ycor{};
+    int win_width_memory{};
+    int win_height_memory{};
     
     bool is_vsync_on{};
+    bool is_fullscreen_on = false;
     bool is_mouselook_on{};
     bool is_antialiasing_on{};
     bool is_encoder_on{};
@@ -128,12 +134,14 @@ private:
     const float cat_min_z = -3;
     const float cat_max_z = 13;
     glm::vec2 cat_direction{};
+    bool did_cat_meow_last_frame = false;
 
     // == METHODS ==
     void init_assets();
 
     // Switches (do_update_bool is set to true when switching via key press and to false when switching via ImGui (because ImGui checkbox already updates the bool))
     void enable_or_disable_mouselook(bool do_update_bool);
+    void enable_or_disable_fullscreen(bool do_update_bool);
     void enable_or_disable_vsync(bool do_update_bool);
     void enable_or_disable_antialiasing(bool do_update_bool);
     
@@ -156,11 +164,11 @@ private:
     void webcam_thread();
 
     // Store OpenGL info
-    const char* gl_info_vendor;
-    const char* gl_info_renderer;
-    const char* gl_info_version;
-    const char* gl_info_shading_version;
-    const char* gl_info_profile;
+    const char* gl_info_vendor{};
+    const char* gl_info_renderer{};
+    const char* gl_info_version{};
+    const char* gl_info_shading_version{};
+    const char* gl_info_profile{};
     int gl_info_n_texture_units = -1;
 
     // Faster compile time: These old Labs don't have to be re-compiled everytime we change anything in App.hpp or any of its imports

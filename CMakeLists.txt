@@ -5,7 +5,7 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_MSVC_PARALLEL ON CACHE BOOL "" FORCE)
 
-# [VCPKG] Find packages
+# Find packages
 find_package(fmt           CONFIG REQUIRED)
 find_package(glm           CONFIG REQUIRED)
 find_package(GLEW                 REQUIRED)
@@ -26,7 +26,7 @@ file(GLOB_RECURSE SOURCES
 # Add source to this project's executable
 add_executable(HCI "HCI.cpp" ${SOURCES})
 
-# [VCPKG] target libraries
+# Target libraries
 target_link_libraries(HCI PRIVATE
     fmt::fmt
     GLEW::GLEW
@@ -45,3 +45,7 @@ target_include_directories(HCI PRIVATE
 # Copy resources into the build folder so relative paths work
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/App/Resources 
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/App/)
+
+if(MSVC)
+    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
+endif()

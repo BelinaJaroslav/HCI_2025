@@ -106,15 +106,32 @@ void App::update_and_draw_models(float delta_t)
             auto y = value.position.y;
             auto z = value.position.z;
             
-            if (x < cat_min_x || x > cat_max_x) {
-                cat_direction.x *= -1;
-                audio_manager.play3D(key_snd_meow, x, y, z);
+            bool is_x_oob = x < cat_min_x || x > cat_max_x;
+            bool is_z_oob = z < cat_min_z || z > cat_max_z;
+
+            if (is_x_oob || is_z_oob) { // Is cat out of bounds (oob)?
+                if (did_cat_meow_last_frame) {
+                    // Cat is oob and also was oob in the previous frame, so we teleport it instead of getting it "stuck on the edge"
+                    x = 0.0f;
+                    z = 0.0f;
+                    audio_manager.play3D(key_snd_teleport, x, y, z);
+                    did_cat_meow_last_frame = false;
+                }
+                else {
+                    if (is_x_oob) {
+                        cat_direction.x *= -1;
+                    }
+                    if (is_z_oob) {
+                        cat_direction.y *= -1;
+                    }
+                    audio_manager.play3D(key_snd_meow, x, y, z);
+                    did_cat_meow_last_frame = true;
+                }
             }
-            if (z < cat_min_z || z > cat_max_z) {
-                cat_direction.y *= -1;
-                audio_manager.play3D(key_snd_meow, x, y, z);
+            else {
+                did_cat_meow_last_frame = false;
             }
-            
+
             x += cat_direction.x * cat_speed * delta_t;
             z += cat_direction.y * cat_speed * delta_t;
             y = get_heightmap_y(x, z);
