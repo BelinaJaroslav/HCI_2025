@@ -2,9 +2,11 @@
 
 ## How to run on Linux with vcpkg
 
-//TODO test if this actually works
+__//TODO__ check if it actually works when the final version is done (GCC is more strict than MSVC)
 
 ```bash
+sudo apt install libopencv-dev
+
 export VCPKG_ROOT=<path_to_bootstrapped_vcpkg> && export PATH=$VCPKG_ROOT:$PATH
 
 cmake --preset=vcpkg
@@ -28,7 +30,7 @@ To turn on the _constant quality video encoder_, go to `./build/App/Resources/ap
 [ ] allow VSync control, fullscreen vs. windowed switching (restore window position & size), screenshot, antialiasing toggle
 [√] simple GUI: display (at least) GL version, profile, FPS
 [ ] event processing: camera, object, app behaviour etc. controlled by mouse (both axes, wheel), keyboard, window resize, etc.
-[ ] multiple different independently moving 3D models, at leats two loaded from file
+[ ] multiple different independently moving 3D models, at least two loaded from file
 [√] free floating and first-person-view camera
 [√] at least three different textures (or subtextures from texture atlas etc.)
 [ ] 3D positional audio (multiple sources, background sound)
@@ -53,8 +55,9 @@ Obsolete functionality used: GLUT, GL compatible profile
   * [ ] fullscreen vs. windowed switching (restore window position & size)
   * [ ] screenshot button
   * [ ] basic control of 3D scene from the camera tracker
-  * [ ] multiple different independently moving 3D models, at leats two loaded from file
-  * [ ] 3D positional audio (multiple sources, background sound)
+  * [ ] multiple different independently moving 3D models, at least two loaded from file
+  * [ ] 3D positional audio, multiple sources
+  * [ ] background music (2D looped audio)
 
 ## Misc
 

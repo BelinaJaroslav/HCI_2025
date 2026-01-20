@@ -7,8 +7,6 @@
 
 // OpenGL Extension Wrangler: allow all multiplatform GL functions
 #include <GL/glew.h> 
-// WGLEW = Windows GL Extension Wrangler :: platform specific functions (in this case Windows)
-//#include <GL/wglew.h> // Not needed for our App
 
 // GLFW toolkit
 // Uses GL calls to open GL context, i.e. GLEW must be first.
@@ -166,7 +164,6 @@ bool App::init()
         if (GLEW_OK != err) {
             fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
         }
-        //wglewInit();
 
         //...after ALL GLFW & GLEW init ...
         if (GLEW_ARB_debug_output) {

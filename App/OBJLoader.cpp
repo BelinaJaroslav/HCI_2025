@@ -42,20 +42,20 @@ void load_OBJ(const std::filesystem::path& file_name, std::vector<vertex>& mesh_
             // v -1.183220029 4.784470081 47.4618988
             if (first_two_chars == "v ") {
                 vertex_or_normal = {};
-                (void)sscanf_s(line.c_str(), "v %f %f %f", &vertex_or_normal.x, &vertex_or_normal.y, &vertex_or_normal.z);
+                (void)sscanf(line.c_str(), "v %f %f %f", &vertex_or_normal.x, &vertex_or_normal.y, &vertex_or_normal.z);
                 vertices.push_back(vertex_or_normal);
             }
             // vt 0.5000 0.7500
             else if (first_three_chars == "vt ") {
                 uv = {};
-                (void)sscanf_s(line.c_str(), "vt %f %f", &uv.x, &uv.y);
+                (void)sscanf(line.c_str(), "vt %f %f", &uv.x, &uv.y);
                 uv.y = -uv.y; // DDS textures are inverted
                 texture_coordinates.push_back(uv);
             }
             // vn 0.7235898972 -0.6894102097 -0.03363365307
             else if (first_three_chars == "vn ") {
                 vertex_or_normal = {};
-                (void)sscanf_s(line.c_str(), "vn %f %f %f", &vertex_or_normal.x, &vertex_or_normal.y, &vertex_or_normal.z);
+                (void)sscanf(line.c_str(), "vn %f %f %f", &vertex_or_normal.x, &vertex_or_normal.y, &vertex_or_normal.z);
                 vertex_normals.push_back(vertex_or_normal);
             }
             else if (first_two_chars == "f ") {
@@ -63,13 +63,13 @@ void load_OBJ(const std::filesystem::path& file_name, std::vector<vertex>& mesh_
                 // f 1 2 3
                 if (n == 0) {
                     unsigned int indices_temp[3]{};
-                    (void)sscanf_s(line.c_str(), "f %d %d %d", &indices_temp[0], &indices_temp[1], &indices_temp[2]);
+                    (void)sscanf(line.c_str(), "f %d %d %d", &indices_temp[0], &indices_temp[1], &indices_temp[2]);
                     indices_vertex.insert(indices_vertex.end(), { indices_temp[0], indices_temp[1], indices_temp[2] });
                 }
                 // f 3/1 4/2 5/3
                 else if (n == 3) {
                     unsigned int indices_temp[6]{};
-                    (void)sscanf_s(line.c_str(), "f %d/%d %d/%d %d/%d", &indices_temp[0], &indices_temp[3], &indices_temp[1], &indices_temp[4], &indices_temp[2], &indices_temp[5]);
+                    (void)sscanf(line.c_str(), "f %d/%d %d/%d %d/%d", &indices_temp[0], &indices_temp[3], &indices_temp[1], &indices_temp[4], &indices_temp[2], &indices_temp[5]);
                     indices_vertex.insert(indices_vertex.end(), { indices_temp[0], indices_temp[1], indices_temp[2] });
                     indices_texture_coordinate.insert(indices_texture_coordinate.end(), { indices_temp[3], indices_temp[4], indices_temp[5] });
                 }
@@ -77,14 +77,14 @@ void load_OBJ(const std::filesystem::path& file_name, std::vector<vertex>& mesh_
                     // f 7//1 8//2 9//3
                     if (line.find("//") != std::string::npos) {
                         unsigned int indices_temp[6]{};
-                        (void)sscanf_s(line.c_str(), "f %d//%d %d//%d %d//%d", &indices_temp[0], &indices_temp[3], &indices_temp[1], &indices_temp[4], &indices_temp[2], &indices_temp[5]);
+                        (void)sscanf(line.c_str(), "f %d//%d %d//%d %d//%d", &indices_temp[0], &indices_temp[3], &indices_temp[1], &indices_temp[4], &indices_temp[2], &indices_temp[5]);
                         indices_vertex.insert(indices_vertex.end(), { indices_temp[0], indices_temp[1], indices_temp[2] });
                         indices_vertex_normal.insert(indices_vertex_normal.end(), { indices_temp[3], indices_temp[4], indices_temp[5] });
                     }
                     // f 6/4/1 3/5/3 7/6/5
                     else {
                         unsigned int indices_temp[9]{};
-                        (void)sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &indices_temp[0], &indices_temp[3], &indices_temp[6], &indices_temp[1], &indices_temp[4], &indices_temp[7], &indices_temp[2], &indices_temp[5], &indices_temp[8]);
+                        (void)sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &indices_temp[0], &indices_temp[3], &indices_temp[6], &indices_temp[1], &indices_temp[4], &indices_temp[7], &indices_temp[2], &indices_temp[5], &indices_temp[8]);
                         indices_vertex.insert(indices_vertex.end(), { indices_temp[0], indices_temp[1], indices_temp[2] });
                         indices_texture_coordinate.insert(indices_texture_coordinate.end(), { indices_temp[3], indices_temp[4], indices_temp[5] });
                         indices_vertex_normal.insert(indices_vertex_normal.end(), { indices_temp[6], indices_temp[7], indices_temp[8] });
@@ -95,7 +95,7 @@ void load_OBJ(const std::filesystem::path& file_name, std::vector<vertex>& mesh_
                     unsigned int v[4]{};
                     unsigned int vt[4]{};
                     unsigned int vn[4]{};
-                    (void)sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", &v[0], &vt[0], &vn[0], &v[1], &vt[1], &vn[1], &v[2], &vt[2], &vn[2], &v[3], &vt[3], &vn[3]);
+                    (void)sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", &v[0], &vt[0], &vn[0], &v[1], &vt[1], &vn[1], &v[2], &vt[2], &vn[2], &v[3], &vt[3], &vn[3]);
                     indices_vertex.insert(indices_vertex.end(), { v[0], v[1], v[2], v[0], v[2], v[3] });
                     indices_texture_coordinate.insert(indices_texture_coordinate.end(), { vt[0], vt[1], vt[2], vt[0], vt[2], vt[3] });
                     indices_vertex_normal.insert(indices_vertex_normal.end(), { vn[0], vn[1], vn[2], vn[0], vn[2], vn[3] });
