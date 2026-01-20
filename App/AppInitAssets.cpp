@@ -48,7 +48,12 @@ void App::init_assets()
     scene.emplace(key_obj_cat, cat_model);
 
     srand(static_cast<unsigned int>(time(0))); // Seed the random generator
-    cat_direction = glm::normalize(glm::circularRand(1.0f)); // Random direction (vector with coordinates on a circle)
+    while (true) {
+        cat_direction = glm::normalize(glm::circularRand(1.0f)); // Random direction (vector with coordinates on a circle)
+        if (abs(cat_direction.x) > 0.15f && abs(cat_direction.y) > 0.15f) { // Ensure it's "diagonal enough"
+            break;
+        }
+    }
 
     // = HEIGHTMAP =
     std::filesystem::path tileatlas_path("./App/Resources/Textures/TILE_ATLAS.png");
@@ -60,6 +65,7 @@ void App::init_assets()
     scene.emplace(key_obj_heightmap, heightmap_model);
 
     // = AUDIO =
-    audio_manager.load(key_snd_pop, "./App/Resources/Audio/pop_sfx.mp3", 0.5f, 100.0f, 5.0f);
     audio_manager.load(key_snd_meow, "./App/Resources/Audio/meow_sfx.mp3", 0.5f, 100.0f, 5.0f);
+    audio_manager.load(key_snd_pop, "./App/Resources/Audio/pop_sfx.mp3", 0.5f, 100.0f, 5.0f);
+    audio_manager.load(key_snd_teleport, "./App/Resources/Audio/teleport_sfx.mp3", 0.5f, 100.0f, 5.0f);
 }

@@ -94,9 +94,9 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
     ImGui::Begin("Render Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
         // Display info
-        ImGui::Text("FOV: %.1f", FOV);
+        ImGui::Text("FOV: %.1f [Scrollwheel]", FOV);
 
-        ImGui::Text("Camera coors: %.1f/%.1f/%.1f", camera.position.x, camera.position.y, camera.position.z);
+        ImGui::Text("Camera coors: %.1f/%.1f/%.1f [W/A/S/D]", camera.position.x, camera.position.y, camera.position.z);
 
         ImGui::Separator();
 
@@ -131,8 +131,16 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
 
         ImGui::Separator();        
 
+        if (ImGui::Button("[?] Take a screenshot (TODO)")) {
+            //TODO
+        }
+
         if (ImGui::Checkbox("[RMB] :: Mouselook on/off", &is_mouselook_on)) {
             enable_or_disable_mouselook(false);
+        }
+
+        if (ImGui::Checkbox("[F] :: Fullscreen on/off", &is_fullscreen_on)) {
+            enable_or_disable_fullscreen(false);
         }
 
         ImGui::Checkbox("[C] :: Spectator mode on/off", &is_camera_freeform);

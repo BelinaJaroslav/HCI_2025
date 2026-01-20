@@ -270,6 +270,22 @@ void App::enable_or_disable_mouselook(bool do_update_bool)
 }
 
 
+void App::enable_or_disable_fullscreen(bool do_update_bool)
+{
+    if (do_update_bool) is_fullscreen_on = !is_fullscreen_on;
+    
+    if (is_fullscreen_on) { // Remember window info and enable fullscreen
+        glfwGetWindowPos(window, &win_xcor, &win_ycor);
+        glfwGetWindowSize(window, &win_width_memory, &win_height_memory);
+        if (win_height_memory == 0) win_height_memory++; // Prevent zero height window
+        glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+    }
+    else { // Disable fullscreen and restore window to memorized position/size
+        glfwSetWindowMonitor(window, nullptr, win_xcor, win_ycor, win_width_memory, win_height_memory, 0);
+    }
+}
+
+
 void App::enable_or_disable_vsync(bool do_update_bool)
 {
     if (do_update_bool) is_vsync_on = !is_vsync_on;

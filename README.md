@@ -52,12 +52,11 @@ Obsolete functionality used: GLUT, GL compatible profile
 
 * TODO:
   * [x] incorporate constant quality video encoder into the final app?
-  * [ ] fullscreen vs. windowed switching (restore window position & size)
+  * [x] fullscreen vs. windowed switching (restore window position & size)
   * [ ] screenshot button
   * [ ] basic control of 3D scene from the camera tracker
-  * [ ] multiple different independently moving 3D models, at least two loaded from file
-  * [ ] 3D positional audio, multiple sources
-  * [ ] background music (2D looped audio)
+    * [ ] multiple different independently moving 3D models, at least two loaded from file
+    * [ ] 3D positional audio, multiple sources
 
 ## Misc
 
