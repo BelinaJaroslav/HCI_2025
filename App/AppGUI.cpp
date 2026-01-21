@@ -40,7 +40,7 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
 
         // Interval adjustment
         static float interval_seconds = 1.0f;
-        if (ImGui::SliderFloat("Update Interval (s)", &interval_seconds, 0.1f, 5.0f)) {
+        if (ImGui::SliderFloat("Update Interval [s]", &interval_seconds, 0.1f, 5.0f)) {
             fps_meter_main.set_interval(std::chrono::duration<double>(interval_seconds));
         }
 
@@ -89,15 +89,17 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
     }
     ImGui::End();
 
-    // = WINDOW 2 :: Render Controls =
+    // = WINDOW 2 :: Controls =
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), 0, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("Render Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     {
         // Display info
-        ImGui::Text("FOV: %.1f [Scrollwheel]", FOV);
+        ImGui::Text("[Scrollwheel] FOV: %.1f", FOV);
 
-        ImGui::Text("Camera coors: %.1f/%.1f/%.1f [W/A/S/D]", camera.position.x, camera.position.y, camera.position.z);
+        ImGui::Text("[W/A/S/D/(Q)/(E)] Camera coors: %.1f/%.1f/%.1f", camera.position.x, camera.position.y, camera.position.z);
 
+        // Color pickers for sky/teapot
+        /*
         ImGui::Separator();
 
         float triangle_color_arr[3] = { triangle_color.r, triangle_color.g, triangle_color.b };
@@ -130,10 +132,9 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
         }
 
         ImGui::Separator();        
+        /**/        
 
-        if (ImGui::Button("[?] Take a screenshot (TODO)")) {
-            //TODO
-        }
+        ImGui::Checkbox("[LMB] :: Flashlight on/off", &is_flashlight_on);
 
         if (ImGui::Checkbox("[RMB] :: Mouselook on/off", &is_mouselook_on)) {
             enable_or_disable_mouselook(false);
@@ -151,6 +152,10 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
 
         if (ImGui::Checkbox("[B] :: Anti-aliasing on/off", &is_antialiasing_on)) {
             enable_or_disable_antialiasing(false);
+        }
+
+        if (ImGui::Button("[?] Take a screenshot (TODO)")) {
+            //TODO
         }
     }
     ImGui::End();
