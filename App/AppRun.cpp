@@ -87,6 +87,17 @@ void App::run()
         current_shader->set_uniform("u_dirlight_diffuse", glm::vec3(0.8f));
         current_shader->set_uniform("u_dirlight_specular", glm::vec3(0.14f));
 
+        current_shader->set_uniform("u_reflector.position", camera.position);
+        current_shader->set_uniform("u_reflector.direction", camera.front);
+        current_shader->set_uniform("u_reflector.cos_inner_cone", glm::cos(glm::radians(20.0f)));
+        current_shader->set_uniform("u_reflector.cos_outer_cone", glm::cos(glm::radians(27.0f)));
+        current_shader->set_uniform("u_reflector.diffuse", glm::vec3(0.7f));
+        current_shader->set_uniform("u_reflector.specular", glm::vec3(0.56f));
+        current_shader->set_uniform("u_reflector.is_on", is_flashlight_on);
+        current_shader->set_uniform("u_reflector.constant", 1.0f);
+        current_shader->set_uniform("u_reflector.linear", 0.07f);
+        current_shader->set_uniform("u_reflector.exponent", 0.017f);
+
         // DRAW MODELS FROM SCENE
         update_and_draw_models(delta_time);
 

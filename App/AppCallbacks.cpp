@@ -107,12 +107,13 @@ void App::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 void App::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
-
-	/*
+	
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// LMB was pressed...
-	}
-	/**/
+		if (this_inst->is_mouselook_on) {
+			this_inst->is_flashlight_on = !this_inst->is_flashlight_on;
+		}
+	}	
 
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 		// RMB was pressed...

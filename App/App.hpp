@@ -78,7 +78,6 @@ private:
     // == MEMBERS ==
     FaceDetector face_detector;
     FPSMeter fps_meter_main;
-    FPSMeter fps_meter_encoder;
     SyncedDeque<std::tuple<cv::Mat, int>> synced_deque;
     cv::VideoCapture capture;
     Camera camera;
@@ -106,6 +105,7 @@ private:
     
     bool is_vsync_on{};
     bool is_fullscreen_on = false;
+    bool is_flashlight_on = true;
     bool is_mouselook_on{};
     bool is_antialiasing_on{};
     bool is_encoder_on{};

@@ -186,10 +186,7 @@ int App::lab_compression_pool() {
 
                 compressed_frame = std::move(it->second);
                 buffer.erase(it);
-            }
-            // Measure thread's "FPS"
-            if (fps_meter_main.is_updated()) fmt::println("'lab_compression_pool' thread \"FPS\": {:.3f}", fps_meter_encoder.get());
-            fps_meter_encoder.update();
+            }            
         }
     }
     catch (std::exception const& e) {

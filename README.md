@@ -16,7 +16,9 @@ cmake --build build
 ./build/HCI
 ```
 
-To turn on the _constant quality video encoder_, go to `./build/App/Resources/app_settings.json` and set `"webcam_encoder"` to `true` (default is `false`). Then you can use `Q`/`A` to increase/decrease the quality.
+In the 3D app, the upper-left window contains all the keyboard controls. The upper-right window contains FPS info and collapsable OpenGL info. The lower-right window is the camera tracker.
+
+The _constant quality video encoder_ can be run in a separate window. To turn it on, go to `./build/App/Resources/app_settings.json` and set `"webcam_encoder"` to `true` (default is `false`). Then you can use `Q`/`A` to increase/decrease the compression quality.
 
 ## Tasks
 
@@ -37,7 +39,7 @@ To turn on the _constant quality video encoder_, go to `./build/App/Resources/ap
 
 ## EXTRAS
 
-[ ] lighting model, at least 3 lights (1x ambient, 1x directional, 1x reflector: at least one is moving; + possible other lights)
+[√] lighting model, at least 3 lights (1x ambient, 1x directional, 1x reflector: at least one is moving; + possible other lights)
 [ ] correct full scale transparency (at least one transparent object; NOT if(alpha<0.1) {discard;} )
 [√] height map textured by height, proper player height coords
 [ ] particles
@@ -51,20 +53,22 @@ Obsolete functionality used: GLUT, GL compatible profile
 ```
 
 * TODO:
-  * [x] incorporate constant quality video encoder into the final app?
-  * [x] fullscreen vs. windowed switching (restore window position & size)
-  * [ ] screenshot button
-  * [ ] basic control of 3D scene from the camera tracker
-    * [ ] multiple different independently moving 3D models, at least two loaded from file
-    * [ ] 3D positional audio, multiple sources
+  * [ ] Přidat možnost dělat screenshoty, které se uloží do souboru
+
+  * [ ] 3D scéna by měla nějak reagovat na výsledek camera trackeru (0/1/2+ detekovaných obličejů); lze nějak použít již existující objekty, nebo si přidat nové
+
+  * [ ] Přidat další zdroj 3D zvuků
+
+  * [ ] Přidat 2D background audio
 
 ## Misc
 
-* `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ...
-* `AppGUI.cpp` – Dear ImGui
+* `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ..., logika přepínání mouselook/fullscreen/vsync/AA
 * `AppCallbacks.cpp` – callbacky
-* `AppInitAssets.cpp` – načtení shaderů, modelů, textur, ...
+* `AppGUI.cpp` – Dear ImGui
+* `AppInitAssets.cpp` – načtení shaderů, textur, modelů, zvuků
 * `AppRun.cpp` – hlavní smyčka: runtime logika a vykreslování
+* `Labs\Lab04Task02.cpp` – constant quality video encoder
 
 &nbsp;
 
