@@ -4,6 +4,7 @@
 
 // OpenCV - GL independent
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/utils/logger.hpp>
 
 // OpenGL Extension Wrangler: allow all multiplatform GL functions
 #include <GL/glew.h> 

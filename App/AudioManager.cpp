@@ -73,12 +73,13 @@ bool AudioManager::play3D(const std::string& name, float sound_x, float sound_y,
 
     // Store in active sounds list for cleanup and cleanup finished sounds
     active_sounds.push_back(std::move(copy_sound));
-    clean_finished_sounds(); // This method could be called periodically, but here it's probably enough
 
     return true;
 }
 
 
+// This is called periodically
+// The end_callback approach wasn't working for us...
 void AudioManager::clean_finished_sounds()
 {
     // Remove sounds that have finished playing
@@ -86,10 +87,7 @@ void AudioManager::clean_finished_sounds()
         std::remove_if(active_sounds.begin(), active_sounds.end(),
             [](const std::unique_ptr<ma_sound>& sound) {
                 if (!sound) return true;
-                bool isPlaying = ma_sound_is_playing(sound.get());
-                bool atEnd = ma_sound_at_end(sound.get());
-
-                if (!isPlaying || atEnd) {
+                if (!ma_sound_is_playing(sound.get()) || ma_sound_at_end(sound.get())) {
                     ma_sound_uninit(sound.get());
                     return true;
                 }

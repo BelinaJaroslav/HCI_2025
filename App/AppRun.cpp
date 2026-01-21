@@ -62,6 +62,7 @@ void App::run()
 		// Update camera position
         process_camera(delta_time);
         audio_manager.set_listener_position(camera.position.x, camera.position.y, camera.position.z, camera.front.x, camera.front.y, camera.front.z);
+        audio_manager.clean_finished_sounds();
 
         // SHADER
         auto current_shader = shader_library.at(key_shader_simple);
@@ -73,7 +74,18 @@ void App::run()
 
         // View matrix is handled by the camera
         glm::mat4 mx_view = camera.get_view_matrix();
-        current_shader->set_uniform("u_view_mx", mx_view);       
+        current_shader->set_uniform("u_view_mx", mx_view);
+        
+        // Lighting
+        current_shader->set_uniform("u_camera_position", camera.position);
+
+        current_shader->set_uniform("u_material_ambient", glm::vec3(0.15f));
+        current_shader->set_uniform("u_material_specular", glm::vec3(0.8f));
+        current_shader->set_uniform("u_material_shininess", 96.0f);
+
+        current_shader->set_uniform("u_dirlight_direction", glm::vec3(0.0f, -0.9f, -0.17f));
+        current_shader->set_uniform("u_dirlight_diffuse", glm::vec3(0.8f));
+        current_shader->set_uniform("u_dirlight_specular", glm::vec3(0.14f));
 
         // DRAW MODELS FROM SCENE
         update_and_draw_models(delta_time);
