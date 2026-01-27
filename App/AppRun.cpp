@@ -36,6 +36,7 @@ void App::run()
             auto tup = synced_deque.pop_front();
             auto& frame = std::get<0>(tup);
             //fmt::println("GL FRAME PTR  = {}", (void*)frame.data);
+
             n_faces_found = std::get<1>(tup);
             texture_library.at(key_tex_webcam)->replace_image(frame);
         }
@@ -252,10 +253,9 @@ void App::webcam_thread()
             CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
         }
         
-        //fmt::println("WEBCAM FRAME PTR = {}", (void*)frame.data);
-
+        cv::Mat safe_copy = frame.clone();
         // Push into synced_deque
-        synced_deque.push_back(std::make_tuple(frame.clone(), _n_faces_found)); // DATA IS BEING COPIED HERE
+        synced_deque.push_back(std::make_tuple(std::move(safe_copy), _n_faces_found)); // DATA IS BEING COPIED HERE <<<<< WHY ARE YOU LYING MAN???
 
         
     } while (!do_terminate_worker_threads); // Repeat until App sets `do_terminate_worker_threads` to `true`
