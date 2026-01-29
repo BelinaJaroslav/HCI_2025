@@ -29,6 +29,9 @@ void App::run()
     update_projection_matrix();
     glViewport(0, 0, win_width, win_height);
 
+	// Start background music
+    audio_manager.play_background_music(key_snd_bgm, 0.15f);
+
 	// Main game loop
 	while (!glfwWindowShouldClose(window)) {
         // Webcam service
@@ -108,7 +111,7 @@ void App::run()
 		// poll events, call callbacks, flip back<->front buffer
 
         if (userPressedScreenshotKey) {
-            saveScreenshot("my_capture.png");
+            saveScreenshot();
 			userPressedScreenshotKey = false;
         }
 
@@ -267,35 +270,3 @@ void App::webcam_thread()
     } while (!do_terminate_worker_threads); // Repeat until App sets `do_terminate_worker_threads` to `true`
 }
 
-void App::saveScreenshot(const std::string& filename)
-{
-	fmt::println("Saving screenshot to {}", filename);
-    // 1. Get dimensions directly from OpenGL
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
-    int width = viewport[2];
-    int height = viewport[3];
-
-    // 2. Prepare the Mat and read pixels
-    cv::Mat image(height, width, CV_8UC3);
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
-
-    // Use viewport[0] and [1] for x and y to be extra precise
-    glReadPixels(viewport[0], viewport[1], width, height, GL_RGB, GL_UNSIGNED_BYTE, image.data);
-
-    // 3. Flip and convert
-    cv::Mat flipped;
-    cv::flip(image, flipped, 0);
-
-    cv::Mat finalImage;
-    cv::cvtColor(flipped, finalImage, cv::COLOR_RGB2BGR);
-
-    // 4. Save
-    if (cv::imwrite(filename, finalImage)) {
-        fmt::println("Screenshot saved to {}", filename);
-    }
-    else {
-        fmt::println("Error: Could not save screenshot to {}", filename);
-    }
-}

@@ -74,6 +74,7 @@ private:
     const std::string key_snd_meow = "snd_meow";
     const std::string key_snd_pop = "snd_pop";
     const std::string key_snd_teleport = "snd_teleport";
+	const std::string key_snd_bgm = "snd_bgm";
 
     // == MEMBERS ==
     FaceDetector face_detector;
@@ -165,7 +166,7 @@ private:
     // Webcam service
     void webcam_thread();
 
-    void saveScreenshot(const std::string& filename);
+    void saveScreenshot();
 
     // Store OpenGL info
     const char* gl_info_vendor{};

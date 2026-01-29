@@ -155,7 +155,7 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
         }
 
         if (ImGui::Button("[1] Take a screenshot")) {
-            saveScreenshot("IMGUI_screenshot.png");
+            saveScreenshot();
         }
     }
     ImGui::End();

@@ -78,6 +78,35 @@ bool AudioManager::play3D(const std::string& name, float sound_x, float sound_y,
 }
 
 
+void AudioManager::play_background_music(const std::string& name, float volume)
+{
+    auto it = sound_bank.find(name);
+    if (it == sound_bank.end()) {
+        fmt::println(stderr, "BGM not found: {}", name);
+        return;
+    }
+
+    // Create a new sound instance for playback
+    auto bgm_sound = std::make_unique<ma_sound>();
+
+    // Initialize the copy
+    if (ma_sound_init_copy(&engine, it->second.get(), MA_SOUND_FLAG_ASYNC, nullptr, bgm_sound.get()) != MA_SUCCESS) {
+        fmt::println(stderr, "Failed to init BGM copy: {}", name);
+        return;
+    }
+
+    // 3. Set BGM specific settings
+    ma_sound_set_looping(bgm_sound.get(), MA_TRUE);
+    ma_sound_set_volume(bgm_sound.get(), volume);
+
+    // Disable spatialization
+    ma_sound_set_spatialization_enabled(bgm_sound.get(), MA_FALSE);
+
+    ma_sound_start(bgm_sound.get());
+    active_sounds.push_back(std::move(bgm_sound));
+}
+
+
 // This is called periodically
 // The end_callback approach wasn't working for us...
 void AudioManager::clean_finished_sounds()
