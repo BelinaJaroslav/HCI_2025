@@ -23,6 +23,7 @@ public:
 
     void load(const std::string& name, const std::filesystem::path& filename, float min_distance, float max_distance, float volume);
     bool play3D(const std::string& name, float sound_x, float sound_y, float sound_z);
+    void play_background_music(const std::string& name, float volume);
     void set_listener_position(float x, float y, float z, float dir_x, float dir_y, float dir_z);
 
     void clean_finished_sounds();

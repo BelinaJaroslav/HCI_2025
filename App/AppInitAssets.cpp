@@ -68,4 +68,5 @@ void App::init_assets()
     audio_manager.load(key_snd_meow, "./App/Resources/Audio/meow_sfx.mp3", 0.5f, 100.0f, 5.0f);
     audio_manager.load(key_snd_pop, "./App/Resources/Audio/pop_sfx.mp3", 0.5f, 100.0f, 5.0f);
     audio_manager.load(key_snd_teleport, "./App/Resources/Audio/teleport_sfx.mp3", 0.5f, 100.0f, 5.0f);
+    audio_manager.load(key_snd_bgm, "./App/Resources/Audio/background.mp3", 0.5f, 100.0f, 5.0f);
 }
