@@ -43,8 +43,14 @@ target_include_directories(HCI PRIVATE
 )
 
 # Copy resources into the build folder so relative paths work
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/App/Resources 
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/App/)
+#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/App/Resources 
+#     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/App/)
+
+add_custom_command(TARGET HCI POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/App/Resources"
+    "$<TARGET_FILE_DIR:HCI>/App/Resources"
+)
 
 if(MSVC)
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
