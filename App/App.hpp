@@ -116,6 +116,8 @@ private:
     float FOV{};
     bool is_camera_freeform = false;
 
+	bool userPressedScreenshotKey = false;
+
     glm::mat4 mx_projection = glm::identity<glm::mat4>();
 
     std::unordered_map<std::string, std::shared_ptr<ShaderProgram>> shader_library;
@@ -162,6 +164,8 @@ private:
     
     // Webcam service
     void webcam_thread();
+
+    void saveScreenshot(const std::string& filename);
 
     // Store OpenGL info
     const char* gl_info_vendor{};

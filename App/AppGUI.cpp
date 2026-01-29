@@ -154,8 +154,8 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
             enable_or_disable_antialiasing(false);
         }
 
-        if (ImGui::Button("[?] Take a screenshot (TODO)")) {
-            //TODO
+        if (ImGui::Button("[1] Take a screenshot")) {
+            saveScreenshot("IMGUI_screenshot.png");
         }
     }
     ImGui::End();

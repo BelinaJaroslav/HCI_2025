@@ -47,6 +47,10 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 			this_inst->audio_manager.play3D(this_inst->key_snd_pop, 0, 1, 0);
 			break;
 
+		case GLFW_KEY_KP_1:
+			// `1` to test the audio
+			this_inst->userPressedScreenshotKey = true;
+			break;
 		// End switch
 		}
 
