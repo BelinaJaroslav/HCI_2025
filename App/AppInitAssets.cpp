@@ -24,6 +24,12 @@ void App::init_assets()
     std::filesystem::path cat_tex_path("./App/Resources/Textures/cat.jpg");
     texture_library.emplace(key_tex_cat, std::make_shared<Texture>(cat_tex_path));
 
+    std::filesystem::path ufo_tex_path("./App/Resources/Textures/lambert1.png");
+    texture_library.emplace(key_tex_ufo, std::make_shared<Texture>(ufo_tex_path));
+
+    std::filesystem::path cow_tex_path("./App/Resources/Textures/cow.png");
+    texture_library.emplace(key_tex_cow, std::make_shared<Texture>(cow_tex_path));
+
     // = MODELS =
     // Teapot
     std::filesystem::path teapot_path("./App/Resources/Objects/teapot_tri_vnt.obj");
@@ -47,6 +53,22 @@ void App::init_assets()
     cat_model.rotation_base = glm::vec4(1.0f, 0.0f, 0.0f, -90.0f);
     scene.emplace(key_obj_cat, cat_model);
 
+    //UFO
+    std::filesystem::path ufo_path("./App/Resources/Objects/ufo.obj");
+    auto ufo_model = Model(ufo_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_ufo));
+    ufo_model.position = glm::vec3(2.0f, 0.5f, 3.0f);
+    ufo_model.scale = glm::vec3(0.01f);
+    ufo_model.rotation_base = glm::vec4(1.0f, 0.0f, 0.0f, 0);
+    scene.emplace(key_obj_ufo, ufo_model);
+
+    //cow
+    std::filesystem::path cow_path("./App/Resources/Objects/cow.obj");
+    auto cow_model = Model(cow_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_cow));
+    cow_model.position = glm::vec3(2.0f, 0.5f, 3.0f);
+    cow_model.scale = glm::vec3(1.0f);
+    cow_model.rotation_base = glm::vec4(1.0f, 0.0f, 0.0f, 0);
+    scene.emplace(key_obj_cow, cow_model);
+
     srand(static_cast<unsigned int>(time(0))); // Seed the random generator
     while (true) {
         cat_direction = glm::normalize(glm::circularRand(1.0f)); // Random direction (vector with coordinates on a circle)
@@ -68,4 +90,5 @@ void App::init_assets()
     audio_manager.load(key_snd_meow, "./App/Resources/Audio/meow_sfx.mp3", 0.5f, 100.0f, 5.0f);
     audio_manager.load(key_snd_pop, "./App/Resources/Audio/pop_sfx.mp3", 0.5f, 100.0f, 5.0f);
     audio_manager.load(key_snd_teleport, "./App/Resources/Audio/teleport_sfx.mp3", 0.5f, 100.0f, 5.0f);
+    audio_manager.load(key_snd_ufo, "./App/Resources/Audio/ufo_flying.mp3", 40.0f, 200.0f, 20.0f);
 }

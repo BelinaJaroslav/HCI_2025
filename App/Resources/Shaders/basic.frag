@@ -29,36 +29,56 @@ struct Reflector {
 	float exponent;
 };
 uniform Reflector u_reflector;
+uniform Reflector u_tractor;
 
 out vec4 frag_color;
 
+// ... Reflector struct and apply_reflector ...
+// Change the return of apply_reflector to vec3 to simplify math
+vec3 apply_reflector(Reflector light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+    if (light.is_on == 0) return vec3(0.0);
+
+    vec3 fragToLight = normalize(light.position - fragPos);
+    
+    // 1. Standard Diffuse/Specular
+    float diff = max(dot(normal, fragToLight), 0.0);
+    vec3 halfVec = normalize(fragToLight + viewDir);
+    float spec = pow(max(dot(normal, halfVec), 0.0), u_material_shininess);
+
+    // 2. Add an Ambient term for that "inner glow"
+    // This makes the beam feel like it's filled with green energy
+    vec3 ambient = light.diffuse * 0.3; 
+
+    float d = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * d + light.exponent * d * d);
+
+    float spot = smoothstep(light.cos_outer_cone, light.cos_inner_cone, dot(-fragToLight, normalize(light.direction)));
+
+    vec3 diffuse  = light.diffuse  * diff;
+    vec3 specular = light.specular * u_material_specular * spec;
+
+    // 3. Combine - Now including the ambient glow
+    return (ambient + diffuse + specular) * attenuation * spot;
+}
 
 void main() {
     vec3 normal = normalize(o_normal);
-	vec3 frag2camera = normalize(u_camera_position - o_fragment_position);
-	vec4 out_color = vec4(0.0f);
-
-	// Ambient light
-	vec4 ambient = vec4(u_material_ambient, 0.0f) * texture(tex0, o_texture_coordinates);
-
-    // Directional light
+    vec3 frag2camera = normalize(u_camera_position - o_fragment_position);
+    vec4 tex_color = texture(tex0, o_texture_coordinates);
+    
+    // 1. Directional / Global Lighting
+    vec3 ambient = u_material_ambient * tex_color.rgb;
+    
     vec3 fragment_to_light = normalize(-u_dirlight_direction);
-    vec4 diffuse = vec4(u_dirlight_diffuse * max(dot(normal, fragment_to_light), 0.0f), 0.0f) * texture(tex0, o_texture_coordinates);
-	vec3 specular = u_dirlight_specular * u_material_specular * pow(max(dot(normal, normalize(fragment_to_light + frag2camera)), 0.0f), u_material_shininess);
-	out_color += (diffuse + vec4(specular, 0.0f));
+    vec3 diff_dir = u_dirlight_diffuse * max(dot(normal, fragment_to_light), 0.0f) * tex_color.rgb;
+    vec3 spec_dir = u_dirlight_specular * u_material_specular * pow(max(dot(normal, normalize(fragment_to_light + frag2camera)), 0.0f), u_material_shininess);
+    
+    vec3 combined_lighting = diff_dir + spec_dir;
 
-    // Reflector
-    if (u_reflector.is_on == 1) {
-        fragment_to_light = normalize(u_reflector.position - o_fragment_position);
-        diffuse = vec4(u_reflector.diffuse * max(dot(normal, fragment_to_light), 0.0f), 0.0f) * texture(tex0, o_texture_coordinates);
-        specular = u_reflector.specular * u_material_specular * pow(max(dot(normal, normalize(fragment_to_light + frag2camera)), 0.0f), u_material_shininess);
-        float d = length(u_reflector.position - o_fragment_position);
-        float attenuation = 1.0f / (u_reflector.constant + u_reflector.linear * d + u_reflector.exponent * (d * d));
-        float spot_intensity = smoothstep(u_reflector.cos_outer_cone, u_reflector.cos_inner_cone, dot(-fragment_to_light, normalize(u_reflector.direction)));
-        diffuse *= attenuation * spot_intensity;
-        specular *= attenuation * spot_intensity;	
-        out_color += (diffuse + vec4(specular, 0.0f));
-    }
+    // 2. Add Reflectors (Multiply by tex_color so they illuminate the surface)
+    combined_lighting += apply_reflector(u_reflector, normal, o_fragment_position, frag2camera) * tex_color.rgb;
+    combined_lighting += apply_reflector(u_tractor, normal, o_fragment_position, frag2camera) * tex_color.rgb;
 
-	frag_color = ambient + out_color;
+    frag_color = vec4(ambient + combined_lighting, 1.0f); // Force alpha to 1.0
 }

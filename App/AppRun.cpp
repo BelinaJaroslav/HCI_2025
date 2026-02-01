@@ -1,4 +1,4 @@
-// Non-OpenGL 3rd party libraries
+﻿// Non-OpenGL 3rd party libraries
 #include <fmt/core.h>
 
 // Our App
@@ -7,52 +7,52 @@
 
 void App::run()
 {
-    // Constant quality encoder service
-    std::jthread t_compression;
-    if (is_encoder_on) t_compression = std::jthread(&App::lab_compression_pool, this);
+	// Constant quality encoder service
+	std::jthread t_compression;
+	if (is_encoder_on) t_compression = std::jthread(&App::lab_compression_pool, this);
 
-    // Webcam service
-    std::jthread thread_webcam_service;
-    thread_webcam_service = std::jthread(&App::webcam_thread, this);
+	// Webcam service
+	std::jthread thread_webcam_service;
+	thread_webcam_service = std::jthread(&App::webcam_thread, this);
 
-    // Measuring delta time
-    double current_timestamp = glfwGetTime();
-    double last_frame_time = current_timestamp;
-    float delta_time = 0.0f;
+	// Measuring delta time
+	double current_timestamp = glfwGetTime();
+	double last_frame_time = current_timestamp;
+	float delta_time = 0.0f;
 
-    // State
+	// State
 	Color teapot_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
-    Color background_color{ 0.549f, 0.823f, 0.858f }; // Sky color
-    glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
+	Color background_color{ 0.549f, 0.823f, 0.858f }; // Sky color
+	glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
 
-    // Init view
-    update_projection_matrix();
-    glViewport(0, 0, win_width, win_height);
+	// Init view
+	update_projection_matrix();
+	glViewport(0, 0, win_width, win_height);
 
 	// Main game loop
 	while (!glfwWindowShouldClose(window)) {
-        // Webcam service
-        if (!synced_deque.empty()) {
-            auto tup = synced_deque.pop_front();
-            auto& frame = std::get<0>(tup);
-            //fmt::println("GL FRAME PTR  = {}", (void*)frame.data);
+		// Webcam service
+		if (!synced_deque.empty()) {
+			auto tup = synced_deque.pop_front();
+			auto& frame = std::get<0>(tup);
+			//fmt::println("GL FRAME PTR  = {}", (void*)frame.data);
 
-            n_faces_found = std::get<1>(tup);
-            texture_library.at(key_tex_webcam)->replace_image(frame);
-        }
+			n_faces_found = std::get<1>(tup);
+			texture_library.at(key_tex_webcam)->replace_image(frame);
+		}
 
-        // Measure delta time
-        current_timestamp = glfwGetTime();
-        delta_time = static_cast<float>(current_timestamp - last_frame_time);
-        last_frame_time = current_timestamp;        
+		// Measure delta time
+		current_timestamp = glfwGetTime();
+		delta_time = static_cast<float>(current_timestamp - last_frame_time);
+		last_frame_time = current_timestamp;
 
 		// Start ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-        // Measure FPS and render GUI
-        fps_meter_main.update();
+		// Measure FPS and render GUI
+		fps_meter_main.update();
 		render_GUI(teapot_color, background_color);
 
 		// Clear canvas
@@ -61,241 +61,337 @@ void App::run()
 		// = After clearing canvas =
 
 		// Update camera position
-        process_camera(delta_time);
-        audio_manager.set_listener_position(camera.position.x, camera.position.y, camera.position.z, camera.front.x, camera.front.y, camera.front.z);
-        audio_manager.clean_finished_sounds();
+		process_camera(delta_time);
+		audio_manager.set_listener_position(camera.position.x, camera.position.y, camera.position.z, camera.front.x, camera.front.y, camera.front.z);
+		audio_manager.clean_finished_sounds();
 
-        // SHADER
-        auto current_shader = shader_library.at(key_shader_simple);
-        current_shader->activate();
-        // Projection matrix is a member of App, it changes on window resize and on FOV change
-        current_shader->set_uniform("u_projection_mx", mx_projection);
-        
-        // Model matrix is handled by each model individually
+		// SHADER
+		auto current_shader = shader_library.at(key_shader_simple);
+		current_shader->activate();
+		// Projection matrix is a member of App, it changes on window resize and on FOV change
+		current_shader->set_uniform("u_projection_mx", mx_projection);
 
-        // View matrix is handled by the camera
-        glm::mat4 mx_view = camera.get_view_matrix();
-        current_shader->set_uniform("u_view_mx", mx_view);
-        
-        // Lighting
-        current_shader->set_uniform("u_camera_position", camera.position);
+		// Model matrix is handled by each model individually
 
-        current_shader->set_uniform("u_material_ambient", glm::vec3(0.15f));
-        current_shader->set_uniform("u_material_specular", glm::vec3(0.8f));
-        current_shader->set_uniform("u_material_shininess", 96.0f);
+		// View matrix is handled by the camera
+		glm::mat4 mx_view = camera.get_view_matrix();
+		current_shader->set_uniform("u_view_mx", mx_view);
 
-        current_shader->set_uniform("u_dirlight_direction", glm::vec3(0.0f, -0.9f, -0.17f));
-        current_shader->set_uniform("u_dirlight_diffuse", glm::vec3(0.8f));
-        current_shader->set_uniform("u_dirlight_specular", glm::vec3(0.14f));
+		// Lighting
+		current_shader->set_uniform("u_camera_position", camera.position);
 
-        current_shader->set_uniform("u_reflector.position", camera.position);
-        current_shader->set_uniform("u_reflector.direction", camera.front);
-        current_shader->set_uniform("u_reflector.cos_inner_cone", glm::cos(glm::radians(20.0f)));
-        current_shader->set_uniform("u_reflector.cos_outer_cone", glm::cos(glm::radians(27.0f)));
-        current_shader->set_uniform("u_reflector.diffuse", glm::vec3(0.7f));
-        current_shader->set_uniform("u_reflector.specular", glm::vec3(0.56f));
-        current_shader->set_uniform("u_reflector.is_on", is_flashlight_on);
-        current_shader->set_uniform("u_reflector.constant", 1.0f);
-        current_shader->set_uniform("u_reflector.linear", 0.07f);
-        current_shader->set_uniform("u_reflector.exponent", 0.017f);
+		current_shader->set_uniform("u_material_ambient", glm::vec3(0.15f));
+		current_shader->set_uniform("u_material_specular", glm::vec3(0.8f));
+		current_shader->set_uniform("u_material_shininess", 96.0f);
 
-        // DRAW MODELS FROM SCENE
-        update_and_draw_models(delta_time);
+		current_shader->set_uniform("u_dirlight_direction", glm::vec3(0.0f, -0.9f, -0.17f));
+		current_shader->set_uniform("u_dirlight_diffuse", glm::vec3(0.8f));
+		current_shader->set_uniform("u_dirlight_specular", glm::vec3(0.14f));
 
-        // IMGUI DRAW
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		current_shader->set_uniform("u_reflector.position", camera.position);
+		current_shader->set_uniform("u_reflector.direction", camera.front);
+		current_shader->set_uniform("u_reflector.cos_inner_cone", glm::cos(glm::radians(20.0f)));
+		current_shader->set_uniform("u_reflector.cos_outer_cone", glm::cos(glm::radians(27.0f)));
+		current_shader->set_uniform("u_reflector.diffuse", glm::vec3(0.7f));
+		current_shader->set_uniform("u_reflector.specular", glm::vec3(0.56f));
+		current_shader->set_uniform("u_reflector.is_on", is_flashlight_on);
+		current_shader->set_uniform("u_reflector.constant", 1.0f);
+		current_shader->set_uniform("u_reflector.linear", 0.07f);
+		current_shader->set_uniform("u_reflector.exponent", 0.017f);
+
+		// RENDER TRACTOR BEAM
+		render_tractor_beam(*current_shader);
+
+		// DRAW MODELS FROM SCENE
+		update_and_draw_models(delta_time);
+
+		// IMGUI DRAW
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		// poll events, call callbacks, flip back<->front buffer
 
-        if (userPressedScreenshotKey) {
-            saveScreenshot("my_capture.png");
+		if (userPressedScreenshotKey) {
+			saveScreenshot("my_capture.png");
 			userPressedScreenshotKey = false;
-        }
+		}
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
 
-    // closing graphics window -> app ends
-    do_terminate_worker_threads = true;
-    do_terminate_encoder_threads = true;
+	// closing graphics window -> app ends
+	do_terminate_worker_threads = true;
+	do_terminate_encoder_threads = true;
 }
 
 
 void App::update_and_draw_models(float delta_t)
 {
-    for (auto& [key, value] : scene) {
 
-        // Rotating teapot
-        if (key == key_obj_teapot) {
-            value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, teapot_rotation_speed * glfwGetTime());
-        }
-        // Cat movement
-        else if (key == key_obj_cat) {
-            auto x = value.position.x;
-            auto y = value.position.y;
-            auto z = value.position.z;
-            
-            bool is_x_oob = x < cat_min_x || x > cat_max_x;
-            bool is_z_oob = z < cat_min_z || z > cat_max_z;
+	if (do_draw_ufo && do_draw_cow) {
+		auto& cow = scene.at(key_obj_cow);
+		auto& ufo = scene.at(key_obj_ufo);
 
-            if (is_x_oob || is_z_oob) { // Is cat out of bounds (oob)?
-                if (did_cat_meow_last_frame) {
-                    // Cat is oob and also was oob in the previous frame, so we teleport it instead of getting it "stuck on the edge"
-                    x = 0.0f;
-                    z = 0.0f;
-                    audio_manager.play3D(key_snd_teleport, x, y, z);
-                    did_cat_meow_last_frame = false;
-                }
-                else {
-                    if (is_x_oob) {
-                        cat_direction.x *= -1;
-                    }
-                    if (is_z_oob) {
-                        cat_direction.y *= -1;
-                    }
-                    audio_manager.play3D(key_snd_meow, x, y, z);
-                    did_cat_meow_last_frame = true;
-                }
-            }
-            else {
-                did_cat_meow_last_frame = false;
-            }
+		audio_manager.update_sound_position(key_snd_meow, ufo.position.x, ufo.position.y, ufo.position.z);
 
-            x += cat_direction.x * cat_speed * delta_t;
-            z += cat_direction.y * cat_speed * delta_t;
-            y = get_heightmap_y(x, z);
-            value.position = glm::vec3(x, y, z);
+		float stop_height = ufo.position.y - 1.0f;
+		if (cow.position.y < stop_height) {
+			cow.position.y += 2.0f * delta_t;
+		}
+		else {
+			audio_manager.play3D(key_snd_teleport, ufo.position.x, ufo.position.y, ufo.position.z);
+			audio_manager.stop_sound(key_snd_ufo);
+			do_draw_cow = false;
+			do_draw_ufo = false;
+			is_tractor_beam_on = false;
+		}
+	}
 
-            float angles = glm::degrees(atan2(-cat_direction.y, cat_direction.x)) + 90;
-            value.rotation = glm::vec4(0.0f, 0.0f, 1.0f, angles);
-        }
+	for (auto& [key, value] : scene) {
 
-        value.draw();
-    }
+		// Rotating teapot
+		if (key == key_obj_teapot) {
+			value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, teapot_rotation_speed * glfwGetTime());
+		}
+		// Cat movement
+		else if (key == key_obj_cat) {
+			auto x = value.position.x;
+			auto y = value.position.y;
+			auto z = value.position.z;
+
+			bool is_x_oob = x < cat_min_x || x > cat_max_x;
+			bool is_z_oob = z < cat_min_z || z > cat_max_z;
+
+			if (is_x_oob || is_z_oob) { // Is cat out of bounds (oob)?
+				if (did_cat_meow_last_frame) {
+					// Cat is oob and also was oob in the previous frame, so we teleport it instead of getting it "stuck on the edge"
+					x = 0.0f;
+					z = 0.0f;
+					audio_manager.play3D(key_snd_teleport, x, y, z);
+					did_cat_meow_last_frame = false;
+				}
+				else {
+					if (is_x_oob) {
+						cat_direction.x *= -1;
+					}
+					if (is_z_oob) {
+						cat_direction.y *= -1;
+					}
+					audio_manager.play3D(key_snd_meow, x, y, z);
+					did_cat_meow_last_frame = true;
+				}
+			}
+			else {
+				did_cat_meow_last_frame = false;
+			}
+
+			x += cat_direction.x * cat_speed * delta_t;
+			z += cat_direction.y * cat_speed * delta_t;
+			y = get_heightmap_y(x, z);
+			value.position = glm::vec3(x, y, z);
+
+			float angles = glm::degrees(atan2(-cat_direction.y, cat_direction.x)) + 90;
+			value.rotation = glm::vec4(0.0f, 0.0f, 1.0f, angles);
+		}
+		else if (key == key_obj_cow) {
+			if (place_cow) {
+				float distance_in_front = 5.0f;
+				glm::vec3 spawn_pos = camera.position + (camera.front * distance_in_front);
+				spawn_pos.y = get_heightmap_y(spawn_pos.x, spawn_pos.z);
+
+				// Update cow data
+				value.position = spawn_pos;
+				float cow_angle = glm::degrees(atan2(-camera.front.z, camera.front.x));
+				value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, cow_angle);
+
+				do_draw_cow = true;
+				// reset ufo stuff
+				audio_manager.stop_sound(key_snd_ufo);
+				do_draw_ufo = false;
+				is_tractor_beam_on = false;
+			}
+		}
+
+		else if (key == key_obj_ufo) {
+			if (place_ufo) {
+				glm::vec3 cow_pos = scene.at(key_obj_cow).position;
+				value.position = cow_pos + glm::vec3(0.0f, 10.0f, 0.0f);
+
+				audio_manager.play_looping_3D(key_snd_ufo, value.position.x, value.position.y, value.position.z);
+
+				place_ufo = false;
+				do_draw_ufo = true;
+				is_tractor_beam_on = true;
+			}
+		}
+
+		if (key == key_obj_ufo && !do_draw_ufo) continue;
+		if (key == key_obj_cow && !do_draw_cow) continue;
+
+		value.draw();
+	}
 }
 
 
 void App::process_camera(float delta_t)
 {
-    glm::vec3 movement = camera.process_input(window, delta_t, is_camera_freeform);
-    camera.position += movement;
+	glm::vec3 movement = camera.process_input(window, delta_t, is_camera_freeform);
+	camera.position += movement;
 
-    if (!is_camera_freeform) {
-        camera.position.y = get_heightmap_y(camera.position.x, camera.position.z);
-        camera.position.y += 2.0f; // Add "player height"
-    }
+	if (!is_camera_freeform) {
+		camera.position.y = get_heightmap_y(camera.position.x, camera.position.z);
+		camera.position.y += 2.0f; // Add "player height"
+	}
 }
 
 
 void App::update_projection_matrix()
 {
-    if (win_height < 1) win_height = 1; // avoid division by 0
+	if (win_height < 1) win_height = 1; // avoid division by 0
 
-    float ratio = static_cast<float>(win_width) / win_height;
+	float ratio = static_cast<float>(win_width) / win_height;
 
-    mx_projection = glm::perspective(
-        glm::radians(FOV),
-        ratio,               // Aspect Ratio. Depends on the size of your window.
-        0.1f,                // Near clipping plane. Keep as big as possible, or you'll get precision issues.
-        20000.0f             // Far clipping plane. Keep as little as possible.
-    );
+	mx_projection = glm::perspective(
+		glm::radians(FOV),
+		ratio,               // Aspect Ratio. Depends on the size of your window.
+		0.1f,                // Near clipping plane. Keep as big as possible, or you'll get precision issues.
+		20000.0f             // Far clipping plane. Keep as little as possible.
+	);
 }
 
 
 float App::get_heightmap_y(float position_x, float position_z)
 {
-    float X = position_x + HEIGHTMAP_SHIFT;
-    float Z = position_z + HEIGHTMAP_SHIFT;
-    float Y = 0.0f;
+	float X = position_x + HEIGHTMAP_SHIFT;
+	float Z = position_z + HEIGHTMAP_SHIFT;
+	float Y = 0.0f;
 
-    float X_floor = std::floor(X);
-    float Z_floor = std::floor(Z);
+	float X_floor = std::floor(X);
+	float Z_floor = std::floor(Z);
 
-    float X_ceil = std::ceil(X);
-    float Z_ceil = std::ceil(Z);
+	float X_ceil = std::ceil(X);
+	float Z_ceil = std::ceil(Z);
 
-    if (X - X_floor < 0.5f && Z - Z_floor < 0.5f) {
-        // In the lower-left triangle
-        float x_fraction = X - X_floor;
-        float y_fraction = Z - Z_floor;
-        float common_height = heightmap_heights[{X_floor, Z_floor}];
-        float x_difference = heightmap_heights[{X_ceil, Z_floor}] - common_height;
-        float y_difference = heightmap_heights[{X_floor, Z_ceil}] - common_height;
-        Y = common_height + x_fraction * x_difference + y_fraction * y_difference;
-    }
-    else {
-        // In the upper-right triangle
-        float x_fraction = X_ceil - X;
-        float y_fraction = Z_ceil - Z;
-        float common_height = heightmap_heights[{X_ceil, Z_ceil}];
-        float x_difference = common_height - heightmap_heights[{X_floor, Z_ceil}];
-        float y_difference = common_height - heightmap_heights[{X_ceil, Z_floor}];
-        Y = common_height - x_fraction * x_difference - y_fraction * y_difference;
-    }
+	if (X - X_floor < 0.5f && Z - Z_floor < 0.5f) {
+		// In the lower-left triangle
+		float x_fraction = X - X_floor;
+		float y_fraction = Z - Z_floor;
+		float common_height = heightmap_heights[{X_floor, Z_floor}];
+		float x_difference = heightmap_heights[{X_ceil, Z_floor}] - common_height;
+		float y_difference = heightmap_heights[{X_floor, Z_ceil}] - common_height;
+		Y = common_height + x_fraction * x_difference + y_fraction * y_difference;
+	}
+	else {
+		// In the upper-right triangle
+		float x_fraction = X_ceil - X;
+		float y_fraction = Z_ceil - Z;
+		float common_height = heightmap_heights[{X_ceil, Z_ceil}];
+		float x_difference = common_height - heightmap_heights[{X_floor, Z_ceil}];
+		float y_difference = common_height - heightmap_heights[{X_ceil, Z_floor}];
+		Y = common_height - x_fraction * x_difference - y_fraction * y_difference;
+	}
 
-    return Y * HEIGHTMAP_SCALE;
+	return Y * HEIGHTMAP_SCALE;
 }
 
 
 void App::webcam_thread()
 {
-    cv::Mat frame; // For captured frame
+	cv::Mat frame; // For captured frame
 
-    do {
-        // Get next frame
-        capture.read(frame);
-        if (frame.empty()) {
-            fmt::println("Cam disconnected? End of video?");
-            continue;
-        }
+	do {
+		// Get next frame
+		capture.read(frame);
+		if (frame.empty()) {
+			fmt::println("Cam disconnected? End of video?");
+			continue;
+		}
 
-        // Find faces
-        auto face_centers = face_detector.find_faces(frame);
-        int _n_faces_found = static_cast<int>(face_centers.size());
+		// Find faces
+		auto face_centers = face_detector.find_faces(frame);
+		int _n_faces_found = static_cast<int>(face_centers.size());
 
-        // Draw face crosses
-        for (const auto& face_center : face_centers) {
-            CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
-        }
-        
-        cv::Mat safe_copy = frame.clone();
-        // Push into synced_deque
-        synced_deque.push_back(std::make_tuple(std::move(safe_copy), _n_faces_found)); // DATA IS BEING COPIED HERE <<<<< WHY ARE YOU LYING MAN???
+		// Draw face crosses
+		for (const auto& face_center : face_centers) {
+			CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
+		}
 
-        
-    } while (!do_terminate_worker_threads); // Repeat until App sets `do_terminate_worker_threads` to `true`
+		cv::Mat safe_copy = frame.clone();
+		// Push into synced_deque
+		synced_deque.push_back(std::make_tuple(std::move(safe_copy), _n_faces_found)); // DATA IS BEING COPIED HERE <<<<< WHY ARE YOU LYING MAN???
+
+
+	} while (!do_terminate_worker_threads); // Repeat until App sets `do_terminate_worker_threads` to `true`
 }
 
 void App::saveScreenshot(const std::string& filename)
 {
 	fmt::println("Saving screenshot to {}", filename);
-    // 1. Get dimensions directly from OpenGL
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
+	// 1. Get dimensions directly from OpenGL
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
 
-    int width = viewport[2];
-    int height = viewport[3];
+	int width = viewport[2];
+	int height = viewport[3];
 
-    // 2. Prepare the Mat and read pixels
-    cv::Mat image(height, width, CV_8UC3);
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	// 2. Prepare the Mat and read pixels
+	cv::Mat image(height, width, CV_8UC3);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
-    // Use viewport[0] and [1] for x and y to be extra precise
-    glReadPixels(viewport[0], viewport[1], width, height, GL_RGB, GL_UNSIGNED_BYTE, image.data);
+	// Use viewport[0] and [1] for x and y to be extra precise
+	glReadPixels(viewport[0], viewport[1], width, height, GL_RGB, GL_UNSIGNED_BYTE, image.data);
 
-    // 3. Flip and convert
-    cv::Mat flipped;
-    cv::flip(image, flipped, 0);
+	// 3. Flip and convert
+	cv::Mat flipped;
+	cv::flip(image, flipped, 0);
 
-    cv::Mat finalImage;
-    cv::cvtColor(flipped, finalImage, cv::COLOR_RGB2BGR);
+	cv::Mat finalImage;
+	cv::cvtColor(flipped, finalImage, cv::COLOR_RGB2BGR);
 
-    // 4. Save
-    if (cv::imwrite(filename, finalImage)) {
-        fmt::println("Screenshot saved to {}", filename);
-    }
-    else {
-        fmt::println("Error: Could not save screenshot to {}", filename);
-    }
+	// 4. Save
+	if (cv::imwrite(filename, finalImage)) {
+		fmt::println("Screenshot saved to {}", filename);
+	}
+	else {
+		fmt::println("Error: Could not save screenshot to {}", filename);
+	}
+}
+
+
+void App::render_tractor_beam(ShaderProgram& shader)
+{
+	// 1. If the beam is off, tell the shader explicitly and exit
+	if (!is_tractor_beam_on) {
+		shader.set_uniform("u_tractor.is_on", 0);
+		return;
+	}
+
+	// 2. Safety check for object existence
+	if (!scene.contains(key_obj_ufo) || !scene.contains(key_obj_cow)) {
+		shader.set_uniform("u_tractor.is_on", 0);
+		return;
+	}
+
+	const auto& ufo = scene.at(key_obj_ufo);
+	const auto& cow = scene.at(key_obj_cow);
+
+	// 3. Set UFO as origin and point toward the cow
+	shader.set_uniform("u_tractor.position", ufo.position);
+	shader.set_uniform("u_tractor.direction", glm::normalize(cow.position - ufo.position));
+
+	// 4. Cone Aperture (How wide the beam is)
+	shader.set_uniform("u_tractor.cos_inner_cone", glm::cos(glm::radians(12.0f)));
+	shader.set_uniform("u_tractor.cos_outer_cone", glm::cos(glm::radians(18.0f)));
+
+	// 5. Green Alien Color
+	shader.set_uniform("u_tractor.diffuse", glm::vec3(0.0f, 1.0f, 0.2f));
+	shader.set_uniform("u_tractor.specular", glm::vec3(0.5f, 1.0f, 0.5f));
+
+	// 6. Falloff (How far the light travels)
+	shader.set_uniform("u_tractor.constant", 1.0f);
+	shader.set_uniform("u_tractor.linear", 0.09f);
+	shader.set_uniform("u_tractor.exponent", 0.032f);
+
+	// 7. Enable this specific light slot
+	shader.set_uniform("u_tractor.is_on", 1);
 }

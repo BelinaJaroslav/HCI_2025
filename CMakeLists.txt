@@ -21,6 +21,9 @@ endif()
 
 file(GLOB_RECURSE SOURCES 
     "${PROJECT_SOURCE_DIR}/App/*.cpp"
+    "${PROJECT_SOURCE_DIR}/App/*.hpp"
+    "${PROJECT_SOURCE_DIR}/App/*.vert" # Add this
+    "${PROJECT_SOURCE_DIR}/App/*.frag" # Add this
 )
 
 # Add source to this project's executable
@@ -43,9 +46,12 @@ target_include_directories(HCI PRIVATE
 )
 
 # Copy resources into the build folder so relative paths work
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/App/Resources 
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/App/)
-
+add_custom_command(TARGET HCI POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/App/Resources"
+        "$<TARGET_FILE_DIR:HCI>/App/Resources"
+    COMMENT "Copying shaders and resources to build directory..."
+)
 if(MSVC)
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
 endif()

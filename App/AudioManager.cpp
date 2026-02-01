@@ -87,6 +87,9 @@ void AudioManager::clean_finished_sounds()
         std::remove_if(active_sounds.begin(), active_sounds.end(),
             [](const std::unique_ptr<ma_sound>& sound) {
                 if (!sound) return true;
+                // keep looping sounds
+                if (ma_sound_is_looping(sound.get())) return false;
+
                 if (!ma_sound_is_playing(sound.get()) || ma_sound_at_end(sound.get())) {
                     ma_sound_uninit(sound.get());
                     return true;
@@ -95,6 +98,40 @@ void AudioManager::clean_finished_sounds()
             }),
         active_sounds.end()
     );
+}
+
+
+bool AudioManager::play_looping_3D(const std::string& name, float x, float y, float z) {
+    auto it = sound_bank.find(name);
+    if (it == sound_bank.end()) return false;
+
+    auto loop_sound = std::make_unique<ma_sound>();
+
+    // Initialize copy with Looping flag
+    if (ma_sound_init_copy(&engine, it->second.get(), 0, nullptr, loop_sound.get()) != MA_SUCCESS) {
+        return false;
+    }
+
+    ma_sound_set_looping(loop_sound.get(), MA_TRUE);
+    ma_sound_set_position(loop_sound.get(), x, y, z);
+    ma_sound_start(loop_sound.get());
+
+    active_sounds.push_back(std::move(loop_sound));
+    return true;
+}
+
+void AudioManager::update_sound_position(const std::string& name, float x, float y, float z) {
+    for (auto& sound : active_sounds) {
+        ma_sound_set_position(sound.get(), x, y, z);
+    }
+}
+
+void AudioManager::stop_sound(const std::string& name) {
+    for (auto it = active_sounds.begin(); it != active_sounds.end(); ) {
+        ma_sound_stop(it->get());
+        ma_sound_uninit(it->get());
+        it = active_sounds.erase(it); 
+    }
 }
 
 

@@ -30,7 +30,7 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 		case GLFW_KEY_C:
 			// `C` to on/off freeform camera
 			this_inst->is_camera_freeform = !this_inst->is_camera_freeform;
-			break;		
+			break;
 
 		case GLFW_KEY_V:
 			// `V` to on/off VSYNC
@@ -51,10 +51,19 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 			// `1` to test the audio
 			this_inst->userPressedScreenshotKey = true;
 			break;
-		// End switch
-		}
+			// End switch
 
+		case GLFW_KEY_K:
+			this_inst->place_cow = !this_inst->place_cow;
+			break;
+
+
+		case GLFW_KEY_L:
+			this_inst->place_ufo = true;
+			break;
+		}
 	}
+
 }
 
 
@@ -111,13 +120,13 @@ void App::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 void App::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
-	
+
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// LMB was pressed...
 		if (this_inst->is_mouselook_on) {
 			this_inst->is_flashlight_on = !this_inst->is_flashlight_on;
 		}
-	}	
+	}
 
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 		// RMB was pressed...
