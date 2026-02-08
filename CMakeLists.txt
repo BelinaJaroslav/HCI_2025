@@ -45,13 +45,14 @@ target_include_directories(HCI PRIVATE
     ${OpenCV_INCLUDE_DIRS}
 )
 
-# Copy resources into the build folder so relative paths work
+
 add_custom_command(TARGET HCI POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/App/Resources"
         "$<TARGET_FILE_DIR:HCI>/App/Resources"
     COMMENT "Copying shaders and resources to build directory..."
 )
+
 if(MSVC)
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
 endif()

@@ -27,7 +27,7 @@ void App::init_assets()
     std::filesystem::path ufo_tex_path("./App/Resources/Textures/lambert1.png");
     texture_library.emplace(key_tex_ufo, std::make_shared<Texture>(ufo_tex_path));
 
-    std::filesystem::path cow_tex_path("./App/Resources/Textures/cow.png");
+    std::filesystem::path cow_tex_path("./App/Resources/Textures/cow3.png");
     texture_library.emplace(key_tex_cow, std::make_shared<Texture>(cow_tex_path));
 
     // = MODELS =
@@ -62,7 +62,7 @@ void App::init_assets()
     scene.emplace(key_obj_ufo, ufo_model);
 
     //cow
-    std::filesystem::path cow_path("./App/Resources/Objects/cow.obj");
+    std::filesystem::path cow_path("./App/Resources/Objects/cow_low.obj");
     auto cow_model = Model(cow_path, shader_library.at(key_shader_simple), texture_library.at(key_tex_cow));
     cow_model.position = glm::vec3(2.0f, 0.5f, 3.0f);
     cow_model.scale = glm::vec3(1.0f);
@@ -91,4 +91,5 @@ void App::init_assets()
     audio_manager.load(key_snd_pop, "./App/Resources/Audio/pop_sfx.mp3", 0.5f, 100.0f, 5.0f);
     audio_manager.load(key_snd_teleport, "./App/Resources/Audio/teleport_sfx.mp3", 0.5f, 100.0f, 5.0f);
     audio_manager.load(key_snd_ufo, "./App/Resources/Audio/ufo_flying.mp3", 40.0f, 200.0f, 20.0f);
+    audio_manager.load(key_snd_bgm, "./App/Resources/Audio/background.mp3", 0.5f, 100.0f, 5.0f);
 }

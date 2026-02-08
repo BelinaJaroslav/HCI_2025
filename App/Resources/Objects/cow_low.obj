@@ -1,7 +1,7 @@
 # Blender 4.0.1
 # www.blender.org
-
-
+mtllib Cow_Low_Poly.mtl
+o Cow_Low_Poly
 v -0.417348 1.079338 -0.709110
 v -0.416031 0.956608 -0.710772
 v -0.416134 0.998093 -0.818069
