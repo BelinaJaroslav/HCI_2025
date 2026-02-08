@@ -16,6 +16,8 @@ private:
     ma_engine engine;
     std::unordered_map<std::string, std::unique_ptr<ma_sound>> sound_bank;
     std::vector<std::unique_ptr<ma_sound>> active_sounds;
+    ma_sound* ufo_sound = nullptr;
+    std::unordered_map<std::string, std::unique_ptr<ma_sound>> managed_sounds;
 
 public:
     AudioManager();
@@ -27,4 +29,7 @@ public:
     void set_listener_position(float x, float y, float z, float dir_x, float dir_y, float dir_z);
 
     void clean_finished_sounds();
+    bool play_looping_3D(const std::string& name, float x, float y, float z);
+    void update_sound_position(const std::string& name, float x, float y, float z);
+    void stop_sound(const std::string& name);
 };

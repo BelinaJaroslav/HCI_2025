@@ -64,16 +64,21 @@ private:
     const std::string key_obj_cube = "obj_cube";
     const std::string key_obj_heightmap = "obj_heightmap";
     const std::string key_obj_teapot = "obj_teapot";
+	const std::string key_obj_ufo = "obj_ufo";
+	const std::string key_obj_cow = "obj_cow";
     
     const std::string key_tex_cat = "tex_cat";
     const std::string key_tex_singlecolor = "tex_singlecolor";
     const std::string key_tex_tileatlas = "tex_tileatlas";
     const std::string key_tex_webcam = "tex_webcam";
     const std::string key_tex_woodbox = "tex_woodbox";
+	const std::string key_tex_ufo = "tex_ufo";
+    const std::string key_tex_cow = "tex_cow";
 
     const std::string key_snd_meow = "snd_meow";
     const std::string key_snd_pop = "snd_pop";
     const std::string key_snd_teleport = "snd_teleport";
+	const std::string key_snd_ufo = "snd_ufo";
 	const std::string key_snd_bgm = "snd_bgm";
 
     // == MEMBERS ==
@@ -107,9 +112,15 @@ private:
     bool is_vsync_on{};
     bool is_fullscreen_on = false;
     bool is_flashlight_on = true;
+	bool is_tractor_beam_on = false;
     bool is_mouselook_on{};
     bool is_antialiasing_on{};
     bool is_encoder_on{};
+    bool do_draw_ufo = false;
+	bool do_draw_cow = false;
+    bool place_ufo = false;
+	bool place_cow = false;
+    bool play_ufo_sound = false;
     
     double last_mouse_x = 0.0f;
     double last_mouse_y = 0.0f;
@@ -175,6 +186,8 @@ private:
     const char* gl_info_shading_version{};
     const char* gl_info_profile{};
     int gl_info_n_texture_units = -1;
+
+    void render_tractor_beam(ShaderProgram& shader);
 
     // Faster compile time: These old Labs don't have to be re-compiled everytime we change anything in App.hpp or any of its imports
 #ifndef SKIP_LABS_COMPILATION
