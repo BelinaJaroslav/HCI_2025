@@ -95,10 +95,9 @@ void AudioManager::play_background_music(const std::string& name, float volume)
         return;
     }
 
-    // 3. Set BGM specific settings
+    // Set BGM specific settings
     ma_sound_set_looping(bgm_sound.get(), MA_TRUE);
     ma_sound_set_volume(bgm_sound.get(), volume);
-
     // Disable spatialization
     ma_sound_set_spatialization_enabled(bgm_sound.get(), MA_FALSE);
 
@@ -150,11 +149,13 @@ bool AudioManager::play_looping_3D(const std::string& name, float x, float y, fl
     return true;
 }
 
+
 void AudioManager::update_sound_position(const std::string& name, float x, float y, float z) {
     for (auto& sound : active_sounds) {
         ma_sound_set_position(sound.get(), x, y, z);
     }
 }
+
 
 void AudioManager::stop_sound(const std::string& name) {
     auto it = managed_sounds.find(name);

@@ -306,7 +306,7 @@ void App::enable_or_disable_antialiasing(bool do_update_bool)
     }
 }
 
-void App::saveScreenshot()
+void App::save_screenshot()
 {
     auto now = std::chrono::system_clock::now();
     std::string filename = std::format("screenshot_{:%Y-%m-%d_%H-%M-%S}.png", now);

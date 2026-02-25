@@ -38,8 +38,6 @@ void App::run()
 		if (!synced_deque.empty()) {
 			auto tup = synced_deque.pop_front();
 			auto& frame = std::get<0>(tup);
-			//fmt::println("GL FRAME PTR  = {}", (void*)frame.data);
-
 			n_faces_found = std::get<1>(tup);
 			texture_library.at(key_tex_webcam)->replace_image(frame);
 		}
@@ -102,7 +100,7 @@ void App::run()
 		current_shader->set_uniform("u_reflector.linear", 0.07f);
 		current_shader->set_uniform("u_reflector.exponent", 0.017f);
 
-		// RENDER TRACTOR BEAM
+		// RENDER TRACTOR BEAM (UFO)
 		render_tractor_beam(*current_shader);
 
 		// DRAW MODELS FROM SCENE
@@ -114,7 +112,7 @@ void App::run()
 		// poll events, call callbacks, flip back<->front buffer
 
         if (userPressedScreenshotKey) {
-            saveScreenshot();
+            save_screenshot();
 			userPressedScreenshotKey = false;
 		}
 
@@ -196,38 +194,40 @@ void App::update_and_draw_models(float delta_t)
 			float angles = glm::degrees(atan2(-cat_direction.y, cat_direction.x)) + 90;
 			value.rotation = glm::vec4(0.0f, 0.0f, 1.0f, angles);
 		}
-		else if (key == key_obj_cow) {
-			if (place_cow) {
-				float distance_in_front = 5.0f;
-				glm::vec3 spawn_pos = camera.position + (camera.front * distance_in_front);
-				spawn_pos.y = get_heightmap_y(spawn_pos.x, spawn_pos.z);
+		// Placing cow
+		else if (key == key_obj_cow && is_placing_cow) {
 
-				// Update cow data
-				value.position = spawn_pos;
-				float cow_angle = glm::degrees(atan2(-camera.front.z, camera.front.x));
-				value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, cow_angle);
+			float distance_in_front = 5.0f;
+			glm::vec3 spawn_pos = camera.position + (camera.front * distance_in_front);
+			spawn_pos.y = get_heightmap_y(spawn_pos.x, spawn_pos.z);
 
-				do_draw_cow = true;
-				// reset ufo stuff
-				//audio_manager.stop_sound(key_snd_ufo);
-				do_draw_ufo = false;
-				is_tractor_beam_on = false;
-			}
+			// Update cow data
+			value.position = spawn_pos;
+			float cow_angle = glm::degrees(atan2(-camera.front.z, camera.front.x));
+			value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, cow_angle);
+
+			do_draw_cow = true;
+			// reset ufo stuff
+			//audio_manager.stop_sound(key_snd_ufo);
+			do_draw_ufo = false;
+			is_tractor_beam_on = false;
+
 		}
-
+		// UFO
 		else if (key == key_obj_ufo) {
-			if (place_ufo && do_draw_cow && !place_cow) {
+			if (do_place_ufo && do_draw_cow && !is_placing_cow) {
 				glm::vec3 cow_pos = scene.at(key_obj_cow).position;
 				value.position = cow_pos + glm::vec3(0.0f, 10.0f, 0.0f);
 
 				audio_manager.play_looping_3D(key_snd_ufo, value.position.x, value.position.y, value.position.z);
 
-				place_ufo = false;
+				do_place_ufo = false;
 				do_draw_ufo = true;
 				is_tractor_beam_on = true;
 			}
 		}
 
+		// Do not draw UFO/Cow if they shouldn't be in the scene
 		if (key == key_obj_ufo && !do_draw_ufo) continue;
 		if (key == key_obj_cow && !do_draw_cow) continue;
 
@@ -321,8 +321,7 @@ void App::webcam_thread()
 
 		cv::Mat safe_copy = frame.clone();
 		// Push into synced_deque
-		synced_deque.push_back(std::make_tuple(std::move(safe_copy), _n_faces_found)); // DATA IS BEING COPIED HERE <<<<< WHY ARE YOU LYING MAN???
-
+		synced_deque.push_back(std::make_tuple(std::move(safe_copy), _n_faces_found));
 
 	} while (!do_terminate_worker_threads); // Repeat until App sets `do_terminate_worker_threads` to `true`
 }

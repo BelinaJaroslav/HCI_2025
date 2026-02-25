@@ -48,18 +48,18 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 			break;
 
 		case GLFW_KEY_KP_1:
-			// `1` to test the audio
+			// `1` to take a screenshot
 			this_inst->userPressedScreenshotKey = true;
 			break;
 			// End switch
 
 		case GLFW_KEY_K:
-			this_inst->place_cow = !this_inst->place_cow;
+			this_inst->is_placing_cow = !this_inst->is_placing_cow;
 			break;
 
 
 		case GLFW_KEY_L:
-			this_inst->place_ufo = true;
+			this_inst->do_place_ufo = true;
 			break;
 		}
 	}

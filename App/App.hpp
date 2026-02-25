@@ -42,7 +42,6 @@ public:
     App();
     bool init();
     void run();
-
     ~App();
 
     struct ProcessedFrame {
@@ -61,25 +60,27 @@ private:
     const std::string key_shader_simple = "simple_shader";
     
     const std::string key_obj_cat = "obj_cat";
+	const std::string key_obj_cow = "obj_cow";
     const std::string key_obj_cube = "obj_cube";
     const std::string key_obj_heightmap = "obj_heightmap";
     const std::string key_obj_teapot = "obj_teapot";
 	const std::string key_obj_ufo = "obj_ufo";
-	const std::string key_obj_cow = "obj_cow";
     
     const std::string key_tex_cat = "tex_cat";
+    const std::string key_tex_cow = "tex_cow";
     const std::string key_tex_singlecolor = "tex_singlecolor";
     const std::string key_tex_tileatlas = "tex_tileatlas";
+	const std::string key_tex_ufo = "tex_ufo";
     const std::string key_tex_webcam = "tex_webcam";
     const std::string key_tex_woodbox = "tex_woodbox";
-	const std::string key_tex_ufo = "tex_ufo";
-    const std::string key_tex_cow = "tex_cow";
 
+	const std::string key_snd_bgm = "snd_bgm";
+	const std::string key_snd_cowmoo = "snd_cowmoo";
+	const std::string key_snd_cowrip = "snd_cowrip";
     const std::string key_snd_meow = "snd_meow";
     const std::string key_snd_pop = "snd_pop";
     const std::string key_snd_teleport = "snd_teleport";
 	const std::string key_snd_ufo = "snd_ufo";
-	const std::string key_snd_bgm = "snd_bgm";
 
     // == MEMBERS ==
     FaceDetector face_detector;
@@ -118,9 +119,9 @@ private:
     bool is_encoder_on{};
     bool do_draw_ufo = false;
 	bool do_draw_cow = false;
-    bool place_ufo = false;
-	bool place_cow = false;
-    bool play_ufo_sound = false;
+    bool do_place_ufo = false;
+	bool is_placing_cow = false;
+    bool do_play_ufo_sound = false;
     
     double last_mouse_x = 0.0f;
     double last_mouse_y = 0.0f;
@@ -177,7 +178,7 @@ private:
     // Webcam service
     void webcam_thread();
 
-    void saveScreenshot();
+    void save_screenshot();
 
     // Store OpenGL info
     const char* gl_info_vendor{};
