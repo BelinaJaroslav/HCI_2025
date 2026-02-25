@@ -94,9 +94,11 @@ private:
     std::atomic<bool> do_terminate_encoder_threads;
 
     int n_faces_found = 0;
+    int n_faces_found_debug_override = -1; // Development help (-1=off, 0=force0, 1=force1, 2=force2)
     int webcamp_width = 0;
     int webcamp_height = 0;
     cv::Mat initial_frame;
+    bool is_unlocked = true; // We refer to the state when there are more than 1 faces detected as "locked"; so "unlocked" is the normal state
 
     // OpenGL members
     GLFWwindow* window{};
@@ -116,19 +118,14 @@ private:
     bool is_mouselook_on{};
     bool is_antialiasing_on{};
     bool is_encoder_on{};
-    
-    bool is_ufo_visible = false;
-	bool is_cow_visible = false;
-    bool ufo_spawn_requested = false;
-	bool is_placing_cow = false;
-    
+
     double last_mouse_x = 0.0f;
     double last_mouse_y = 0.0f;
     bool is_first_mouse = true;
     float FOV{};
     bool is_camera_freeform = false;
 
-	bool userPressedScreenshotKey = false;
+	bool did_user_press_screenshot_key = false;
 
     glm::mat4 mx_projection = glm::identity<glm::mat4>();
 
@@ -138,9 +135,7 @@ private:
 
     std::map<std::pair<float, float>, float> heightmap_heights;
 
-    // Object dynamics
-    // Teapot
-    const float teapot_rotation_speed = 23.0f;
+    // Object dynamics    
     // Cat
     const float cat_speed = 6.5f;
     const float cat_min_x = -8;
@@ -149,6 +144,12 @@ private:
     const float cat_max_z = 13;
     glm::vec2 cat_direction{};
     bool did_cat_meow_last_frame = false;
+    // Cow + UFO
+    bool is_ufo_visible = false;
+    bool is_cow_visible = false;
+    bool is_ufo_spawn_requested = false;
+    bool is_placing_cow = false;
+    bool is_moo_requested = false;
 
     // == METHODS ==
     void init_assets();
@@ -160,7 +161,7 @@ private:
     void enable_or_disable_antialiasing(bool do_update_bool);
     
     // AppRun
-    void render_GUI(Color& triangle_color, Color& background_color);
+    void render_GUI();
     void update_projection_matrix();
     void update_and_draw_models(float delta_t);
     void process_camera(float delta_t);

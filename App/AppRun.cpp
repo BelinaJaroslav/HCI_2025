@@ -20,10 +20,24 @@ void App::run()
 	double last_frame_time = current_timestamp;
 	float delta_time = 0.0f;
 
-	// State
-	Color teapot_color{ 1.0f, 0.6f, 1.0f, 1.0f }; // Pink
-	Color background_color{ 0.549f, 0.823f, 0.858f }; // Sky color
-	glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
+	// Colors
+	Color teapot_color{ 1.0f, 0.6f, 1.0f }; // Pink ("unlocked")
+	Color teapot_color_locked{ 0.8f, 0.0f, 0.0f }; // Red ("locked")
+	Color background_color{ 0.549f, 0.823f, 0.858f }; // Sky color day ("unlocked")
+	Color background_color_locked{ 0.0f, 0.0f, 0.0f }; // Sky color night ("locked")
+	
+	const auto SetClearColor = [](Color& c) {
+		glClearColor(c.r, c.g, c.b, 1.0f);
+	};
+
+	const auto SetTeapotColor = [&](Color& c) {
+		if (!texture_library.contains(key_tex_singlecolor)) return;
+		texture_library.at(key_tex_singlecolor)->replace_color(
+			glm::vec3(c.r * 255, c.g * 255, c.b * 255)
+		);
+	};
+
+	SetClearColor(background_color);
 
 	// Init view
 	update_projection_matrix();
@@ -42,6 +56,10 @@ void App::run()
 			texture_library.at(key_tex_webcam)->replace_image(frame);
 		}
 
+		if (n_faces_found_debug_override >= 0) {
+			n_faces_found = n_faces_found_debug_override;
+		}
+
 		// Measure delta time
 		current_timestamp = glfwGetTime();
 		delta_time = static_cast<float>(current_timestamp - last_frame_time);
@@ -54,7 +72,7 @@ void App::run()
 
 		// Measure FPS and render GUI
 		fps_meter_main.update();
-		render_GUI(teapot_color, background_color);
+		render_GUI();
 
 		// Clear canvas
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -100,6 +118,35 @@ void App::run()
 		current_shader->set_uniform("u_reflector.linear", 0.07f);
 		current_shader->set_uniform("u_reflector.exponent", 0.017f);
 
+		// N_DETECTED_FACES REACTION
+		if (is_unlocked) {
+			if (n_faces_found == 0 && !is_placing_cow) {
+				is_placing_cow = true;
+				is_moo_requested = true;
+			}
+			if (n_faces_found >= 1 && is_placing_cow) {
+				is_placing_cow = false;
+				is_ufo_spawn_requested = true;
+			}
+			if (n_faces_found > 1) {
+				is_unlocked = false;
+				SetClearColor(background_color_locked);
+				SetTeapotColor(teapot_color_locked);
+				audio_manager.stopBGM();
+			}
+		}
+		else if (n_faces_found <= 1) {
+			is_unlocked = true;
+			SetClearColor(background_color);
+			SetTeapotColor(teapot_color);
+			audio_manager.playBGM(key_snd_bgm, 0.15f);
+		}
+
+		if (!is_unlocked) {
+			current_shader->set_uniform("u_dirlight_diffuse", glm::vec3(0.35f));
+			current_shader->set_uniform("u_dirlight_specular", glm::vec3(0.0f));
+		}
+
 		// RENDER TRACTOR BEAM (UFO)
 		render_tractor_beam(*current_shader);
 
@@ -111,9 +158,9 @@ void App::run()
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		// poll events, call callbacks, flip back<->front buffer
 
-        if (userPressedScreenshotKey) {
+        if (did_user_press_screenshot_key) {
             save_screenshot();
-			userPressedScreenshotKey = false;
+			did_user_press_screenshot_key = false;
 		}
 
 		glfwPollEvents();
@@ -128,6 +175,9 @@ void App::run()
 
 void App::update_and_draw_models(float delta_t)
 {
+	constexpr float COW_FLY_SPEED = 2.8f;
+	constexpr float COW_DIST_FROM_CAMERA = 4.0f;
+
 	// == COW + UFO update ==
 
 	if (scene.contains(key_obj_cow) && scene.contains(key_obj_ufo)) {
@@ -138,7 +188,7 @@ void App::update_and_draw_models(float delta_t)
 			// UFO IS VISIBLE => COW IS BEING KIDNAPPED
 			if (float stop_height = ufo.position.y - 1.0f; cow.position.y < stop_height) {
 				// COW GOING UP
-				cow.position.y += 2.5f * delta_t;
+				cow.position.y += COW_FLY_SPEED * delta_t;
 			}
 			else {
 				// COW REACHED UFO
@@ -146,28 +196,33 @@ void App::update_and_draw_models(float delta_t)
 				is_cow_visible = false;
 				is_ufo_visible = false;
 
-				// Ignore [K]/[L] inputs which may have been pressed when cow was flying up
+				// Ignore changing number of detected faces when cow flys up by resetting appropriate vars after cow reaches ufo:
 				is_placing_cow = false;
-				ufo_spawn_requested = false;
+				is_ufo_spawn_requested = false;
 			}
 		}
 		else {
 			if (is_placing_cow) {
 				// PLACING COW
-				float distance_in_front = 5.0f;
+				float distance_in_front = COW_DIST_FROM_CAMERA;
 				glm::vec3 spawn_pos = camera.position + (camera.front * distance_in_front);
 				spawn_pos.y = get_heightmap_y(spawn_pos.x, spawn_pos.z);
 				cow.position = spawn_pos;
 				float cow_angle = glm::degrees(atan2(-camera.front.z, camera.front.x));
 				cow.rotation = glm::vec4(0.0f, 1.0f, 0.0f, cow_angle);
 				is_cow_visible = true;
+				if (is_moo_requested) {
+					is_moo_requested = false;
+					audio_manager.play3D(key_snd_cowmoo, cow.position.x, cow.position.y, cow.position.z);
+				}
 			}
-			if (ufo_spawn_requested) {
-				ufo_spawn_requested = false;
+			if (is_ufo_spawn_requested) {
+				is_ufo_spawn_requested = false;
 				if (!is_placing_cow && is_cow_visible) {
 					// SPAWN UFO
 					ufo.position = cow.position + glm::vec3(0.0f, 10.0f, 0.0f);
 					is_ufo_visible = true;
+					audio_manager.play3D(key_snd_cowrip, cow.position.x, cow.position.y, cow.position.z);
 				}				
 			}
 		}
@@ -182,6 +237,7 @@ void App::update_and_draw_models(float delta_t)
 
 		// Rotating teapot
 		if (key == key_obj_teapot) {
+			const float teapot_rotation_speed = (is_unlocked) ? 23.0f : -120.0f;
 			value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, teapot_rotation_speed * glfwGetTime());
 		}
 		// Cat movement
@@ -298,7 +354,19 @@ float App::get_heightmap_y(float position_x, float position_z)
 
 void App::webcam_thread()
 {
-	cv::Mat frame; // For captured frame
+	// The face detector is not the best, so,
+	// we consider that number of faces has changed only if said number is detected for more than `N_FACES_CHANGE_FRAME_THRESH` frames.
+	constexpr int N_FACES_CHANGE_FRAME_THRESH = 20;
+	// Used to store the most recent output from face detector:
+	int _current = 1;
+	// `_prev` stores the value of `_current` from the previous frame:
+	int _prev;
+	// Used to count, how many consecutive frames had the same `_current` value:
+	int _counter = 0;
+	// This is what give to the app, changed only after `N_FACES_CHANGE_FRAME_THRESH` consecutive frames:
+	int _n_faces_found = _current;
+	// Used to store the captured frame:
+	cv::Mat frame; 
 
 	do {
 		// Get next frame
@@ -310,11 +378,24 @@ void App::webcam_thread()
 
 		// Find faces
 		auto face_centers = face_detector.find_faces(frame);
-		int _n_faces_found = static_cast<int>(face_centers.size());
 
 		// Draw face crosses
 		for (const auto& face_center : face_centers) {
 			CV2Tools::draw_cross_normalized(frame, face_center, 30, CV_RGB(203, 0, 248)); // pink cross
+		}
+
+		_prev = _current;
+		_current = static_cast<int>(face_centers.size());
+
+		if (_prev == _current) {
+			_counter++;
+		}
+		else {
+			_counter = 0;
+		}
+
+		if (_counter > N_FACES_CHANGE_FRAME_THRESH) {
+			_n_faces_found = _current;
 		}
 
 		cv::Mat safe_copy = frame.clone();

@@ -91,8 +91,8 @@ void App::init_assets()
 
     // = AUDIO =
     audio_manager.loadBGM(key_snd_bgm, "./App/Resources/Audio/background.mp3");
-    audio_manager.load(key_snd_cowmoo, "./App/Resources/Audio/Cow_moo.mp3", 0.5f, 100.0f, 5.0f);
-    audio_manager.load(key_snd_cowrip, "./App/Resources/Audio/Cow_rip.mp3", 0.5f, 100.0f, 5.0f);
+    audio_manager.load(key_snd_cowmoo, "./App/Resources/Audio/Cow_moo.mp3", 0.5f, 100.0f, 6.0f);
+    audio_manager.load(key_snd_cowrip, "./App/Resources/Audio/Cow_rip.mp3", 0.5f, 100.0f, 8.0f);
     audio_manager.load(key_snd_meow, "./App/Resources/Audio/meow_sfx.mp3", 0.5f, 100.0f, 5.0f);
     audio_manager.load(key_snd_pop, "./App/Resources/Audio/pop_sfx.mp3", 0.5f, 100.0f, 5.0f);
     audio_manager.load(key_snd_teleport, "./App/Resources/Audio/teleport_sfx.mp3", 0.5f, 100.0f, 5.0f);

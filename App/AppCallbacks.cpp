@@ -40,27 +40,30 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 		case GLFW_KEY_B:
 			// `B` to on/off AA
 			this_inst->enable_or_disable_antialiasing(true);
-			break;
+			break;		
 
+		case GLFW_KEY_KP_1:
+			// `1` to take a screenshot
+			this_inst->did_user_press_screenshot_key = true;
+			break;
+			// End switch
+
+		// DEV KEYS
+		/*
 		case GLFW_KEY_P:
 			// `P` to test the audio
 			this_inst->audio_manager.play3D(this_inst->key_snd_pop, 0, 1, 0);
 			break;
 
-		case GLFW_KEY_KP_1:
-			// `1` to take a screenshot
-			this_inst->userPressedScreenshotKey = true;
-			break;
-			// End switch
-
 		case GLFW_KEY_K:
 			this_inst->is_placing_cow = !this_inst->is_placing_cow;
 			break;
 
-
 		case GLFW_KEY_L:
-			this_inst->ufo_spawn_requested = true;
+			this_inst->is_ufo_spawn_requested = true;
 			break;
+		/**/
+
 		}
 	}
 

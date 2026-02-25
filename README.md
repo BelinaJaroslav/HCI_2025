@@ -5,6 +5,7 @@
 * __TODO,__ don't fotget to:
   * CMake switch back to release profile
   * Test if it runs on Linux, including JPEG option
+  * Change `n_faces_found_debug_override` to `-1`
 
 ```bash
 sudo apt install libopencv-dev                  # System installation of OpenCV is required
