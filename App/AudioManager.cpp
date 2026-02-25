@@ -78,36 +78,6 @@ bool AudioManager::play3D(const std::string& name, float sound_x, float sound_y,
 }
 
 
-void AudioManager::play_background_music(const std::string& name, float volume)
-{
-    auto it = sound_bank.find(name);
-    if (it == sound_bank.end()) {
-        fmt::println(stderr, "BGM not found: {}", name);
-        return;
-    }
-
-    // Create a new sound instance for playback
-    auto bgm_sound = std::make_unique<ma_sound>();
-
-    // Initialize the copy
-    if (ma_sound_init_copy(&engine, it->second.get(), MA_SOUND_FLAG_ASYNC, nullptr, bgm_sound.get()) != MA_SUCCESS) {
-        fmt::println(stderr, "Failed to init BGM copy: {}", name);
-        return;
-    }
-
-    // Set BGM specific settings
-    ma_sound_set_looping(bgm_sound.get(), MA_TRUE);
-    ma_sound_set_volume(bgm_sound.get(), volume);
-    // Disable spatialization
-    ma_sound_set_spatialization_enabled(bgm_sound.get(), MA_FALSE);
-
-    ma_sound_start(bgm_sound.get());
-    managed_sounds[name] = std::move(bgm_sound); // Use name as key
-    ma_sound_start(managed_sounds[name].get());
-    active_sounds.push_back(std::move(bgm_sound));
-}
-
-
 // This is called periodically
 // The end_callback approach wasn't working for us...
 void AudioManager::clean_finished_sounds()
@@ -117,9 +87,6 @@ void AudioManager::clean_finished_sounds()
         std::remove_if(active_sounds.begin(), active_sounds.end(),
             [](const std::unique_ptr<ma_sound>& sound) {
                 if (!sound) return true;
-                // keep looping sounds
-                if (ma_sound_is_looping(sound.get())) return false;
-
                 if (!ma_sound_is_playing(sound.get()) || ma_sound_at_end(sound.get())) {
                     ma_sound_uninit(sound.get());
                     return true;
@@ -131,44 +98,65 @@ void AudioManager::clean_finished_sounds()
 }
 
 
-bool AudioManager::play_looping_3D(const std::string& name, float x, float y, float z) {
-    auto it = sound_bank.find(name);
-    if (it == sound_bank.end()) return false;
+void AudioManager::set_listener_position(float x, float y, float z, float dir_x, float dir_y, float dir_z)
+{
+    ma_engine_listener_set_position(&engine, 0, x, y, z);
+    ma_engine_listener_set_direction(&engine, 0, dir_x, dir_y, dir_z);
+}
 
-    auto loop_sound = std::make_unique<ma_sound>();
-    if (ma_sound_init_copy(&engine, it->second.get(), 0, nullptr, loop_sound.get()) != MA_SUCCESS) {
+
+// == BGM ==
+
+void AudioManager::loadBGM(const std::string& name, const std::filesystem::path& filename)
+{
+    auto new_bgm = std::make_unique<ma_sound>();
+    if (ma_sound_init_from_file(&engine, filename.string().c_str(), MA_SOUND_FLAG_ASYNC, nullptr, nullptr, new_bgm.get()) != MA_SUCCESS) {
+        fmt::println(stderr, "Failed to load BGM: {}", name);
+        return;
+    }
+    bgm_bank.emplace(name, std::move(new_bgm));
+    fmt::println("Loaded BGM: {}", filename.string());
+}
+
+
+bool AudioManager::playBGM(const std::string& name, float volume)
+{
+    stopBGM();
+
+    auto it = bgm_bank.find(name);
+    if (it == bgm_bank.end()) {
+        fmt::println(stderr, "BGM not found: {}", name);
         return false;
     }
 
-    ma_sound_set_looping(loop_sound.get(), MA_TRUE);
-    ma_sound_set_position(loop_sound.get(), x, y, z);
-    ma_sound_start(loop_sound.get());
+    active_bgm = std::make_unique<ma_sound>();
 
-    managed_sounds[name] = std::move(loop_sound);
+    if (ma_sound_init_copy(&engine, it->second.get(), 0, nullptr, active_bgm.get()) != MA_SUCCESS) {
+        fmt::println(stderr, "Failed to initialize sound copy: {}", name);
+        active_bgm.reset();
+        return false;
+    }
+
+    ma_sound_set_volume(active_bgm.get(), volume);
+    // (2D looping audio)
+    ma_sound_set_looping(active_bgm.get(), MA_TRUE);
+    ma_sound_set_spatialization_enabled(active_bgm.get(), MA_FALSE);
+
+    if (ma_sound_start(active_bgm.get()) != MA_SUCCESS) {
+        fmt::println(stderr, "Failed to play BGM: {}", name);
+        stopBGM();
+        return false;
+    }
 
     return true;
 }
 
 
-void AudioManager::update_sound_position(const std::string& name, float x, float y, float z) {
-    for (auto& sound : active_sounds) {
-        ma_sound_set_position(sound.get(), x, y, z);
-    }
-}
-
-
-void AudioManager::stop_sound(const std::string& name) {
-    auto it = managed_sounds.find(name);
-    if (it != managed_sounds.end()) {
-        ma_sound_stop(it->second.get());
-        ma_sound_uninit(it->second.get());
-        managed_sounds.erase(it);
-    }
-}
-
-
-void AudioManager::set_listener_position(float x, float y, float z, float dir_x, float dir_y, float dir_z)
+void AudioManager::stopBGM()
 {
-    ma_engine_listener_set_position(&engine, 0, x, y, z);
-    ma_engine_listener_set_direction(&engine, 0, dir_x, dir_y, dir_z);
+    if (active_bgm) {
+        ma_sound_stop(active_bgm.get());
+        ma_sound_uninit(active_bgm.get());
+        active_bgm.reset();
+    }
 }

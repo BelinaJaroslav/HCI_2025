@@ -59,7 +59,7 @@ void App::key_callback(GLFWwindow* window, int key, int scancode, int action, in
 
 
 		case GLFW_KEY_L:
-			this_inst->do_place_ufo = true;
+			this_inst->ufo_spawn_requested = true;
 			break;
 		}
 	}

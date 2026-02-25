@@ -7,9 +7,9 @@
   * Test if it runs on Linux, including JPEG option
 
 ```bash
-sudo apt install libopencv-dev # System installation of OpenCV is required
+sudo apt install libopencv-dev                  # System installation of OpenCV is required
 
-export VCPKG_ROOT=<path_to_bootstrapped_vcpkg> # Everything else is shipped via vcpkg
+export VCPKG_ROOT=<path_to_bootstrapped_vcpkg>  # Everything else is shipped via vcpkg
 
 cmake --preset=vcpkg
 

@@ -113,15 +113,14 @@ private:
     bool is_vsync_on{};
     bool is_fullscreen_on = false;
     bool is_flashlight_on = true;
-	bool is_tractor_beam_on = false;
     bool is_mouselook_on{};
     bool is_antialiasing_on{};
     bool is_encoder_on{};
-    bool do_draw_ufo = false;
-	bool do_draw_cow = false;
-    bool do_place_ufo = false;
+    
+    bool is_ufo_visible = false;
+	bool is_cow_visible = false;
+    bool ufo_spawn_requested = false;
 	bool is_placing_cow = false;
-    bool do_play_ufo_sound = false;
     
     double last_mouse_x = 0.0f;
     double last_mouse_y = 0.0f;

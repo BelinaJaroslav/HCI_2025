@@ -30,7 +30,7 @@ void App::run()
 	glViewport(0, 0, win_width, win_height);
 
 	// Start background music
-    audio_manager.play_background_music(key_snd_bgm, 0.15f);
+    audio_manager.playBGM(key_snd_bgm, 0.15f);
 
 	// Main game loop
 	while (!glfwWindowShouldClose(window)) {
@@ -128,25 +128,55 @@ void App::run()
 
 void App::update_and_draw_models(float delta_t)
 {
+	// == COW + UFO update ==
 
-	if (do_draw_ufo && do_draw_cow) {
+	if (scene.contains(key_obj_cow) && scene.contains(key_obj_ufo)) {
 		auto& cow = scene.at(key_obj_cow);
 		auto& ufo = scene.at(key_obj_ufo);
 
-		audio_manager.update_sound_position(key_snd_meow, ufo.position.x, ufo.position.y, ufo.position.z);
+		if (is_ufo_visible) {
+			// UFO IS VISIBLE => COW IS BEING KIDNAPPED
+			if (float stop_height = ufo.position.y - 1.0f; cow.position.y < stop_height) {
+				// COW GOING UP
+				cow.position.y += 2.5f * delta_t;
+			}
+			else {
+				// COW REACHED UFO
+				audio_manager.play3D(key_snd_teleport, ufo.position.x, ufo.position.y, ufo.position.z);
+				is_cow_visible = false;
+				is_ufo_visible = false;
 
-		float stop_height = ufo.position.y - 1.0f;
-		if (cow.position.y < stop_height) {
-			cow.position.y += 2.0f * delta_t;
+				// Ignore [K]/[L] inputs which may have been pressed when cow was flying up
+				is_placing_cow = false;
+				ufo_spawn_requested = false;
+			}
 		}
 		else {
-			audio_manager.play3D(key_snd_teleport, ufo.position.x, ufo.position.y, ufo.position.z);
-			audio_manager.stop_sound(key_snd_ufo);
-			do_draw_cow = false;
-			do_draw_ufo = false;
-			is_tractor_beam_on = false;
+			if (is_placing_cow) {
+				// PLACING COW
+				float distance_in_front = 5.0f;
+				glm::vec3 spawn_pos = camera.position + (camera.front * distance_in_front);
+				spawn_pos.y = get_heightmap_y(spawn_pos.x, spawn_pos.z);
+				cow.position = spawn_pos;
+				float cow_angle = glm::degrees(atan2(-camera.front.z, camera.front.x));
+				cow.rotation = glm::vec4(0.0f, 1.0f, 0.0f, cow_angle);
+				is_cow_visible = true;
+			}
+			if (ufo_spawn_requested) {
+				ufo_spawn_requested = false;
+				if (!is_placing_cow && is_cow_visible) {
+					// SPAWN UFO
+					ufo.position = cow.position + glm::vec3(0.0f, 10.0f, 0.0f);
+					is_ufo_visible = true;
+				}				
+			}
 		}
 	}
+	else {
+		fmt::println(stderr, "!scene.contains(key_obj_cow) || !scene.contains(key_obj_ufo)");
+	}	
+
+	// == Update the rest ==
 
 	for (auto& [key, value] : scene) {
 
@@ -193,43 +223,11 @@ void App::update_and_draw_models(float delta_t)
 
 			float angles = glm::degrees(atan2(-cat_direction.y, cat_direction.x)) + 90;
 			value.rotation = glm::vec4(0.0f, 0.0f, 1.0f, angles);
-		}
-		// Placing cow
-		else if (key == key_obj_cow && is_placing_cow) {
-
-			float distance_in_front = 5.0f;
-			glm::vec3 spawn_pos = camera.position + (camera.front * distance_in_front);
-			spawn_pos.y = get_heightmap_y(spawn_pos.x, spawn_pos.z);
-
-			// Update cow data
-			value.position = spawn_pos;
-			float cow_angle = glm::degrees(atan2(-camera.front.z, camera.front.x));
-			value.rotation = glm::vec4(0.0f, 1.0f, 0.0f, cow_angle);
-
-			do_draw_cow = true;
-			// reset ufo stuff
-			//audio_manager.stop_sound(key_snd_ufo);
-			do_draw_ufo = false;
-			is_tractor_beam_on = false;
-
-		}
-		// UFO
-		else if (key == key_obj_ufo) {
-			if (do_place_ufo && do_draw_cow && !is_placing_cow) {
-				glm::vec3 cow_pos = scene.at(key_obj_cow).position;
-				value.position = cow_pos + glm::vec3(0.0f, 10.0f, 0.0f);
-
-				audio_manager.play_looping_3D(key_snd_ufo, value.position.x, value.position.y, value.position.z);
-
-				do_place_ufo = false;
-				do_draw_ufo = true;
-				is_tractor_beam_on = true;
-			}
-		}
+		}		
 
 		// Do not draw UFO/Cow if they shouldn't be in the scene
-		if (key == key_obj_ufo && !do_draw_ufo) continue;
-		if (key == key_obj_cow && !do_draw_cow) continue;
+		if (key == key_obj_ufo && !is_ufo_visible) continue;
+		if (key == key_obj_cow && !is_cow_visible) continue;
 
 		value.draw();
 	}
@@ -330,7 +328,7 @@ void App::webcam_thread()
 void App::render_tractor_beam(ShaderProgram& shader)
 {
 	// 1. If the beam is off, tell the shader explicitly and exit
-	if (!is_tractor_beam_on) {
+	if (!is_ufo_visible) {
 		shader.set_uniform("u_tractor.is_on", 0);
 		return;
 	}
