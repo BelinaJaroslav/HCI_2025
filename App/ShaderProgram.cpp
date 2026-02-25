@@ -77,16 +77,6 @@ GLuint ShaderProgram::get_uniform_location(const std::string & name) {
 }
 
 
-/*
-GLint ShaderProgram::get_attrib_location(const std::string& name) {
-    GLint loc = glGetAttribLocation(ID, name);
-    if (loc == -1) {
-        std::cerr << "No vertex attribute with name: " << name << ", or reserved name (starting with gl_)\n";
-    return loc;
-}
-/**/
-
-
 void ShaderProgram::set_uniform(const std::string& name, const GLfloat val) {
     auto loc = get_uniform_location(name);
     glProgramUniform1f(ID, loc, val);

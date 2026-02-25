@@ -355,21 +355,21 @@ float App::get_heightmap_y(float position_x, float position_z)
 void App::webcam_thread()
 {
 	// The face detector is not the best, so,
-	// we consider that number of faces has changed only if said number is detected for more than `N_FACES_CHANGE_FRAME_THRESH` frames.
-	constexpr int N_FACES_CHANGE_FRAME_THRESH = 20;
+	// we consider that number of faces has changed only if said number is detected for more than `N_FACES_CHANGE_FRAME_THRESH` webcam frames.
+	constexpr int N_FACES_CHANGE_FRAME_THRESH = 10;
 	// Used to store the most recent output from face detector:
 	int _current = 1;
-	// `_prev` stores the value of `_current` from the previous frame:
+	// `_prev` stores the value of `_current` from the previous webcam frame:
 	int _prev;
-	// Used to count, how many consecutive frames had the same `_current` value:
+	// Used to count, how many consecutive webcam frames had the same `_current` value:
 	int _counter = 0;
-	// This is what give to the app, changed only after `N_FACES_CHANGE_FRAME_THRESH` consecutive frames:
+	// This is what give to the app, changed only after `N_FACES_CHANGE_FRAME_THRESH` consecutive webcam frames:
 	int _n_faces_found = _current;
-	// Used to store the captured frame:
+	// Used to store the captured webcam frame:
 	cv::Mat frame; 
 
 	do {
-		// Get next frame
+		// Get next webcam frame
 		capture.read(frame);
 		if (frame.empty()) {
 			fmt::println("Cam disconnected? End of video?");
