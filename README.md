@@ -2,12 +2,13 @@
 
 ## How to run on Linux with vcpkg
 
-__//TODO__ check if it actually works when the final version is done (GCC is more strict than MSVC)
+* __TODO,__ don't fotget to:
+  * Test if it runs on Linux, including JPEG option
 
 ```bash
-sudo apt install libopencv-dev
+sudo apt install libopencv-dev                  # System installation of OpenCV is required
 
-export VCPKG_ROOT=<path_to_bootstrapped_vcpkg> && export PATH=$VCPKG_ROOT:$PATH
+export VCPKG_ROOT=<path_to_bootstrapped_vcpkg>  # Everything else is shipped via vcpkg
 
 cmake --preset=vcpkg
 
@@ -52,15 +53,6 @@ The _constant quality video encoder_ can be run in a separate window. To turn it
 Obsolete functionality used: GLUT, GL compatible profile
 ```
 
-* TODO:
-  * [ ] Přidat možnost dělat screenshoty, které se uloží do souboru
-
-  * [ ] 3D scéna by měla nějak reagovat na výsledek camera trackeru (0/1/2+ detekovaných obličejů); lze nějak použít již existující objekty, nebo si přidat nové
-
-  * [ ] Přidat další zdroj 3D zvuků
-
-  * [ ] Přidat 2D background audio
-
 ## Misc
 
 * `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ..., logika přepínání mouselook/fullscreen/vsync/AA
@@ -70,7 +62,7 @@ Obsolete functionality used: GLUT, GL compatible profile
 * `AppRun.cpp` – hlavní smyčka: runtime logika a vykreslování
 * `Labs\Lab04Task02.cpp` – constant quality video encoder
 
-&nbsp;
+<br>
 
 * Intel Core i7 6700HQ, 16 GB RAM, NVIDIA GeForce GTX 960M, Laptop battery, maximized window (almost 1080p):
   * without AA: 270 FPS
@@ -81,7 +73,7 @@ Obsolete functionality used: GLUT, GL compatible profile
   * with AAx4: 1600 FPS
   * with AAx16: 700 FPS
 
-&nbsp;
+<br>
 
 * [Jak hoblovat](./Markdown/jak_hoblovat.md)
 * [Zadání 01](./Markdown/LAB01.md)

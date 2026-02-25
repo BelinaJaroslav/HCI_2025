@@ -1,16 +1,17 @@
 {
-  "dependencies": [
-    "fmt",
-    "glew",
-    "glfw3",
-    "glm",
-    "nlohmann-json",
-    {
-      "name": "imgui",
-      "features": [
-        "opengl3-binding",
-        "glfw-binding"
-      ]
-    }
-  ]
+    "dependencies": [
+        "fmt",
+        "glew",
+        "glfw3",
+        "glm",
+        "nlohmann-json",
+        {
+            "name": "imgui",
+            "features": ["opengl3-binding", "glfw-binding"]
+        }
+    ],
+    "overrides": [
+        { "name": "imgui", "version": "1.91.9" },
+        { "name": "glfw3", "version": "3.3.9" }
+    ]
 }

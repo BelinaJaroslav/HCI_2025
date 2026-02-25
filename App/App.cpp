@@ -65,7 +65,7 @@ bool App::init()
     }
     fmt::println("Initialized face detector.");
     
-    // Load JSON conf
+    // Load JSON config
     std::ifstream settings_file("App/Resources/app_settings.json");
     nlohmann::json settings = nlohmann::json::parse(settings_file);
     
@@ -196,17 +196,15 @@ bool App::init()
         // Show window after everything loads        
         glfwShowWindow(window);
 
-
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-        // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // IF using Docking Branch
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
 
         // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForOpenGL(window, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+        ImGui_ImplGlfw_InitForOpenGL(window, true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
         ImGui_ImplOpenGL3_Init();
     }
     catch (std::exception const& e) {
@@ -306,7 +304,7 @@ void App::enable_or_disable_antialiasing(bool do_update_bool)
     }
 }
 
-void App::saveScreenshot()
+void App::save_screenshot()
 {
     auto now = std::chrono::system_clock::now();
     std::string filename = std::format("screenshot_{:%Y-%m-%d_%H-%M-%S}.png", now);

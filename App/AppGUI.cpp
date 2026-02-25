@@ -1,7 +1,7 @@
 #include "App.hpp"
 
 
-void App::render_GUI(Color& triangle_color, Color& background_color)
+void App::render_GUI()
 {
     ImVec2 viewport_size = ImGui::GetMainViewport()->Size;
 
@@ -86,6 +86,17 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
                 ImGui::EndTable();
             }
         }
+        // Development help
+        if (ImGui::CollapsingHeader("Dev tools")) {
+            ImGui::SeparatorText("Number of detected faces");
+            ImGui::RadioButton("Get from webcam", &n_faces_found_debug_override, -1);
+            ImGui::SameLine();
+            ImGui::RadioButton("Force 0", &n_faces_found_debug_override, 0);
+            ImGui::SameLine();
+            ImGui::RadioButton("Force 1", &n_faces_found_debug_override, 1);
+            ImGui::SameLine();
+            ImGui::RadioButton("Force 2", &n_faces_found_debug_override, 2);
+        }
     }
     ImGui::End();
 
@@ -96,43 +107,7 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
         // Display info
         ImGui::Text("[Scrollwheel] FOV: %.1f", FOV);
 
-        ImGui::Text("[W/A/S/D/(Q)/(E)] Camera coors: %.1f/%.1f/%.1f", camera.position.x, camera.position.y, camera.position.z);
-
-        // Color pickers for sky/teapot
-        /*
-        ImGui::Separator();
-
-        float triangle_color_arr[3] = { triangle_color.r, triangle_color.g, triangle_color.b };
-        if (ImGui::ColorEdit3("Teapot color", triangle_color_arr)) {
-            triangle_color.r = triangle_color_arr[0];
-            triangle_color.g = triangle_color_arr[1];
-            triangle_color.b = triangle_color_arr[2];
-        }
-
-        float background_color_arr[3] = { background_color.r, background_color.g, background_color.b };
-        if (ImGui::ColorEdit3("Sky color", background_color_arr)) {
-            background_color.r = background_color_arr[0];
-            background_color.g = background_color_arr[1];
-            background_color.b = background_color_arr[2];
-            glClearColor(background_color_arr[0], background_color_arr[1], background_color_arr[2], 1.0f);
-        }
-
-        if (ImGui::Button("Reset colors")) {
-            triangle_color = { 1.0f, 0.6f, 1.0f, 1.0f };
-            background_color = { 0.549f, 0.823f, 0.858f };
-            glClearColor(background_color.r, background_color.g, background_color.b, 1.0f);
-        }
-
-        ImGui::SameLine();
-
-        if (ImGui::Button("Apply teapot color")) {
-            texture_library.at(key_tex_singlecolor)->replace_color(
-                glm::vec3(triangle_color.r * 255, triangle_color.g * 255, triangle_color.b * 255)
-            );
-        }
-
-        ImGui::Separator();        
-        /**/        
+        ImGui::Text("[W/A/S/D/(Q)/(E)] Camera coors: %.1f/%.1f/%.1f", camera.position.x, camera.position.y, camera.position.z);     
 
         ImGui::Checkbox("[LMB] :: Flashlight on/off", &is_flashlight_on);
 
@@ -155,7 +130,7 @@ void App::render_GUI(Color& triangle_color, Color& background_color)
         }
 
         if (ImGui::Button("[1] Take a screenshot")) {
-            saveScreenshot();
+            save_screenshot();
         }
     }
     ImGui::End();

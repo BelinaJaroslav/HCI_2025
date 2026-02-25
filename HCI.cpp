@@ -12,6 +12,6 @@ int main()
         }
     }
     catch (std::exception const& e) {
-        fmt::println("ERROR :: {}", e.what());
+        fmt::println(stderr, "ERROR :: {}", e.what());
     }
 }

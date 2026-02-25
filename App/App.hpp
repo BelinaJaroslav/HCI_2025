@@ -42,7 +42,6 @@ public:
     App();
     bool init();
     void run();
-
     ~App();
 
     struct ProcessedFrame {
@@ -61,25 +60,27 @@ private:
     const std::string key_shader_simple = "simple_shader";
     
     const std::string key_obj_cat = "obj_cat";
+	const std::string key_obj_cow = "obj_cow";
     const std::string key_obj_cube = "obj_cube";
     const std::string key_obj_heightmap = "obj_heightmap";
     const std::string key_obj_teapot = "obj_teapot";
 	const std::string key_obj_ufo = "obj_ufo";
-	const std::string key_obj_cow = "obj_cow";
     
     const std::string key_tex_cat = "tex_cat";
+    const std::string key_tex_cow = "tex_cow";
     const std::string key_tex_singlecolor = "tex_singlecolor";
     const std::string key_tex_tileatlas = "tex_tileatlas";
+	const std::string key_tex_ufo = "tex_ufo";
     const std::string key_tex_webcam = "tex_webcam";
     const std::string key_tex_woodbox = "tex_woodbox";
-	const std::string key_tex_ufo = "tex_ufo";
-    const std::string key_tex_cow = "tex_cow";
 
+	const std::string key_snd_bgm = "snd_bgm";
+	const std::string key_snd_cowmoo = "snd_cowmoo";
+	const std::string key_snd_cowrip = "snd_cowrip";
     const std::string key_snd_meow = "snd_meow";
     const std::string key_snd_pop = "snd_pop";
     const std::string key_snd_teleport = "snd_teleport";
 	const std::string key_snd_ufo = "snd_ufo";
-	const std::string key_snd_bgm = "snd_bgm";
 
     // == MEMBERS ==
     FaceDetector face_detector;
@@ -93,9 +94,11 @@ private:
     std::atomic<bool> do_terminate_encoder_threads;
 
     int n_faces_found = 0;
+    int n_faces_found_debug_override = -1; // Development help (-1=off, 0=force0, 1=force1, 2=force2)
     int webcamp_width = 0;
     int webcamp_height = 0;
     cv::Mat initial_frame;
+    bool is_unlocked = true; // We refer to the state when there are more than 1 faces detected as "locked"; so "unlocked" is the normal state
 
     // OpenGL members
     GLFWwindow* window{};
@@ -112,23 +115,17 @@ private:
     bool is_vsync_on{};
     bool is_fullscreen_on = false;
     bool is_flashlight_on = true;
-	bool is_tractor_beam_on = false;
     bool is_mouselook_on{};
     bool is_antialiasing_on{};
     bool is_encoder_on{};
-    bool do_draw_ufo = false;
-	bool do_draw_cow = false;
-    bool place_ufo = false;
-	bool place_cow = false;
-    bool play_ufo_sound = false;
-    
+
     double last_mouse_x = 0.0f;
     double last_mouse_y = 0.0f;
     bool is_first_mouse = true;
     float FOV{};
     bool is_camera_freeform = false;
 
-	bool userPressedScreenshotKey = false;
+	bool did_user_press_screenshot_key = false;
 
     glm::mat4 mx_projection = glm::identity<glm::mat4>();
 
@@ -138,9 +135,7 @@ private:
 
     std::map<std::pair<float, float>, float> heightmap_heights;
 
-    // Object dynamics
-    // Teapot
-    const float teapot_rotation_speed = 23.0f;
+    // Object dynamics    
     // Cat
     const float cat_speed = 6.5f;
     const float cat_min_x = -8;
@@ -149,6 +144,12 @@ private:
     const float cat_max_z = 13;
     glm::vec2 cat_direction{};
     bool did_cat_meow_last_frame = false;
+    // Cow + UFO
+    bool is_ufo_visible = false;
+    bool is_cow_visible = false;
+    bool is_ufo_spawn_requested = false;
+    bool is_placing_cow = false;
+    bool is_moo_requested = false;
 
     // == METHODS ==
     void init_assets();
@@ -160,7 +161,7 @@ private:
     void enable_or_disable_antialiasing(bool do_update_bool);
     
     // AppRun
-    void render_GUI(Color& triangle_color, Color& background_color);
+    void render_GUI();
     void update_projection_matrix();
     void update_and_draw_models(float delta_t);
     void process_camera(float delta_t);
@@ -177,7 +178,7 @@ private:
     // Webcam service
     void webcam_thread();
 
-    void saveScreenshot();
+    void save_screenshot();
 
     // Store OpenGL info
     const char* gl_info_vendor{};
