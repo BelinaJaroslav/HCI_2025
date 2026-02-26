@@ -44,7 +44,7 @@ void App::render_GUI()
             fps_meter_main.set_interval(std::chrono::duration<double>(interval_seconds));
         }
 
-        // GL info:        
+        // GL info        
         ImGui::Separator();
         if (ImGui::CollapsingHeader("GL info")) {
             if (ImGui::BeginTable("table", 2)) {

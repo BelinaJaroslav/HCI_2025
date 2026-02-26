@@ -5,7 +5,6 @@
 
 class FaceDetector {
 public:
-
 	FaceDetector() { }
 
 
@@ -37,7 +36,5 @@ public:
 	}
 
 private:
-
 	cv::CascadeClassifier classifier;
-
 };

@@ -6,8 +6,7 @@
 
 
 class CV2Tools {
-public:
-    
+public:    
     static void draw_cross_normalized(cv::Mat& img, cv::Point2f center_normalized, int size, cv::Scalar color) {
         // Author: JJ
         center_normalized.x = std::clamp(center_normalized.x, 0.0f, 1.0f);

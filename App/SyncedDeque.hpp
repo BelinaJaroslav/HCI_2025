@@ -8,7 +8,6 @@
 template<typename T>
 class SyncedDeque {
 protected:
-
     std::mutex mux;
     std::deque<T> de_queue;
     std::condition_variable cv_sleep;
@@ -16,7 +15,6 @@ protected:
     std::atomic<bool> shutdown_ = false;
 
 public:
-
     SyncedDeque() = default;
     SyncedDeque(const SyncedDeque<T>&) = delete;
     virtual ~SyncedDeque() {

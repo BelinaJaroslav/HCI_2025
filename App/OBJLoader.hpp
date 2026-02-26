@@ -22,6 +22,7 @@ void load_heightmap(
 	std::map<std::pair<float, float>, float>& heightmap_heights
 );
 
+
 // Heightmap helper methods
 glm::vec2 heightmap_get_subtex_S_and_T(const int x, const int y);
 glm::vec2 heightmap_get_subtex_by_height(float height);

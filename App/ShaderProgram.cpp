@@ -77,6 +77,7 @@ GLuint ShaderProgram::get_uniform_location(const std::string & name) {
 }
 
 
+#pragma region set_uniforms
 void ShaderProgram::set_uniform(const std::string& name, const GLfloat val) {
     auto loc = get_uniform_location(name);
     glProgramUniform1f(ID, loc, val);
@@ -121,7 +122,8 @@ void ShaderProgram::set_uniform(const std::string & name, const std::vector<glm:
     auto loc = get_uniform_location(name);
     glProgramUniform3fv(ID, loc, GLsizei(val.size()), glm::value_ptr(val[0]));
 }
-  
+#pragma endregion set_uniforms
+
 
 std::string ShaderProgram::get_shader_info_log(const GLuint obj) {
     int log_length = 0;

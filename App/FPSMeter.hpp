@@ -1,4 +1,4 @@
-/* Derived from 'fps_meter.hpp' by 'jiri' */
+/* Derived from 'fps_meter.hpp' by JJ */
 
 #pragma once
 
@@ -10,7 +10,6 @@ using namespace std::chrono_literals;
 //  A simple class to measure Frames Per Second (FPS) with a configurable update interval.
 class FPSMeter {
 public:
-
 	// Do not allow type conversion from integers, bool, float etc.
 	explicit FPSMeter(std::chrono::duration<double> interval = 1.0s) : m_interval(interval) {}
 
@@ -56,11 +55,9 @@ public:
 	}
 
 private:
-
 	double m_fps{ 0.0 };
 	std::chrono::time_point<std::chrono::steady_clock> m_last_time = std::chrono::steady_clock::now();
 	std::chrono::duration<double> m_interval = 1.0s;
 	size_t m_frame_count{ 0 };
 	bool m_updated{ false };
-
 };

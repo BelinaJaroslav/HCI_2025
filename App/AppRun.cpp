@@ -115,7 +115,7 @@ void App::run()
 		current_shader->set_uniform("u_reflector.linear", 0.07f);
 		current_shader->set_uniform("u_reflector.exponent", 0.017f);
 
-		// N_DETECTED_FACES REACTION
+		// Reaction to the number of detected faces on the webcam
 		if (is_unlocked) {
 			if (n_faces_found == 0 && !is_placing_cow) {
 				is_placing_cow = true;
@@ -277,7 +277,7 @@ void App::update_and_draw_models(float delta_t)
 			value.rotation = glm::vec4(0.0f, 0.0f, 1.0f, angles);
 		}		
 
-		// Do not draw UFO/Cow if they shouldn't be in the scene
+		// Do not draw UFO/Cow if they shouldn't be visible this frame
 		if (key == key_obj_ufo && !is_ufo_visible) continue;
 		if (key == key_obj_cow && !is_cow_visible) continue;
 

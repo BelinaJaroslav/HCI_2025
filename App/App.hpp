@@ -29,7 +29,6 @@
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
 #include "Model.hpp"
-#include "ThreadPool.hpp"
 #include "ShaderProgram.hpp"
 #include "SyncedDeque.hpp"
 #include "vertex.hpp"
@@ -37,7 +36,6 @@
 
 class App {
 public:
-
     App();
     bool init();
     void run();
@@ -52,34 +50,33 @@ public:
     SyncedDeque<ProcessedFrame> result_queue;
 
 private:
-
     struct Color { GLfloat r, g, b, a; };
 
     // Map keys that may be used across multiple methods
-    const std::string key_shader_simple = "simple_shader";
+    const char* key_shader_simple = "simple_shader";
     
-    const std::string key_obj_cat = "obj_cat";
-	const std::string key_obj_cow = "obj_cow";
-    const std::string key_obj_cube = "obj_cube";
-    const std::string key_obj_heightmap = "obj_heightmap";
-    const std::string key_obj_teapot = "obj_teapot";
-	const std::string key_obj_ufo = "obj_ufo";
+    const char* key_obj_cat = "obj_cat";
+	const char* key_obj_cow = "obj_cow";
+    const char* key_obj_cube = "obj_cube";
+    const char* key_obj_heightmap = "obj_heightmap";
+    const char* key_obj_teapot = "obj_teapot";
+	const char* key_obj_ufo = "obj_ufo";
     
-    const std::string key_tex_cat = "tex_cat";
-    const std::string key_tex_cow = "tex_cow";
-    const std::string key_tex_singlecolor = "tex_singlecolor";
-    const std::string key_tex_tileatlas = "tex_tileatlas";
-	const std::string key_tex_ufo = "tex_ufo";
-    const std::string key_tex_webcam = "tex_webcam";
-    const std::string key_tex_woodbox = "tex_woodbox";
+    const char* key_tex_cat = "tex_cat";
+    const char* key_tex_cow = "tex_cow";
+    const char* key_tex_singlecolor = "tex_singlecolor";
+    const char* key_tex_tileatlas = "tex_tileatlas";
+	const char* key_tex_ufo = "tex_ufo";
+    const char* key_tex_webcam = "tex_webcam";
+    const char* key_tex_woodbox = "tex_woodbox";
 
-	const std::string key_snd_bgm = "snd_bgm";
-	const std::string key_snd_cowmoo = "snd_cowmoo";
-	const std::string key_snd_cowrip = "snd_cowrip";
-    const std::string key_snd_meow = "snd_meow";
-    const std::string key_snd_pop = "snd_pop";
-    const std::string key_snd_teleport = "snd_teleport";
-	const std::string key_snd_ufo = "snd_ufo";
+	const char* key_snd_bgm = "snd_bgm";
+	const char* key_snd_cowmoo = "snd_cowmoo";
+	const char* key_snd_cowrip = "snd_cowrip";
+    const char* key_snd_meow = "snd_meow";
+    const char* key_snd_pop = "snd_pop";
+    const char* key_snd_teleport = "snd_teleport";
+	const char* key_snd_ufo = "snd_ufo";
 
     // == MEMBERS ==
     FaceDetector face_detector;
@@ -102,6 +99,14 @@ private:
     GLFWwindow* window{};
     GLFWmonitor* monitor{};
     const GLFWvidmode* mode{};
+
+    // Storing OpenGL info collected on startup so it be shown in the GUI
+    const char* gl_info_vendor{};
+    const char* gl_info_renderer{};
+    const char* gl_info_version{};
+    const char* gl_info_shading_version{};
+    const char* gl_info_profile{};
+    int gl_info_n_texture_units = -1;
 
     int win_width{};
     int win_height{};
@@ -163,6 +168,8 @@ private:
     void update_and_draw_models(float delta_t);
     void process_camera(float delta_t);
     float get_heightmap_y(float position_x, float position_z);
+    void render_tractor_beam(ShaderProgram& shader);
+    void save_screenshot();
 
     // Callbacks
     static void error_callback(int error, const char* description);
@@ -174,15 +181,4 @@ private:
     
     // Webcam service
     void webcam_thread();
-    void save_screenshot();
-
-    // Store OpenGL info
-    const char* gl_info_vendor{};
-    const char* gl_info_renderer{};
-    const char* gl_info_version{};
-    const char* gl_info_shading_version{};
-    const char* gl_info_profile{};
-    int gl_info_n_texture_units = -1;
-
-    void render_tractor_beam(ShaderProgram& shader);
 };
