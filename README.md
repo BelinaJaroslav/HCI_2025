@@ -32,9 +32,11 @@ cd build
 The _constant quality video encoder_ can be run in an older version of the project, which can be found in [releases](https://github.com/BelinaJaroslav/HCI_2025/releases/tag/sidequest).
 
 ```bash
+mkdir sidequest
+cd sidequest
+
 wget "https://github.com/BelinaJaroslav/HCI_2025/releases/download/sidequest/constant_quality_video_encoder.zip"
 unzip constant_quality_video_encoder.zip
-cd constant_quality_video_encoder
 
 cmake --preset=vcpkg
 cmake --build build
@@ -52,9 +54,10 @@ cd build
 * The upper-right window contains FPS info and:
   * Collapsible OpenGL info
   * Collapsible "dev tools", where you can simulate number of detected faces, if you don't have a webcam or if the face detector does not work well for you (because of low resolution webcam, poor lighting conditions, etc.)
-  * _Note:_ It seems like the collapsible sections can't be opened while in fullscreen on Linux; on Windows it's ok.
 
 When zero faces are detected, a cow mysteriously appears. As soon as a face is detected again, the cow is taken care of. If the app detects more than one face, it switches to the "night mode".
+
+If the webcam is not connected, we use a fallback Nescafé® video.
 
 ### Constant quality video encoder description
 
@@ -94,7 +97,7 @@ Obsolete functionality used: GLUT, GL compatible profile
 
 ## Misc
 
-### AA performance comparison
+### Anti-aliasing performance comparison
 
 * Intel Core i7 6700HQ, 16 GB RAM, NVIDIA GeForce GTX 960M, Laptop battery, maximized window (almost 1080p):
   * without AA: 270 FPS
