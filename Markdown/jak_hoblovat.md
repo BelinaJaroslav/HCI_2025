@@ -47,7 +47,7 @@ Všechny větve, o kterých lokál ví, lze vypsat pomocí `git branch -v`.
     cd \HCI\vcpkg; .\bootstrap-vcpkg.bat
     ```
 
-    * Alternativně by šel přidat soubor `CMakeUserPresets.json` do .gitignore a každý by měl vlastní verzi souboru s vlastní cestou k vcpkg
+    * Alternativně by šel přidat soubor `CMakeUserPresets.json` do `.gitignore` a každý by měl vlastní verzi souboru s vlastní cestou k vcpkg
 
 * Potom:
   * Otevřít VS launcher
@@ -64,15 +64,3 @@ Přidat do PATH:
 ```text
 C:\HCI\opencv\build\x64\vc16\bin
 ```
-
-## Jak přidávat nové balíky
-
-* VS _Tools_ → _Command Line_ → _Developer PowerShell_
-
-```powershell
-$env:VCPKG_ROOT="C:\HCI\vcpkg"
-$env:PATH="$env:VCPKG_ROOT;$env:PATH"
-# vcpkg příkazy pro přidání balíků
-```
-
-Potom bude potřeba něco připsat do `CMakeLists.txt`

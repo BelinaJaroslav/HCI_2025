@@ -1,9 +1,8 @@
-# HCI_2025
+# HCI 2025
+
+Bělina, Mocek
 
 ## How to run on Linux with vcpkg
-
-* __TODO,__ don't fotget to:
-  * Test if it runs on Linux, including JPEG option
 
 ```bash
 sudo apt install libopencv-dev                  # System installation of OpenCV is required
@@ -17,9 +16,31 @@ cmake --build build
 ./build/HCI
 ```
 
-In the 3D app, the upper-left window contains all the keyboard controls. The upper-right window contains FPS info and collapsable OpenGL info. The lower-right window is the camera tracker.
+## App description
 
-The _constant quality video encoder_ can be run in a separate window. To turn it on, go to `./build/App/Resources/app_settings.json` and set `"webcam_encoder"` to `true` (default is `false`). Then you can use `Q`/`A` to increase/decrease the compression quality.
+### Main 3D app
+
+* The upper-left window contains all of the app controls. You can use the GUI or keyboard/mouse controls, which are listed directly in that window.
+* The lower-right window is the camera tracker.
+* The upper-right window contains FPS info and:
+  * Collapsible OpenGL info
+  * Collapsible "dev tools", where you can simulate number of detected faces, if you don't have a webcam or if the face detector does not work well for you (because of low resolution webcam, poor lighting conditions, etc.)
+  * _Note:_ It seems like the collapsible sections can't be opened while in fullscreen on Linux; on Windows it's ok.
+
+When zero faces are detected, a cow mysteriously appears. As soon as a face is detected again, the cow is taken care of. If the app detects more than one face, it switches to the "night mode".
+
+### Constant quality video encoder
+
+The _constant quality video encoder_ can be run in an older version of the project, which can be found in //TODO. To turn it on, go to `./build/App/Resources/app_settings.json` and set `"webcam_encoder"` to `true` (default is `false`). Then you can use <kbd>Q</kbd>/<kbd>A</kbd> to increase/decrease the compression quality.
+
+### Co kde
+
+* `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ..., logika přepínání mouselook/fullscreen/vsync/AA
+* `AppCallbacks.cpp` – callbacky
+* `AppGUI.cpp` – Dear ImGui
+* `AppInitAssets.cpp` – načtení shaderů, textur, modelů, zvuků
+* `AppRun.cpp` – hlavní smyčka: runtime logika a vykreslování
+* `Labs/Lab04Task02.cpp` – constant quality video encoder
 
 ## Tasks
 
@@ -30,13 +51,13 @@ The _constant quality video encoder_ can be run in a separate window. To turn it
 [√] multiple threads + synchronisation 
 [√] 3D GL Core profile + shaders version 4.6, enabled GL debug, used DSA (Direct State Access) 
 [√] high performance => at least 60 FPS
-[ ] allow VSync control, fullscreen vs. windowed switching (restore window position & size), screenshot, antialiasing toggle
+[√] allow VSync control, fullscreen vs. windowed switching (restore window position & size), screenshot, antialiasing toggle
 [√] simple GUI: display (at least) GL version, profile, FPS
-[ ] event processing: camera, object, app behaviour etc. controlled by mouse (both axes, wheel), keyboard, window resize, etc.
-[ ] multiple different independently moving 3D models, at least two loaded from file
+[√] event processing: camera, object, app behaviour etc. controlled by mouse (both axes, wheel), keyboard, window resize, etc.
+[√] multiple different independently moving 3D models, at least two loaded from file
 [√] free floating and first-person-view camera
 [√] at least three different textures (or subtextures from texture atlas etc.)
-[ ] 3D positional audio (multiple sources, background sound)
+[√] 3D positional audio (multiple sources, background sound)
 
 ## EXTRAS
 
@@ -55,14 +76,7 @@ Obsolete functionality used: GLUT, GL compatible profile
 
 ## Misc
 
-* `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ..., logika přepínání mouselook/fullscreen/vsync/AA
-* `AppCallbacks.cpp` – callbacky
-* `AppGUI.cpp` – Dear ImGui
-* `AppInitAssets.cpp` – načtení shaderů, textur, modelů, zvuků
-* `AppRun.cpp` – hlavní smyčka: runtime logika a vykreslování
-* `Labs\Lab04Task02.cpp` – constant quality video encoder
-
-<br>
+### AA performance comparison
 
 * Intel Core i7 6700HQ, 16 GB RAM, NVIDIA GeForce GTX 960M, Laptop battery, maximized window (almost 1080p):
   * without AA: 270 FPS
@@ -73,7 +87,7 @@ Obsolete functionality used: GLUT, GL compatible profile
   * with AAx4: 1600 FPS
   * with AAx16: 700 FPS
 
-<br>
+### Lab tasks
 
 * [Jak hoblovat](./Markdown/jak_hoblovat.md)
 * [Zadání 01](./Markdown/LAB01.md)
