@@ -1,4 +1,7 @@
-﻿// Non-OpenGL 3rd party libraries
+﻿// Cpp std
+#include <thread>
+
+// Non-OpenGL 3rd party libraries
 #include <fmt/core.h>
 
 // Our App
