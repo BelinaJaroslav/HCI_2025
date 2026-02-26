@@ -10,8 +10,8 @@
 
 #include <fmt/core.h>
 
-#include "DefinesAndMacros.hpp"
 #include "OBJLoader.hpp"
+#include "HeightmapConfig.hpp"
 
 
 void load_OBJ(const std::filesystem::path& file_name, std::vector<vertex>& mesh_vertices, std::vector<GLuint>& mesh_vertex_indices)

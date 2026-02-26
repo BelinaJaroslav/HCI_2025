@@ -3,14 +3,11 @@
 
 // Our App
 #include "App.hpp"
+#include "HeightmapConfig.hpp"
 
 
 void App::run()
 {
-	// Constant quality encoder service
-	std::jthread t_compression;
-	if (is_encoder_on) t_compression = std::jthread(&App::lab_compression_pool, this);
-
 	// Webcam service
 	std::jthread thread_webcam_service;
 	thread_webcam_service = std::jthread(&App::webcam_thread, this);
@@ -169,7 +166,6 @@ void App::run()
 
 	// closing graphics window -> app ends
 	do_terminate_worker_threads = true;
-	do_terminate_encoder_threads = true;
 }
 
 

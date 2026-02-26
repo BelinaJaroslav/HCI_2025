@@ -5,7 +5,8 @@
 #include <fmt/core.h>
 
 // Our App
-#include "App/App.hpp"
+#include "App.hpp"
+#include "HeightmapConfig.hpp"
 
 void App::init_assets()
 {

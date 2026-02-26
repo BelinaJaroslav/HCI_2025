@@ -4,21 +4,48 @@ Bělina, Mocek
 
 ## How to run on Linux with vcpkg
 
-```bash
-sudo apt install libopencv-dev                  # System installation of OpenCV is required
+### Prerequisites
 
-export VCPKG_ROOT=<path_to_bootstrapped_vcpkg>  # Everything else is shipped via vcpkg
+```bash
+# System installation of OpenCV is required
+sudo apt install libopencv-dev
+
+# Everything else is shipped via vcpkg, which is found using a environment variable
+export VCPKG_ROOT=<path_to_bootstrapped_vcpkg>
+```
+
+### Main 3D app
+
+```bash
+git clone https://github.com/BelinaJaroslav/HCI_2025
+cd HCI_2025
 
 cmake --preset=vcpkg
-
 cmake --build build
 
-./build/HCI
+cd build
+./HCI
+```
+
+### Constant quality video encoder
+
+The _constant quality video encoder_ can be run in an older version of the project, which can be found in [releases](https://github.com/BelinaJaroslav/HCI_2025/releases/tag/sidequest).
+
+```bash
+wget "https://github.com/BelinaJaroslav/HCI_2025/releases/download/sidequest/constant_quality_video_encoder.zip"
+unzip constant_quality_video_encoder.zip
+cd constant_quality_video_encoder
+
+cmake --preset=vcpkg
+cmake --build build
+
+cd build
+./HCI
 ```
 
 ## App description
 
-### Main 3D app
+### Main 3D app description
 
 * The upper-left window contains all of the app controls. You can use the GUI or keyboard/mouse controls, which are listed directly in that window.
 * The lower-right window is the camera tracker.
@@ -29,18 +56,9 @@ cmake --build build
 
 When zero faces are detected, a cow mysteriously appears. As soon as a face is detected again, the cow is taken care of. If the app detects more than one face, it switches to the "night mode".
 
-### Constant quality video encoder
+### Constant quality video encoder description
 
-The _constant quality video encoder_ can be run in an older version of the project, which can be found in //TODO. To turn it on, go to `./build/App/Resources/app_settings.json` and set `"webcam_encoder"` to `true` (default is `false`). Then you can use <kbd>Q</kbd>/<kbd>A</kbd> to increase/decrease the compression quality.
-
-### Co kde
-
-* `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ..., logika přepínání mouselook/fullscreen/vsync/AA
-* `AppCallbacks.cpp` – callbacky
-* `AppGUI.cpp` – Dear ImGui
-* `AppInitAssets.cpp` – načtení shaderů, textur, modelů, zvuků
-* `AppRun.cpp` – hlavní smyčka: runtime logika a vykreslování
-* `Labs/Lab04Task02.cpp` – constant quality video encoder
+You can use <kbd>Q</kbd>/<kbd>A</kbd> to increase/decrease the compression quality.
 
 ## Tasks
 
@@ -87,16 +105,10 @@ Obsolete functionality used: GLUT, GL compatible profile
   * with AAx4: 1600 FPS
   * with AAx16: 700 FPS
 
-### Lab tasks
+### Co kde
 
-* [Jak hoblovat](./Markdown/jak_hoblovat.md)
-* [Zadání 01](./Markdown/LAB01.md)
-* [Zadání 02](./Markdown/LAB02.md)
-* [Zadání 03](./Markdown/LAB03.md)
-* [Zadání 04 (JPEG video sidequest)](./Markdown/LAB04.md)
-* [Zadání 05 (OpenGL init)](./Markdown/LAB05.md)
-* [Zadání 06 (GUI)](./Markdown/LAB06.md)
-* [Zadání 07 (Shaders)](./Markdown/LAB07.md)
-* [Zadání 08 (Transformations)](./Markdown/LAB08.md)
-* [Zadání 09 (Textures)](./Markdown/LAB09.md)
-* [Zadání 10 (Audio)](./Markdown/LAB10.pdf)
+* `App.cpp` – init (kamera, JSON, OpenGL), konstruktor, destruktor, ..., logika přepínání mouselook/fullscreen/vsync/AA
+* `AppCallbacks.cpp` – callbacky
+* `AppGUI.cpp` – Dear ImGui
+* `AppInitAssets.cpp` – načtení shaderů, textur, modelů, zvuků
+* `AppRun.cpp` – hlavní smyčka: runtime logika a vykreslování

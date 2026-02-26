@@ -30,7 +30,6 @@
 
 App::App()
     : do_terminate_worker_threads(false)
-    , do_terminate_encoder_threads(false)
 {}
 
 
@@ -52,9 +51,9 @@ bool App::init()
         return false;
     }
 
-    webcamp_width = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH));
-    webcamp_height = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT));
-    fmt::println("Initialized capture device. Width: {}, Height: {}", webcamp_width, webcamp_height);
+    webcam_width = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH));
+    webcam_height = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT));
+    fmt::println("Initialized capture device. Width: {}, Height: {}", webcam_width, webcam_height);
 
     // Read one frame; we need it because when we change texture (webcamp footage in imgui) size and data format MUST match; so this will be set as initial texture
     capture.read(initial_frame);
@@ -66,7 +65,7 @@ bool App::init()
     fmt::println("Initialized face detector.");
     
     // Load JSON config
-    std::ifstream settings_file("App/Resources/app_settings.json");
+    std::ifstream settings_file("./App/Resources/app_settings.json");
     nlohmann::json settings = nlohmann::json::parse(settings_file);
     
     // - Default values
@@ -76,7 +75,6 @@ bool App::init()
     is_vsync_on = true;
     is_mouselook_on = false;
     is_antialiasing_on = true;
-    is_encoder_on = false;
     FOV = 110.0f;
 
     if (settings["app_name"].is_string()) {
@@ -98,9 +96,6 @@ bool App::init()
     }
     if (settings["antialiasing"].is_boolean()) {
         is_antialiasing_on = settings["antialiasing"].template get<bool>();
-    }
-    if (settings["webcam_encoder"].is_boolean()) {
-        is_encoder_on = settings["webcam_encoder"].template get<bool>();
     }
     if (settings["FOV"].is_number_integer()) {
         FOV = static_cast<float>(settings["FOV"].template get<int>());

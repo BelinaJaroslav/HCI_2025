@@ -26,7 +26,6 @@
 #include "AudioManager.hpp"
 #include "Camera.hpp"
 #include "CV2Tools.hpp"
-#include "DefinesAndMacros.hpp"
 #include "FaceDetector.hpp"
 #include "FPSMeter.hpp"
 #include "Model.hpp"
@@ -91,12 +90,11 @@ private:
     AudioManager audio_manager;
 
     std::atomic<bool> do_terminate_worker_threads;
-    std::atomic<bool> do_terminate_encoder_threads;
 
     int n_faces_found = 0;
     int n_faces_found_debug_override = -1; // Development help (-1=off, 0=force0, 1=force1, 2=force2)
-    int webcamp_width = 0;
-    int webcamp_height = 0;
+    int webcam_width = 0;
+    int webcam_height = 0;
     cv::Mat initial_frame;
     bool is_unlocked = true; // We refer to the state when there are more than 1 faces detected as "locked"; so "unlocked" is the normal state
 
@@ -117,7 +115,6 @@ private:
     bool is_flashlight_on = true;
     bool is_mouselook_on{};
     bool is_antialiasing_on{};
-    bool is_encoder_on{};
 
     double last_mouse_x = 0.0f;
     double last_mouse_y = 0.0f;
@@ -177,7 +174,6 @@ private:
     
     // Webcam service
     void webcam_thread();
-
     void save_screenshot();
 
     // Store OpenGL info
@@ -189,28 +185,4 @@ private:
     int gl_info_n_texture_units = -1;
 
     void render_tractor_beam(ShaderProgram& shader);
-
-    // Faster compile time: These old Labs don't have to be re-compiled everytime we change anything in App.hpp or any of its imports
-#ifndef SKIP_LABS_COMPILATION
-    // Lab 01
-    void lab_identify_object_by_luminance() const;
-    void lab_find_red_object_in_image() const;
-    void lab_find_red_object_in_video();
-    void lab_find_face_in_video();    
-    // Lab 02
-    void lab_complex_behaviour();    
-    // Lab 03
-    void lab_multithread();    
-    void tracker_thread();
-    void render_thread();
-    // Lab 04
-    int lab_compression(); 
-    std::vector<uchar> lossy_bw_limit(cv::Mat& input_img, size_t size_limit);
-    std::vector<uchar> lossy_quality_limit(const cv::Mat& frame, const float target_coefficient);
-#endif // !SKIP_LABS_COMPILATION
-
-    // "constant quality video encoder" is part of the final assignment
-    void grabber_thread();
-    void process_frame(const cv::Mat& original, int id, int threshold, int quality, SyncedDeque<ProcessedFrame>& result_queue);
-    int lab_compression_pool();
 };
